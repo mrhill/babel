@@ -47,6 +47,18 @@ void testerr(void)
     bbLog( bbMsg, bbT("Last error: %d"), bbErrGet());
 }
 
+void testtypes()
+{
+    if ((sizeof(bbU8)!=1)||(sizeof(bbS8)!=1))
+        bbLog(bbErr, bbT("sizeof(bbU8)!=1\n"));
+    if ((sizeof(bbU16)!=2)||(sizeof(bbS16)!=2))
+        bbLog(bbErr, bbT("sizeof(bbU16)!=2\n"));
+    if ((sizeof(bbU32)!=4)||(sizeof(bbS32)!=4))
+        bbLog(bbErr, bbT("sizeof(bbU32)!=4\n"));
+    if ((sizeof(bbU64)!=8)||(sizeof(bbS64)!=8))
+        bbLog(bbErr, bbT("sizeof(bbU64)!=8\n"));
+}
+
 void teststr(void)
 {
     bbCHAR tmp[100];
@@ -219,6 +231,8 @@ int main(int argc, char** argv)
     bbLog( bbMsg, bbT("Signed wchar_t: %s\n"), (iwc>0)?bbT("no"):bbT("yes"));
     bbLog( bbMsg, bbT("Signed char: %s\n"), (ic>0)?bbT("no"):bbT("yes"));
 
+    bbPrintf( bbT("testtypes-----------------\n")); 
+    testtypes();
     bbPrintf( bbT("testfile------------------\n")); 
     testfile();
     bbPrintf( bbT("testlog-------------------\n")); 
