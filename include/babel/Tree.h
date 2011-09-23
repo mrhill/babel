@@ -29,14 +29,14 @@ protected:
         return (bbTreeNode*)((bbU8*)mpNodes + idx * mNodeSize);
     }
 
+    bbU32 LinkNode(bbU32 idx);
+
     /** Allocate a new node.
         The allocated node struct will be unitialized.
         This function invalidates any node pointers, because it may reallocate the mpNodes[] array.
         @return Index into mpNodes[], or (bbU32)-1 on error
     */
     bbU32 NewNode();
-
-    bbU32 LinkNode(bbU32 idx);
 
 public:
     bbTree(bbUINT const datasize, bbUINT const leveloffs, bbUINT const indexenlarge = 32);

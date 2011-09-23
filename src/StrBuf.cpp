@@ -152,7 +152,7 @@ bbCHAR* bbStrBuf::Cat(const char* pStr)
 }
 #endif
 
-bbStrBuf& bbStrBuf::operator+=(const bbCHARCP cp)
+bbStrBuf& bbStrBuf::operator+=(bbCHARCP cp)
 {
     bbUINT str_len = bbCP_LENGTH(cp);
     bbCHAR* pStr = Ensure(str_len);

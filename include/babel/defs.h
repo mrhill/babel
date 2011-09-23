@@ -298,7 +298,7 @@ typedef unsigned int   bbUINT;
 
 typedef unsigned char  bbU8;
 typedef unsigned short bbU16;
-#if bbSIZEOF_INT==4
+#if bbSIZEOF_INT==4 && !defined(_MSC_VER)
 typedef unsigned int   bbU32;
 typedef signed int     bbS32;
 #else

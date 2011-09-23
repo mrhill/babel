@@ -101,7 +101,7 @@ public:
     inline bbStrBuf& operator+=(const char* pStr) { Cat(pStr); return *this; }
     #endif
 
-    bbStrBuf& operator+=(const bbCHARCP cp);
+    bbStrBuf& operator+=(bbCHARCP cp);
 
     bbCHAR* PrintHex(const bbU8* pData, bbUINT size);
 };
