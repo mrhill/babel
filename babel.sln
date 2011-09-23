@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "babel", "babel.vcproj", "{24DA9D8C-E2ED-4100-B0D2-EE93643092E8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "babeltest", "test\babeltest\babeltest.vcproj", "{100B5D34-D2DC-4EED-B8BA-C376AB9EAF39}"
+	ProjectSection(ProjectDependencies) = postProject
+		{24DA9D8C-E2ED-4100-B0D2-EE93643092E8} = {24DA9D8C-E2ED-4100-B0D2-EE93643092E8}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24DA9D8C-E2ED-4100-B0D2-EE93643092E8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{24DA9D8C-E2ED-4100-B0D2-EE93643092E8}.Debug|Win32.Build.0 = Debug|Win32
+		{24DA9D8C-E2ED-4100-B0D2-EE93643092E8}.Release|Win32.ActiveCfg = Release|Win32
+		{24DA9D8C-E2ED-4100-B0D2-EE93643092E8}.Release|Win32.Build.0 = Release|Win32
+		{100B5D34-D2DC-4EED-B8BA-C376AB9EAF39}.Debug|Win32.ActiveCfg = Debug|Win32
+		{100B5D34-D2DC-4EED-B8BA-C376AB9EAF39}.Debug|Win32.Build.0 = Debug|Win32
+		{100B5D34-D2DC-4EED-B8BA-C376AB9EAF39}.Release|Win32.ActiveCfg = Release|Win32
+		{100B5D34-D2DC-4EED-B8BA-C376AB9EAF39}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
