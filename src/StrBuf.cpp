@@ -91,13 +91,15 @@ bbCHAR* bbStrBuf::Ensure(bbUINT str_len)
     return mpStr + mLen;
 }
 
-void bbStrBuf::Attach(bbCHAR* const pStr, bbUINT len)
+void bbStrBuf::Attach(bbCHAR* const pStr, bbUINT capacity, int len)
 {
     Clear();
+
     if (pStr)
     {
         mpStr = pStr;
-        mLen = mCapacity = len;
+        mCapacity = capacity;
+        mLen = len<0 ? bbStrLen(pStr) : len;
     }
 }
 

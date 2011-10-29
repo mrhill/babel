@@ -41,7 +41,12 @@ public:
 
     ~bbStrBuf() { Clear(); }
 
-    void Attach(bbCHAR* const pStr, bbUINT len);
+    /** Attach heap buffer to string, replacing any existing string.
+        @param pStr Heap buffer containing 0-terminated string
+        @param capacity Size of heap buffer in number of characters
+        @param len String length without 0-terminator, can be -1 to detect string length
+    */
+    void Attach(bbCHAR* const pStr, bbUINT capacity, int len);
 
     /** Detach string and clear buffer object.
         The string object will be cleared regardless of success or failure.
