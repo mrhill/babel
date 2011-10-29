@@ -7,6 +7,8 @@
 
 #include <locale.h>
 
+extern int testStrBuf();
+
 static bbLOGHANDLER g_old_loghandler;
 
 void TestLogHandler(bbLOGLEVEL const loglevel, const bbCHAR* pMsg)
@@ -190,7 +192,7 @@ void testunicode(void)
 
     static bbCHAR* blocknames[] = { bbCPGUNICODE_BLOCKNAMES } ;
 
-    for (i=0; i<sizeof(cps)/sizeof(bbCHARCP); i++)
+    for (i=0; i < bbARRSIZE(cps); i++)
     {
         cp = cps[i];
         block = bbCpgUnicode_GetBlock(cp);
@@ -198,11 +200,12 @@ void testunicode(void)
         bbLog(bbMsg, (block!=(bbUINT)-1) ? blocknames[block] : bbT(""));
     }
 
-    for (i=0; i<sizeof(ranges)/sizeof(bbUINT); i++)    
+    for (i=0; i < bbARRSIZE(ranges); i++)    
     {
+        bbCHAR* pName = blocknames[ranges[i]];
         cp = bbCpgUnicode_GetBlockRange(ranges[i], &size);
         bbPrintf(bbT("%d -> 0x%X:%d "), ranges[i], cp, size);
-        bbLog(bbMsg, blocknames[ranges[i]]);
+        bbLog(bbMsg, pName ? pName : bbT("<unknown>"));
     }
 }
 
@@ -251,6 +254,8 @@ int main(int argc, char** argv)
     testdir();
     bbPrintf( bbT("testunicode---------------\n")); 
     testunicode();
+    bbPrintf( bbT("testStrBuf----------------\n")); 
+    testStrBuf();
 
     return 0;
 }

@@ -13,6 +13,8 @@ class bbStrBuf
     bbUINT  mCapacity;
     bbCHAR  mBuf[bbSTRBUF_MINSIZE];
 
+    int VPrintf(const bbCHAR* pFmt, bbVALIST args);
+
 public:
     /** Construct 0 length and 0-terminated string.
         Always succeeds.
@@ -104,6 +106,11 @@ public:
     bbStrBuf& operator+=(bbCHARCP cp);
 
     bbCHAR* PrintHex(const bbU8* pData, bbUINT size);
+
+    /** Print formatted string.
+        Existing string contents will be overwritten.
+    */
+    int Printf(const bbCHAR*, ...);
 };
 
 #endif /* bbSTRBUF_H_ */

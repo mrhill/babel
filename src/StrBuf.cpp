@@ -182,3 +182,39 @@ bbCHAR* bbStrBuf::PrintHex(const bbU8* pData, bbUINT size)
     return pInsert;
 }
 
+int bbStrBuf::VPrintf(const bbCHAR* pFmt, bbVALIST args)
+{
+    int size;
+    bool retried = false;
+
+    Clear();
+    for(;;)
+    {
+        size = bbVsnprintf(mpStr, mCapacity, pFmt, args);
+        if (!retried && (size<0 || size>=(int)mCapacity))
+        {
+            *mpStr = 0;
+            mLen = 0;
+            if (!Ensure((mCapacity<<2)-1))
+                return -1;
+            retried = true;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    return size;
+}
+
+int bbStrBuf::Printf(const bbCHAR* pFmt, ...)
+{
+    bbVALIST args;
+    bbVASTART(args, pFmt);
+    int ret = VPrintf(pFmt, args);
+    bbVAEND(args);
+    return ret;
+}
+
+
