@@ -116,6 +116,23 @@ bbCHAR* bbStrBuf::Detach()
     return pStr;
 }
 
+bbCHAR* bbStrBuf::Assign(const bbCHAR* const pStr)
+{
+    Clear();
+    bbCHAR* pInsert = mpStr;
+    if (pStr)
+    {
+        bbUINT str_len = bbStrLen(pStr);
+        bbCHAR* pInsert = Ensure(str_len);
+        if (pInsert)
+        {
+            mLen+=str_len;
+            bbStrCpy(pInsert, pStr);
+        }
+    }
+    return pInsert;
+}
+
 bbCHAR* bbStrBuf::Cat(const bbCHAR* const pStr)
 {
     bbCHAR* pInsert = mpStr + mLen;

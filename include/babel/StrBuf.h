@@ -70,6 +70,12 @@ public:
     /** @internal */
     inline void AddSize(bbUINT const increase) { mLen+=increase; }
 
+    /** Assign string buffer by copying from referenced string.
+        Guaranted to succeed, if referenced string is less than bbSTRBUF_MINSIZE characters.
+        @param pStr 0-terminated string to copy, can be NULL to produce an empty string.
+    */
+    bbCHAR* Assign(const bbCHAR* const pStr);
+
     /** Assign string buffer by copying at most \a len chacters from referenced string.
         If the source string is less than \a len characters, it will be copied only
         until its 0-terminator. At any case the buffer capacity will be set to hold \a len characters.
@@ -92,6 +98,8 @@ public:
     */
     bbCHAR* Cat(const char* pStr);
     #endif
+
+    inline bbStrBuf& operator=(const bbCHAR* const pStr) { Assign(pStr); return *this; }
 
     /** Concatenate string to end of buffer.
         Will do nothing on failure.
