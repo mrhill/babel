@@ -185,19 +185,19 @@ bbCHAR* bbStrBuf::PrintHex(const bbU8* pData, bbUINT size)
 int bbStrBuf::VPrintf(const bbCHAR* pFmt, bbVALIST args)
 {
     int size;
-    bool retried = false;
+    int retried = 0;
 
     Clear();
     for(;;)
     {
         size = bbVsnprintf(mpStr, mCapacity, pFmt, args);
-        if (!retried && (size<0 || size>=(int)mCapacity))
+        if ((size<0 || size>=(int)mCapacity) && (retried<4))
         {
             *mpStr = 0;
             mLen = 0;
             if (!Ensure((mCapacity<<2)-1))
                 return -1;
-            retried = true;
+            retried++;
         }
         else
         {
