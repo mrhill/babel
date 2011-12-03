@@ -20,6 +20,7 @@
     inline T *       Detach() { return (T*)bbArr_Detach(this); }\
     inline bbUINT    GetSize() const { return mSize; }\
     inline bbERR     SetSize(const bbUINT size) { return bbArr_SetSize##elsize (this, size); }\
+    inline bbERR     CopyFrom(const name##Rec* pFrom) { return bbArr_CopyFrom##elsize(this, (void*)pFrom); }\
     inline T *       Grow(const int relsize) { return (T*)bbArr_Grow##elsize (this, relsize); }\
     inline T *       Append(T const item) { T* p=Grow(1); if(p) *p=item; return p; }\
     inline void      Del(const bbUINT index) { bbMemMove(mpData+index, mpData+index+1, (mSize-index-1)*elsize); Grow(-1); }\
@@ -123,6 +124,14 @@ void* bbArr_Grow12(void* const p, const int relsize);
 void* bbArr_Grow16(void* const p, const int relsize);
 void* bbArr_Grow24(void* const p, const int relsize);
 void* bbArr_Grow48(void* const p, const int relsize);
+bbERR bbArr_CopyFrom1(void* const p, void* const pFrom);
+bbERR bbArr_CopyFrom2(void* const p, void* const pFrom);
+bbERR bbArr_CopyFrom4(void* const p, void* const pFrom);
+bbERR bbArr_CopyFrom8(void* const p, void* const pFrom);
+bbERR bbArr_CopyFrom12(void* const p, void* const pFrom);
+bbERR bbArr_CopyFrom16(void* const p, void* const pFrom);
+bbERR bbArr_CopyFrom24(void* const p, void* const pFrom);
+bbERR bbArr_CopyFrom48(void* const p, void* const pFrom);
 bbERR bbArrObj_SetSize(void* const p, const bbUINT size);
 bbERR bbArrArr_SetSize(void* const p, const bbUINT size);
 void  bbArrArr_Clear(void* const p);

@@ -63,6 +63,17 @@ template<unsigned int N> static void* bbArr_Grow(void* const p, const int relsiz
     return (bbU8*)((struct bbsArrBase*)p)->mpData + oldSize * N;
 }
 
+template<unsigned int N> static bbERR bbArr_CopyFrom(void* const p, void* const pFrom)
+{
+    bbUINT const size = ((bbsArrBase*)pFrom)->mSize;
+
+    if (bbEOK != bbArr_SetSize<N>(p, size))
+        return bbELAST;
+
+    bbMemMove(((bbsArrBase*)p)->mpData, ((bbsArrBase*)pFrom)->mpData, size*N);
+    return bbEOK;
+}
+
 bbERR bbArr_SetSize1(void* const p, const bbUINT size) { return bbArr_SetSize<1>(p, size); }
 bbERR bbArr_SetSize2(void* const p, const bbUINT size) { return bbArr_SetSize<2>(p, size); }
 bbERR bbArr_SetSize4(void* const p, const bbUINT size) { return bbArr_SetSize<4>(p, size); }
@@ -80,6 +91,15 @@ void* bbArr_Grow12(void* const p, const int relsize) { return bbArr_Grow<12>(p, 
 void* bbArr_Grow16(void* const p, const int relsize) { return bbArr_Grow<16>(p, relsize); }
 void* bbArr_Grow24(void* const p, const int relsize) { return bbArr_Grow<24>(p, relsize); }
 void* bbArr_Grow48(void* const p, const int relsize) { return bbArr_Grow<48>(p, relsize); }
+
+bbERR bbArr_CopyFrom1(void* const p, void* const pFrom) { return bbArr_CopyFrom<1>(p, pFrom);}
+bbERR bbArr_CopyFrom2(void* const p, void* const pFrom) { return bbArr_CopyFrom<2>(p, pFrom);}
+bbERR bbArr_CopyFrom4(void* const p, void* const pFrom) { return bbArr_CopyFrom<4>(p, pFrom);}
+bbERR bbArr_CopyFrom8(void* const p, void* const pFrom) { return bbArr_CopyFrom<8>(p, pFrom);}
+bbERR bbArr_CopyFrom12(void* const p, void* const pFrom) { return bbArr_CopyFrom<12>(p, pFrom);}
+bbERR bbArr_CopyFrom16(void* const p, void* const pFrom) { return bbArr_CopyFrom<16>(p, pFrom);}
+bbERR bbArr_CopyFrom24(void* const p, void* const pFrom) { return bbArr_CopyFrom<24>(p, pFrom);}
+bbERR bbArr_CopyFrom48(void* const p, void* const pFrom) { return bbArr_CopyFrom<48>(p, pFrom);}
 
 template<unsigned int N> static bbERR bbVec_SetCapacity(void* const p, const bbUINT size)
 {
