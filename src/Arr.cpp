@@ -133,8 +133,12 @@ template<unsigned int N> static bbERR bbVec_CopyFrom(void* const p, void* const 
     return bbEOK;
 }
 
+bbERR bbVec_SetCapacity1(void* const p, const bbUINT size) { return bbVec_SetCapacity<1>(p, size); }
+bbERR bbVec_SetCapacity2(void* const p, const bbUINT size) { return bbVec_SetCapacity<2>(p, size); }
 bbERR bbVec_SetCapacity4(void* const p, const bbUINT size) { return bbVec_SetCapacity<4>(p, size); }
 bbERR bbVec_SetCapacity8(void* const p, const bbUINT size) { return bbVec_SetCapacity<8>(p, size); }
+bbERR bbVec_CopyFrom1(void* const p, void* const pFrom) { return bbVec_CopyFrom<1>(p, pFrom); }
+bbERR bbVec_CopyFrom2(void* const p, void* const pFrom) { return bbVec_CopyFrom<2>(p, pFrom); }
 bbERR bbVec_CopyFrom4(void* const p, void* const pFrom) { return bbVec_CopyFrom<4>(p, pFrom); }
 bbERR bbVec_CopyFrom8(void* const p, void* const pFrom) { return bbVec_CopyFrom<8>(p, pFrom); }
 

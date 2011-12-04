@@ -435,11 +435,11 @@ typedef struct bbENCSTATE bbENCSTATE;
 /** Load little endian bbU16 (16 bit) from unaligned address */
 #define bbLD16LE(adr) ((bbU32)*((bbU8*)(adr))|((bbU32)*(((bbU8*)(adr))+1)<<8))
 /** Store bbU32 (32 bit) to unaligned address, stores in little endian order */
-#define bbST32LE(adr,w) *(bbU8*)(adr)=(bbU8)(w);*((bbU8*)(adr)+1)=(bbU8)((w)>>8);*((bbU8*)(adr)+2)=(bbU8)((w)>>16);*((bbU8*)(adr)+3)=(bbU8)((w)>>24);
+#define bbST32LE(adr,w) *(bbU8*)(adr)=(bbU8)(w),*((bbU8*)(adr)+1)=(bbU8)((w)>>8),*((bbU8*)(adr)+2)=(bbU8)((w)>>16),*((bbU8*)(adr)+3)=(bbU8)((w)>>24)
 /** Store 24 bit word (low 24 bit of a bbU32) to unaligned address, stores in little endian order */
-#define bbST24LE(adr,w) *(bbU8*)(adr)=(bbU8)(w);*((bbU8*)(adr)+1)=(bbU8)((w)>>8);*((bbU8*)(adr)+2)=(bbU8)((w)>>16);
+#define bbST24LE(adr,w) *(bbU8*)(adr)=(bbU8)(w),*((bbU8*)(adr)+1)=(bbU8)((w)>>8),*((bbU8*)(adr)+2)=(bbU8)((w)>>16)
 /** Store bbU16 (16 bit) to unaligned address, stores in little endian order */
-#define bbST16LE(adr,w) *(bbU8*)(adr)=(bbU8)(w);*((bbU8*)(adr)+1)=(bbU8)((w)>>8);
+#define bbST16LE(adr,w) *(bbU8*)(adr)=(bbU8)(w),*((bbU8*)(adr)+1)=(bbU8)((w)>>8)
 /** Load little endian bbS16 (16 bit) from unaligned address and sign-extend */
 #define bbLDS16LE(adr) (bbS32)((bbU32)*((bbU8*)(adr))|((bbS32)*(((bbS8*)(adr))+1)<<8))
 /** Load little endian 24 bit word (low 24 bit of a bbU32) from unaligned address and sign-extend */
@@ -448,9 +448,9 @@ typedef struct bbENCSTATE bbENCSTATE;
 #define bbLD32LE(adr) (*(const bbU32*)(adr))
 #define bbLD24LE(adr) ((bbU32)*((bbU16*)(adr))|((bbU32)*(((bbU8*)(adr))+2)<<16))
 #define bbLD16LE(adr) ((bbU32)*(const bbU16*)(adr))
-#define bbST32LE(adr,w) *(bbU32*)(adr)=(bbU32)(w);
-#define bbST24LE(adr,w) *(bbU16*)(adr)=(bbU16)(w);*((bbU8*)(adr)+2)=(bbU8)((w)>>16);
-#define bbST16LE(adr,w) *(bbU16*)(adr)=(bbU16)(w);
+#define bbST32LE(adr,w) *(bbU32*)(adr)=(bbU32)(w)
+#define bbST24LE(adr,w) *(bbU16*)(adr)=(bbU16)(w),*((bbU8*)(adr)+2)=(bbU8)((w)>>16)
+#define bbST16LE(adr,w) *(bbU16*)(adr)=(bbU16)(w)
 #define bbLDS16LE(adr) ((bbS32)*((bbS16*)(adr)))
 #define bbLDS24LE(adr) (bbS32)((bbU32)*(const bbU16*)(adr)|((bbS32)*(((bbS8*)(adr))+2)<<16))
 #endif
@@ -463,11 +463,11 @@ typedef struct bbENCSTATE bbENCSTATE;
 /** Load big endian bbU16 (16 bit) from unaligned address */
 #define bbLD16BE(adr) ((((bbU32)*(bbU8*)(adr))<<8)|(bbU32)*((bbU8*)(adr)+1))
 /** Store bbU32 (32 bit) to unaligned address, stores in big endian order */
-#define bbST32BE(adr,w) *(bbU8*)(adr)=(bbU8)((w)>>24);*((bbU8*)(adr)+1)=(bbU8)((w)>>16);*((bbU8*)(adr)+2)=(bbU8)((w)>>8); *((bbU8*)(adr)+3)=(bbU8)(w);
+#define bbST32BE(adr,w) *(bbU8*)(adr)=(bbU8)((w)>>24),*((bbU8*)(adr)+1)=(bbU8)((w)>>16),*((bbU8*)(adr)+2)=(bbU8)((w)>>8), *((bbU8*)(adr)+3)=(bbU8)(w)
 /** Store 24 bit word (low 24 bit of a bbU32) to unaligned address, stores in big endian order */
-#define bbST24BE(adr,w) *(bbU8*)(adr)=(bbU8)((w)>>16);*((bbU8*)(adr)+1)=(bbU8)((w)>>8);*((bbU8*)(adr)+2)=(bbU8)(w);
+#define bbST24BE(adr,w) *(bbU8*)(adr)=(bbU8)((w)>>16),*((bbU8*)(adr)+1)=(bbU8)((w)>>8),*((bbU8*)(adr)+2)=(bbU8)(w)
 /** Store bbU16 (16 bit) to unaligned address, stores in big endian order */
-#define bbST16BE(adr,w) *(bbU8*)(adr)=(bbU8)((w)>>8);*((bbU8*)(adr)+1)=(bbU8)(w);
+#define bbST16BE(adr,w) *(bbU8*)(adr)=(bbU8)((w)>>8),*((bbU8*)(adr)+1)=(bbU8)(w)
 /** Load big endian 24 bit word (low 24 bit of a bbU32) from unaligned address and sign-extend */
 #define bbLDS24BE(adr) (bbS32)((((bbS32)*(bbS8*)(adr))<<16)|(((bbU32)*((bbU8*)(adr)+1))<<8)|((bbU32)*((bbU8*)(adr)+2)))
 /** Load big endian bbS16 (16 bit) from unaligned address and sign-extend */
@@ -511,9 +511,9 @@ typedef struct bbENCSTATE bbENCSTATE;
 
 /** Store bbU32 (32 bit) to aligned address, stores in little endian order */
 #if bbCPUE==bbCPUE_LE
-#define bbSTA32LE(adr,w) *(bbU32*)(adr)=(bbU32)(w);
+#define bbSTA32LE(adr,w) *(bbU32*)(adr)=(bbU32)(w)
 #else
-#define bbSTA32LE(adr,w) *(bbU8*)(adr)=(bbU8)(w);*((bbU8*)(adr)+1)=(bbU8)((w)>>8);*((bbU8*)(adr)+2)=(bbU8)((w)>>16);*((bbU8*)(adr)+3)=(bbU8)((w)>>24);
+#define bbSTA32LE(adr,w) *(bbU8*)(adr)=(bbU8)(w),*((bbU8*)(adr)+1)=(bbU8)((w)>>8),*((bbU8*)(adr)+2)=(bbU8)((w)>>16),*((bbU8*)(adr)+3)=(bbU8)((w)>>24)
 #endif
 
 /** Load little endian bbU16 (16 bit) from aligned address */

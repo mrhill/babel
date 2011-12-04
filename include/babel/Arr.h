@@ -136,8 +136,12 @@ bbERR bbArrObj_SetSize(void* const p, const bbUINT size);
 bbERR bbArrArr_SetSize(void* const p, const bbUINT size);
 void  bbArrArr_Clear(void* const p);
 
+bbERR bbVec_SetCapacity1(void* const p, const bbUINT size);
+bbERR bbVec_SetCapacity2(void* const p, const bbUINT size);
 bbERR bbVec_SetCapacity4(void* const p, const bbUINT size);
 bbERR bbVec_SetCapacity8(void* const p, const bbUINT size);
+bbERR bbVec_CopyFrom1(void* const p, void* const pFrom);
+bbERR bbVec_CopyFrom2(void* const p, void* const pFrom);
 bbERR bbVec_CopyFrom4(void* const p, void* const pFrom);
 bbERR bbVec_CopyFrom8(void* const p, void* const pFrom);
 
@@ -173,6 +177,8 @@ bbDECLAREARR(bbCHAR, bbArrCHAR, 4);
 #else
 #error Cannot detect sizeof(bbCHAR)
 #endif
+
+bbDECLAREVEC(bbU8, bbVecU8, 1);
 
 /** Array of strings.
     This class maintains an array of 0-terminated strings,
