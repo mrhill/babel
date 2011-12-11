@@ -224,7 +224,32 @@ int bbStrBuf::VPrintf(const bbCHAR* pFmt, bbVALIST args)
         }
     }
 
+    mLen = size;
     return size;
+}
+
+int bbStrBuf::VCatf(const bbCHAR* pFmt, bbVALIST args)
+{
+    int size;
+    int retried = 0;
+
+    for(;;)
+    {
+        size = bbVsnprintf(mpStr+mLen, mCapacity-mLen, pFmt, args);
+        if ((size<0 || size>=(int)(mCapacity-mLen)) && (retried<4))
+        {
+            if (!Ensure((mCapacity<<2)-1))
+                return -1;
+            retried++;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    mLen += size;
+    return mLen;
 }
 
 int bbStrBuf::Printf(const bbCHAR* pFmt, ...)
@@ -236,4 +261,17 @@ int bbStrBuf::Printf(const bbCHAR* pFmt, ...)
     return ret;
 }
 
+int bbStrBuf::Catf(const bbCHAR* pFmt, ...)
+{
+    bbVALIST args;
+    bbVASTART(args, pFmt);
+    int ret = VCatf(pFmt, args);
+    bbVAEND(args);
+    return ret;
+}
+
+int bbStrBuf::CatN(bbU64 n)
+{
+    return Catf(bbT("%I64u"), n);
+}
 

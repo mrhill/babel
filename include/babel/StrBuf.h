@@ -14,6 +14,7 @@ class bbStrBuf
     bbCHAR  mBuf[bbSTRBUF_MINSIZE];
 
     int VPrintf(const bbCHAR* pFmt, bbVALIST args);
+    int VCatf(const bbCHAR* pFmt, bbVALIST args);
 
 public:
     /** Construct 0 length and 0-terminated string.
@@ -69,6 +70,7 @@ public:
     inline bbCHAR* GetPtr() { return mpStr; }
 
     inline bbUINT GetLen() const { return mLen; }
+    inline bool empty() const { return mLen==0; }
 
     inline bbUINT GetCapacity() const { return mCapacity; }
 
@@ -112,18 +114,30 @@ public:
     */
     inline bbStrBuf& operator+=(const bbCHAR* const pStr) { Cat(pStr); return *this; }
 
+    bbStrBuf& operator+=(bbCHARCP cp);
+
     #if bbSIZEOF_CHAR != 1
     inline bbStrBuf& operator+=(const char* pStr) { Cat(pStr); return *this; }
+    inline bbStrBuf& operator+=(char cp) { return operator+=((bbCHARCP)cp); }
     #endif
-
-    bbStrBuf& operator+=(bbCHARCP cp);
 
     bbCHAR* PrintHex(const bbU8* pData, bbUINT size);
 
     /** Print formatted string.
         Existing string contents will be overwritten.
+        @return New length of string
     */
     int Printf(const bbCHAR*, ...);
+
+    /** Concatenate formatted string to end of buffer.
+        @return New length of complete string
+    */
+    int Catf(const bbCHAR*, ...);
+
+    /** Concatenate number as unsigned decimal. 
+        @return New length of complete string
+    */
+    int CatN(bbU64 n);
 };
 
 #endif /* bbSTRBUF_H_ */

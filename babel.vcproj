@@ -727,10 +727,6 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="babel.txt"
-			>
-		</File>
-		<File
 			RelativePath="Doxyfile"
 			>
 		</File>
