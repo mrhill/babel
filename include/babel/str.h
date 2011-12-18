@@ -408,7 +408,7 @@ typedef enum
 /** Parse number from string.
     The parser recognizes:
     - signed decimal integers, starting with 0-9 or -
-    - unsigned hexadecimal integers, staring with 0x, &, or $
+    - unsigned hexadecimal integers, starting with 0x, &, or $
     - unsigned binary integers, starting with % or b or B
 
     if #bbSTROPT_STOPONUKCHAR is set, parsing will stop on the first unknown
