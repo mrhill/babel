@@ -228,17 +228,27 @@ struct bbArrStrRec
         @param pStr 0-terminated string to append
         @return bbEOK on success, or value of #bbgErr on failure
     */
-    bbERR Add( const bbCHAR* const pStr);
+    bbERR Add(const bbCHAR* pStr);
 
-    /** Attach a string to end of list.
-        The string must be in a heap block, control will be passed over to bbArrStr.
+    /** Insert copy of string to given position in list.
+        The string will be copied to a new heap block, and 0-terminated.
         @param pStr 0-terminated string to append
+        @param idx Index to insert string at, can be -1 for end of list.
         @return bbEOK on success, or value of #bbgErr on failure
     */
-    bbERR Attach( bbCHAR* const pStr);
+    bbERR Insert(const bbCHAR* pStr, bbUINT idx);
 
-    inline bbCHAR* &       operator[](const bbUINT idx) { return mIndex[idx]; }
-    inline bbCHAR* const & operator[](const bbUINT idx) const { return mIndex[idx]; }
+    /** Attach a string to given position in list.
+        The string must be in a heap block, control will be passed over to bbArrStr.
+        @param pStr 0-terminated string to append
+        @param idx Index to insert string at, can be -1 for end of list.
+        @return bbEOK on success, or value of #bbgErr on failure
+    */
+    bbERR Attach(bbCHAR* pStr, bbUINT idx = (bbUINT)-1);
+
+    inline bbCHAR* operator[](bbUINT idx) { return mIndex[idx]; }
+    inline const bbCHAR* operator[](bbUINT idx) const { return mIndex[idx]; }
+
     bbERR CopyFrom(const bbArrStrRec* pFrom);
 };
 

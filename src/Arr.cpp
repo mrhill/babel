@@ -186,30 +186,40 @@ void bbArrStrRec::Clear()
     bbArrObj_SetSize(this, 0);
 }
 
-bbERR bbArrStrRec::Add( const bbCHAR* const pStr)
+bbERR bbArrStrRec::Add(const bbCHAR* pStr)
+{
+    return Insert(pStr, (bbUINT)-1);
+}
+
+bbERR bbArrStrRec::Insert(const bbCHAR* pStr, bbUINT idx)
 {
     bbCHAR* const pCopy = bbStrDup(pStr);
     if (!pCopy) 
         return bbELAST;
 
-    bbCHAR** pLast = mIndex.Grow(1);
-
-    if (!pLast)
+    if (bbEOK != Attach(pCopy, idx))
     {
         bbMemFree(pCopy);
-        return bbErrSet(bbENOMEM);
+        return bbELAST;
     }
-
-    *pLast = pCopy;
 
     return bbEOK;
 }
 
-bbERR bbArrStrRec::Attach(bbCHAR* const pStr)
+bbERR bbArrStrRec::Attach(bbCHAR* const pStr, bbUINT idx)
 {
+    if (idx > mIndex.mSize)
+        idx = mIndex.mSize;
+
+    bbU32 moveSize = mIndex.mSize - idx;
+
     if (!mIndex.Grow(1))
         return bbELAST;
-    *mIndex.GetPtrLast() = pStr;
+
+    if (moveSize)
+        bbMemMove(mIndex.GetPtr(idx+1), mIndex.GetPtr(idx), moveSize*mIndex.GetElementSize());
+
+    *mIndex.GetPtr(idx) = pStr;
     return bbEOK;
 }
 
