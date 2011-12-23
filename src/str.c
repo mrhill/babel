@@ -146,6 +146,12 @@ bbCHAR** bbStrSplit(const bbCHAR* pStr, bbU32 opt, bbUINT* const pCount)
     bbCHAR*  pWordEnd;
     const bbCHAR* pWordStart;
 
+    if (!pStr)
+    {
+        bbErrSet(bbEBADPARAM);
+        return NULL;
+    }
+
     //
     // Count sub-strings and source string len
     //
