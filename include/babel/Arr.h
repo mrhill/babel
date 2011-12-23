@@ -204,6 +204,8 @@ struct bbArrStrRec
     */
     inline bbCHAR* const* GetPtr() const { return mIndex.GetPtr(); }
 
+    inline bbCHAR** GetPtr(bbUINT idx) { return mIndex.GetPtr(idx); }
+
     /** Set array to given size.
         If the array is shrunken, memory for clipped objects is freed.
         If the array is enlarged, NULL pointers will be appended.
