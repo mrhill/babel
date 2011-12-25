@@ -537,6 +537,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\Registry.cpp"
+				>
+			</File>
+			<File
 				RelativePath="src\str.c"
 				>
 				<FileConfiguration
@@ -707,6 +711,10 @@
 			</File>
 			<File
 				RelativePath="include\babel\mem.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\babel\Registry.h"
 				>
 			</File>
 			<File
