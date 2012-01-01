@@ -121,6 +121,8 @@ public:
     inline bbStrBuf& operator+=(char cp) { return operator+=((bbCHARCP)cp); }
     #endif
 
+    bbCHAR operator[](int i) const { return mpStr[i]; }
+
     bbCHAR* PrintHex(const bbU8* pData, bbUINT size);
 
     /** Print formatted string.
