@@ -29,7 +29,7 @@ struct bbRegistry
 
     inline void* GetObj(int const id)
     {
-        return mEntries[id].pObj;
+        return (unsigned)id < GetSize() ? mEntries[id].pObj : NULL;
     }
 
     int NextID();
