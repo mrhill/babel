@@ -646,10 +646,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\babel\bbconfig.h"
-				>
-			</File>
-			<File
 				RelativePath="include\babel\bit.h"
 				>
 			</File>

@@ -4,10 +4,12 @@
 #include <babel/fixmath.h>
 #include <babel/timedate.h>
 #include <babel/dir.h>
-
 #include <locale.h>
 
-extern int testStrBuf();
+#if !defined(_MSC_VER)
+extern "C"
+#endif
+int testStrBuf();
 
 static bbLOGHANDLER g_old_loghandler;
 

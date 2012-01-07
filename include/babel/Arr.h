@@ -148,10 +148,8 @@ bbERR bbVec_CopyFrom8(void* const p, void* const pFrom);
 bbDECLAREARR(bbU8, bbArrU8, 1);
 bbDECLAREARR(bbU16, bbArrU16, 2);
 bbDECLAREARR(bbU32, bbArrU32, 4);
-#if bbUSE_LONGLONG==1
 bbDECLAREARR(bbU64, bbArrU64, 8);
 bbDECLAREVEC(bbU64, bbVecU64, 8);
-#endif
 bbDECLAREARR(double, bbArrF64, 8);
 bbDECLAREARRPTR(bbU8*, bbArrPU8);
 bbDECLAREARRPTR(bbU16*, bbArrPU16);
