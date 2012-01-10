@@ -94,7 +94,7 @@ void bbDirClose(bbDIRH handle)
     }
 }
 
-#else /* (bbOS == bbOS_WIN32) || (bbOS == bbOS_WINCE) */
+#elif bbOS != bbOS_QT
 
 bbDIRH bbDirOpen( const bbCHAR* pPath)
 {

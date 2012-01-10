@@ -3,6 +3,7 @@ CONFIG += staticlib
 TARGET = libqbabel
 DEPENDPATH += .
 INCLUDEPATH += ./include/babel
+DEFINES += bbQT
 
 QMAKE_CXXFLAGS += /Zc:wchar_t /Zp4
 QMAKE_CXXFLAGS_DEBUG += /Zc:wchar_t /Zp4
@@ -42,12 +43,14 @@ SOURCES += \
     src/bit.c \
     src/cpg_unicode.c \
     src/dir.c \
+    src/dir_qt.cpp \
     src/enc.c \
     src/enc_sbc.c \
     src/enc_utf16.c \
     src/enc_utf8.c \
     src/err.c \
     src/file.c \
+    src/file_qt.cpp \
     src/fixmath.c \
     src/heap.c \
     src/log.c \
