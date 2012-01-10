@@ -275,3 +275,15 @@ int bbStrBuf::CatN(bbU64 n)
     return Catf(bbT("%I64u"), n);
 }
 
+#if bbOS == bbOS_QT
+#include <QByteArray>
+#include <QString>
+bbCHAR* bbStrFromQt(const QString& str)
+{
+    QByteArray utf8 = str.toUtf8();
+    bbCHAR* pStr = bbStrAlloc(utf8.size());
+    if (pStr)
+        bbStrCpy(pStr, utf8.constData());
+    return pStr;
+}
+#endif

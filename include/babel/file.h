@@ -15,7 +15,7 @@ extern "C" {
     NULL if invalid.
     @see bbFileOpen
 */
-#if bbOS != bbOS_PALMOS
+#if (bbOS != bbOS_PALMOS) && (bbOS != bbOS_QT)
 typedef FILE* bbFILEH;
 #else
 typedef void* bbFILEH;
@@ -37,9 +37,9 @@ typedef void* bbFILEH;
 /** Seek mode "relative to file end" for #bbFileSeek. */
 #define bbFILESEEK_END 2
 
-#define bbFILESTAT_TYPEMASK _S_IFMT  /**< file type mask */
-#define bbFILESTAT_DIR      _S_IFDIR /**< directory */
-#define bbFILESTAT_REG      _S_IFREG /**< regular */
+#define bbFILESTAT_TYPEMASK 0xF000   /**< file type mask */
+#define bbFILESTAT_DIR      0x4000   /**< directory */
+#define bbFILESTAT_REG      0x8000   /**< regular */
 #define bbFILESTAT_READ     0000400  /**< read permission, owner */
 #define bbFILESTAT_WRITE    0000200  /**< write permission, owner */
 #define bbFILESTAT_EXEC     0000100  /**< execute/search permission, owner */
@@ -100,6 +100,8 @@ __int64 __cdecl _ftelli64(FILE*);
 */
 #if (bbOS == bbOS_WINCE) || (bbOS == bbOS_WIN32)
 #define bbFileTell(handle) _ftelli64(handle)
+#elif (bbOS == bbOS_QT)
+#define bbFileTell(handle) ((QFile*)(handle)->pos())
 #else
 #define bbFileTell(handle) (bbU64)(bbS64)ftell(handle)
 #endif

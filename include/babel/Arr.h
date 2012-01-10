@@ -1,6 +1,6 @@
 #ifndef bbARR_H_
 #define bbARR_H_
-#include <stdlib.h> /* for NULL definition */
+
 #include "mem.h"
 
 /** Macro to declare a typed array.

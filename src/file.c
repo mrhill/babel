@@ -1,10 +1,10 @@
-/*  ANSI/Win31 C stdio.h based implementation */
+/*  ANSI/Win32 C stdio.h based implementation */
 
 #include "mem.h"
 #include "str.h"
 #include "file.h"
 
-#if bbOS != bbOS_PALMOS
+#if (bbOS != bbOS_PALMOS) && (bbOS != bbOS_QT)
 
 #include <errno.h>
 #include <wchar.h>
@@ -19,7 +19,7 @@
 #if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WINCE) || (bbOS == bbOS_SYMBIAN)
 #define bbPATHDELIM '\\'
 #define bbEXTDELIM '.'
-#elif (bbIS == bbOS_RISCOS)
+#elif (bbOS == bbOS_RISCOS)
 #define bbPATHDELIM '.'
 #define bbEXTDELIM '/'
 #else
@@ -28,128 +28,6 @@
 #endif
 
 static bbERR errno2bbERR(const bbERR defaulterr);
-
-bbCHAR* bbPathJoin(const bbCHAR* const pDir, const bbCHAR* const pFile, const bbCHAR* const pExt)
-{
-    const bbUINT slen_dir  = pDir  ? bbStrLen(pDir)  : 0;
-    const bbUINT slen_file = pFile ? bbStrLen(pFile) : 0;
-    const bbUINT slen_ext  = pExt  ? bbStrLen(pExt)  : 0;
-
-    bbCHAR* pPath = (bbCHAR*) bbMemAlloc((slen_dir + slen_file + slen_ext + (2*bbCP_MAXCU + 1))*sizeof(bbCHAR));
-
-    if (pPath)
-    {
-        bbCHAR* pTmp = pPath;
-
-        if (pDir)
-        {
-            bbStrCpy( pTmp, pDir); pTmp += slen_dir;
-            bbCP_APPEND_PTR(pTmp, bbPATHDELIM);
-        }
-
-        if (pFile)
-        {
-            bbStrCpy( pTmp, pFile); pTmp += slen_file;
-        }
-
-        if (pExt)
-        {
-            bbCP_APPEND_PTR(pTmp, bbEXTDELIM);
-            bbStrCpy( pTmp, pExt); pTmp += slen_ext;
-        }
-
-        *pTmp = 0;
-    }
-
-    return pPath;
-}
-
-bbERR bbPathSplit(const bbCHAR* const pPath, bbCHAR** const ppDir, bbCHAR** const ppFile, bbCHAR** const ppExt)
-{
-    bbCHARCP cp;
-
-    const bbCHAR* pTmp  = pPath;
-    const bbCHAR* pLast;
-
-    const bbCHAR* pSrcDir  = pPath;
-    const bbCHAR* pSrcFile = NULL;
-    const bbCHAR* pSrcExt  = NULL;
-
-    bbCHAR* pDstDir  = NULL;
-    bbCHAR* pDstFile = NULL;
-    bbCHAR* pDstExt  = NULL;
-
-    bbUINT len;
-
-    if (!pPath)
-        return bbErrSet(bbEBADPARAM);
-
-    do
-    {
-        pLast = pTmp;
-        bbCP_NEXT_PTR(pTmp, cp);
-
-        if (cp == bbDIRDELIM) pSrcFile = pTmp;
-        if (cp == bbFILEEXTDELIM) pSrcExt = pTmp;
-    } while (cp);
-
-    if (pSrcFile == NULL)
-    {
-        // not file delim found -> whole string is filename
-        pSrcFile = pPath;
-        pSrcDir  = NULL;
-    }
-
-    if (ppDir)
-    {
-        len = (pSrcDir==NULL) ? sizeof(bbCHAR) : ((bbUINT)(bbUPTR)pSrcFile - (bbUINT)(bbUPTR)pPath);
-
-        if ((pDstDir = (bbCHAR*) bbMemAlloc((bbU32)len)) == NULL)
-            goto bbPathSplit_err;
-
-        len -= sizeof(bbCHAR);
-        bbMemMove(pDstDir, pPath, len);
-        *(bbCHAR*)((bbU8*)pDstDir + len) = 0;
-
-        *ppDir = pDstDir;
-    }
-
-    if (ppFile)
-    {
-        len = pSrcExt ? (bbUINT)(bbUPTR)pSrcExt - (bbUINT)(bbUPTR)pSrcFile : (bbUINT)(bbUPTR)pTmp - (bbUINT)(bbUPTR)pSrcFile;
-        if ((pDstFile = (bbCHAR*)bbMemAlloc((bbU32)len)) == NULL)
-            goto bbPathSplit_err;
-
-        len -= sizeof(bbCHAR);
-        bbMemMove(pDstFile, pSrcFile, len);
-        *(bbCHAR*)((bbU8*)pDstFile + len) = 0;
-
-        *ppFile = pDstFile;
-    }
-
-    if (ppExt)
-    {
-        len = pSrcExt ? (bbUINT)(bbUPTR)pTmp - (bbUINT)(bbUPTR)pSrcExt : sizeof(bbCHAR);
-        if ((pDstExt = (bbCHAR*)bbMemAlloc((bbU32)len)) == NULL)
-            goto bbPathSplit_err;
-
-        len -= sizeof(bbCHAR);
-        bbMemMove(pDstExt, pSrcExt, len);
-        *(bbCHAR*)((bbU8*)pDstExt + len) = 0;
-
-        *ppExt = pDstExt;
-    }
-
-    return bbEOK;
-
-    bbPathSplit_err:
-
-    if (pDstExt)  bbMemFree(pDstExt);
-    if (pDstFile) bbMemFree(pDstFile);
-    if (pDstDir)  bbMemFree(pDstDir);
-
-    return bbELAST;
-}
 
 bbCHAR* bbPathNorm(const bbCHAR* const pPath)
 {
@@ -212,34 +90,6 @@ bbCHAR* bbPathNorm(const bbCHAR* const pPath)
     #endif
 }
 
-bbCHAR* bbPathDelimEx(const bbCHAR* const pPath, bbUINT extralen)
-{
-    bbUINT len = bbStrLen(pPath);
-   
-    bbCHAR* pTmp = (bbCHAR*) bbMemAlloc((len + extralen + 2) * sizeof(bbCHAR));
-
-    if (pTmp)
-    {
-        bbStrCpy(pTmp, pPath);
-#if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64) || (bbOS == bbOS_WINCE)
-        if ((pTmp[len-1] != bbDIRDELIM) && (pTmp[len-1] != '/'))
-#else
-        if (pTmp[len-1] != bbDIRDELIM)
-#endif
-        {
-            pTmp[len] = bbDIRDELIM;
-            pTmp[len+1] = 0;
-        }
-    }
-
-    return pTmp;
-}
-
-bbCHAR* bbPathDelim(const bbCHAR* const pPath)
-{
-    return bbPathDelimEx(pPath, 0);
-}
-
 bbCHAR* bbPathTemp(const bbCHAR* pDir)
 {
     bbCHAR* pName;
@@ -297,7 +147,7 @@ bbERR bbFileStat(const bbCHAR* const pPath, bbFILESTAT* const pStat)
         *(bbU64*)&pStat->mode = *(bbU64*)&s.st_mode;
         pStat->drive = s.st_dev;
         *(bbU64*)&pStat->atime = *(bbU64*)&s.st_atime;
-        pStat->ctime = s.st_ctime;
+        pStat->ctime = (bbS32)s.st_ctime;
     }
     return bbEOK;
 #else
@@ -430,21 +280,6 @@ bbERR bbFileWrite(bbFILEH handle, const void* pBuf, const bbU32 size)
     return bbErrSet(bbEFILEWRITE);
 }
 
-bbERR bbFileWriteLE(bbFILEH handle, const bbU32 val, const bbUINT size)
-{
-    #if bbCPUE==bbCPUE_LE /* little endian version */
-
-    return bbFileWrite(handle, (void*)&val, size);
-
-    #else /* big endian version */
-
-    bbU8 buf[4];
-    bbST32LE(&buf[0], val)
-    return bbFileWrite(handle, &buf[0], size);
-
-    #endif
-}
-
 bbERR bbFileTrunc(bbFILEH handle)
 {
 #if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64) || (bbOS == bbOS_WINCE)
@@ -464,3 +299,167 @@ bbERR bbFileTrunc(bbFILEH handle)
 
 #endif /* bbOS != bbOS_PALMOS */
 
+bbERR bbFileWriteLE(bbFILEH handle, const bbU32 val, const bbUINT size)
+{
+    #if bbCPUE==bbCPUE_LE /* little endian version */
+
+    return bbFileWrite(handle, (void*)&val, size);
+
+    #else /* big endian version */
+
+    bbU8 buf[4];
+    bbST32LE(&buf[0], val)
+    return bbFileWrite(handle, &buf[0], size);
+
+    #endif
+}
+
+bbCHAR* bbPathJoin(const bbCHAR* const pDir, const bbCHAR* const pFile, const bbCHAR* const pExt)
+{
+    const bbUINT slen_dir  = pDir  ? bbStrLen(pDir)  : 0;
+    const bbUINT slen_file = pFile ? bbStrLen(pFile) : 0;
+    const bbUINT slen_ext  = pExt  ? bbStrLen(pExt)  : 0;
+
+    bbCHAR* pPath = (bbCHAR*) bbMemAlloc((slen_dir + slen_file + slen_ext + (2*bbCP_MAXCU + 1))*sizeof(bbCHAR));
+
+    if (pPath)
+    {
+        bbCHAR* pTmp = pPath;
+
+        if (pDir)
+        {
+            bbStrCpy( pTmp, pDir); pTmp += slen_dir;
+            bbCP_APPEND_PTR(pTmp, bbPATHDELIM);
+        }
+
+        if (pFile)
+        {
+            bbStrCpy( pTmp, pFile); pTmp += slen_file;
+        }
+
+        if (pExt)
+        {
+            bbCP_APPEND_PTR(pTmp, bbEXTDELIM);
+            bbStrCpy( pTmp, pExt); pTmp += slen_ext;
+        }
+
+        *pTmp = 0;
+    }
+
+    return pPath;
+}
+
+bbERR bbPathSplit(const bbCHAR* const pPath, bbCHAR** const ppDir, bbCHAR** const ppFile, bbCHAR** const ppExt)
+{
+    bbCHARCP cp;
+
+    const bbCHAR* pTmp  = pPath;
+    const bbCHAR* pLast;
+
+    const bbCHAR* pSrcDir  = pPath;
+    const bbCHAR* pSrcFile = NULL;
+    const bbCHAR* pSrcExt  = NULL;
+
+    bbCHAR* pDstDir  = NULL;
+    bbCHAR* pDstFile = NULL;
+    bbCHAR* pDstExt  = NULL;
+
+    bbUINT len;
+
+    if (!pPath)
+        return bbErrSet(bbEBADPARAM);
+
+    do
+    {
+        pLast = pTmp;
+        bbCP_NEXT_PTR(pTmp, cp);
+
+        if (cp == bbDIRDELIM) pSrcFile = pTmp;
+        if (cp == bbFILEEXTDELIM) pSrcExt = pTmp;
+    } while (cp);
+
+    if (pSrcFile == NULL)
+    {
+        // not file delim found -> whole string is filename
+        pSrcFile = pPath;
+        pSrcDir  = NULL;
+    }
+
+    if (ppDir)
+    {
+        len = (pSrcDir==NULL) ? sizeof(bbCHAR) : ((bbUINT)(bbUPTR)pSrcFile - (bbUINT)(bbUPTR)pPath);
+
+        if ((pDstDir = (bbCHAR*) bbMemAlloc((bbU32)len)) == NULL)
+            goto bbPathSplit_err;
+
+        len -= sizeof(bbCHAR);
+        bbMemMove(pDstDir, pPath, len);
+        *(bbCHAR*)((bbU8*)pDstDir + len) = 0;
+
+        *ppDir = pDstDir;
+    }
+
+    if (ppFile)
+    {
+        len = pSrcExt ? (bbUINT)(bbUPTR)pSrcExt - (bbUINT)(bbUPTR)pSrcFile : (bbUINT)(bbUPTR)pTmp - (bbUINT)(bbUPTR)pSrcFile;
+        if ((pDstFile = (bbCHAR*)bbMemAlloc((bbU32)len)) == NULL)
+            goto bbPathSplit_err;
+
+        len -= sizeof(bbCHAR);
+        bbMemMove(pDstFile, pSrcFile, len);
+        *(bbCHAR*)((bbU8*)pDstFile + len) = 0;
+
+        *ppFile = pDstFile;
+    }
+
+    if (ppExt)
+    {
+        len = pSrcExt ? (bbUINT)(bbUPTR)pTmp - (bbUINT)(bbUPTR)pSrcExt : sizeof(bbCHAR);
+        if ((pDstExt = (bbCHAR*)bbMemAlloc((bbU32)len)) == NULL)
+            goto bbPathSplit_err;
+
+        len -= sizeof(bbCHAR);
+        bbMemMove(pDstExt, pSrcExt, len);
+        *(bbCHAR*)((bbU8*)pDstExt + len) = 0;
+
+        *ppExt = pDstExt;
+    }
+
+    return bbEOK;
+
+    bbPathSplit_err:
+
+    if (pDstExt)  bbMemFree(pDstExt);
+    if (pDstFile) bbMemFree(pDstFile);
+    if (pDstDir)  bbMemFree(pDstDir);
+
+    return bbELAST;
+}
+
+bbCHAR* bbPathDelimEx(const bbCHAR* const pPath, bbUINT extralen)
+{
+    bbUINT len = bbStrLen(pPath);
+   
+    bbCHAR* pTmp = (bbCHAR*) bbMemAlloc((len + extralen + 2) * sizeof(bbCHAR));
+
+    if (pTmp)
+    {
+        bbStrCpy(pTmp, pPath);
+#if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64) || (bbOS == bbOS_WINCE)
+        if ((pTmp[len-1] != bbDIRDELIM) && (pTmp[len-1] != '/'))
+#else
+        if (pTmp[len-1] != bbDIRDELIM)
+#endif
+        {
+            pTmp[len] = bbDIRDELIM;
+            pTmp[len+1] = 0;
+        }
+    }
+
+    return pTmp;
+}
+
+bbCHAR* bbPathDelim(const bbCHAR* const pPath)
+{
+    return bbPathDelimEx(pPath, 0);
+}

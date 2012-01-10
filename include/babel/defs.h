@@ -30,14 +30,6 @@ extern "C" {
 #define bbCFGENC_UTF8  2
 #define bbCFGENC_UTF16 3
 
-/** Internal character encoding.
-    Choose one from bbCFGENC_*
-*/
-#ifndef bbCFGENC
-#define bbCFGENC 3
-#endif
-
-
 /** Constant identifying ASCII codepage. */
 #define bbCPG_ASCII 0
 /** Constant identifying Unicode 4.0 codepage. */
@@ -109,9 +101,12 @@ extern "C" {
 #define bbOS_ITRON   6
 #define bbOS_RISCOS  7
 #define bbOS_ANDROID 8
+#define bbOS_QT      9
 
 #ifndef bbOS
-#if defined(UNDER_CE)
+#if defined(bbQT)
+#define bbOS bbOS_QT
+#elif defined(UNDER_CE)
 #define bbOS bbOS_WINCE
 #elif defined(WIN32)
 #define bbOS bbOS_WIN32
@@ -126,6 +121,52 @@ extern "C" {
 #endif
 #endif /* bbOS */
 
+#ifdef  __cplusplus
+}
+#endif
+
+#if bbOS == bbOS_QT
+
+#include <QtGlobal>
+#include <stdlib.h> /* for malloc */
+#include <stdio.h>  /* for printf, etc. */
+#include <stdarg.h> /* for va_list */
+#include <string.h> /* for memset etc. */
+#include <time.h>
+#if defined(UNDER_CE) || defined(WIN32) || defined(WIN64)
+#include <CRTDBG.H>
+#endif
+
+#elif (bbOS == bbOS_WIN32) || (bbOS == bbOS_WINCE)
+
+#define WIN32_LEAN_AND_MEAN /* exclude rare stuff */
+#include <windows.h>
+#include <CRTDBG.H>
+#include <stdlib.h> /* for malloc */
+#include <stdio.h>  /* for printf, etc. */
+#include <stdarg.h> /* for va_list */
+#include <time.h>
+
+#elif bbOS == bbOS_PALMOS
+
+#include <PalmOS.h>
+
+#elif bbOS == bbOS_POSIX
+
+#include <stdlib.h> /* for malloc */
+#include <stdio.h>  /* for printf, etc. */
+#include <stdarg.h> /* for va_list */
+#include <string.h> /* for memset etc. */
+#include <time.h>
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
+#endif
+
+#ifdef  __cplusplus
+extern "C" {
+#endif
 
 /* try CPU auto detection */
 #define bbCPU_UNDEFINED 0
@@ -155,17 +196,23 @@ extern "C" {
 #define bbCPUE_BE 1
 
 #ifndef bbCPUE
-#if (bbCPU==bbCPU_68K)
-#define bbCPUE bbCPUE_BE
+#if bbOS==bbOS_QT
+  #if Q_BYTE_ORDER == Q_BIG_ENDIAN
+    #define bbCPUE bbCPUE_BE
+  #else
+    #define bbCPUE bbCPUE_LE
+  #endif
+#elif bbCPU==bbCPU_68K
+  #define bbCPUE bbCPUE_BE
 #else
-#define bbCPUE bbCPUE_LE
+  #define bbCPUE bbCPUE_LE
 #endif
 #endif /* bbCPUE */
 
 
 /* try sizeof() detections */
 #ifndef bbSIZEOF_INT
-#if defined(WIN32) || defined(__CYGWIN__) || defined(_X86_) || defined(ANDROID)
+#if defined(WIN32) || defined(__CYGWIN__) || defined(_X86_) || defined(ANDROID) || (bbOS==bbOS_QT)
 #define bbSIZEOF_INT 4
 #else
 #error Cannot detect bbSIZEOF_INT
@@ -173,7 +220,9 @@ extern "C" {
 #endif /* bbSIZEOF_INT */
 
 #ifndef bbSIZEOF_UPTR
-#if defined(WIN32) || defined(__CYGWIN__) || defined(_X86_) || defined(ANDROID)
+#if (bbOS==bbOS_QT)
+#define bbSIZEOF_UPTR QT_POINTER_SIZE
+#elif defined(WIN32) || defined(__CYGWIN__) || defined(_X86_) || defined(ANDROID)
 #define bbSIZEOF_UPTR 4
 #elif defined(WIN64)
 #define bbSIZEOF_UPTR 8
@@ -182,44 +231,6 @@ extern "C" {
 #endif
 #endif /* bbSIZEOF_UPTR */
 
-#ifdef  __cplusplus
-}
-#endif
-
-#if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WINCE)
-
-#define WIN32_LEAN_AND_MEAN /* exclude rare stuff */
-#include <windows.h>
-#include <CRTDBG.H>
-#include <stdlib.h> /* for malloc */
-#include <stdio.h>  /* for printf, etc. */
-#include <stdarg.h> /* for va_list */
-#include <time.h>
-
-#elif bbOS == bbOS_PALMOS
-
-#include <PalmOS.h>
-
-#elif bbOS == bbOS_POSIX
-
-#include <stdlib.h> /* for malloc */
-#include <stdio.h>  /* for printf, etc. */
-#include <stdarg.h> /* for va_list */
-#include <string.h> /* for memset etc. */
-#include <time.h>
-#ifndef NULL
-#define NULL ((void*)0)
-#endif
-
-#endif
-
-#if defined(_MSC_VER)
-#define __attribute__(x)
-#endif
-
-#ifdef  __cplusplus
-extern "C" {
-#endif
 
 #ifdef _MSC_VER
 #define __attribute__(n)
@@ -270,6 +281,17 @@ extern "C" {
 #define bbENC_DBC bbENC_DBCBE
 #define bbENC_UTF16 bbENC_UTF16BE
 #define bbENC_UTF32 bbENC_UTF32BE
+#endif
+
+/** Internal character encoding.
+    Choose one from bbCFGENC_*
+*/
+#ifndef bbCFGENC
+#if bbOS==bbOS_QT
+#define bbCFGENC bbCFGENC_UTF8
+#else
+#define bbCFGENC bbCFGENC_UTF16
+#endif
 #endif
 
 #if bbCFGENC == bbCFGENC_SBC
@@ -668,7 +690,9 @@ extern bbCHAR bbgErrStr[bbERRSTRMAXLEN];
 
 #ifdef bbDEBUG
     #ifndef ASSERT
-        #if defined(WIN32)
+        #if bbOS == bbOS_QT && defined(__cplusplus)
+            #define bbASSERT(a) Q_ASSERT(a)
+        #elif defined(WIN32)
             #define bbASSERT(a) if(!(a)) _CrtDbgBreak();
         #elif bbOS == bbOS_PALMOS
             #define bbASSERT(a) ErrFatalDisplayIf((!(a)), "bbASSERT");
@@ -780,12 +804,11 @@ enum
 /** Error code base, mh library. @internal */
 #define bbEBASE_MH 0x700
 
-
-/*@}*/
-
 #ifdef  __cplusplus
 }
 #endif
+
+/*@}*/
 
 #endif /* bbBABEL_DEFS_H_ */
 

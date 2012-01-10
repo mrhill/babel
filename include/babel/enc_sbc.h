@@ -59,7 +59,7 @@ int bbStrICmp_sbc(const bbCHAR8* pStr1, const bbCHAR8* pStr2);
 #elif bbOS == bbOS_POSIX
 #define bbStrICmp_sbc(pStr1, pStr2) strcasecmp((const char*)pStr1, (const char*)pStr2)
 #else
-#define bbStrICmp_sbc(pStr1, pStr2) stricmp((const char*)pStr1, (const char*)pStr2)
+#define bbStrICmp_sbc(pStr1, pStr2) _stricmp((const char*)pStr1, (const char*)pStr2)
 #endif
 #endif
 

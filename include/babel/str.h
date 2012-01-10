@@ -13,6 +13,11 @@
 #include "enc.h"
 #include "cpg_unicode.h"
 
+#if bbOS==bbOS_QT && defined(__cplusplus)
+class QString;
+bbCHAR* bbStrFromQt(const QString& str);
+#endif
+
 #if bbSTRCONV==bbSTRCONV_WIN
 #include <iconv.h>
 #endif

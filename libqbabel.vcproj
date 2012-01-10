@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9,00"
+	Name="libqbabel"
+	ProjectGUID="{A338640A-B163-3251-B0BF-CA603254EF80}"
+	Keyword="Qt4VSv1.0">
+	<Platforms>
+		<Platform
+			Name="Win32" />
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="debug\"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			ConfigurationType="4"
+			IntermediateDirectory="debug\"
+			UseOfMfc="0">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;c:\Qt\4.8.0\include\QtCore&quot;,&quot;c:\Qt\4.8.0\include\QtGui&quot;,&quot;c:\Qt\4.8.0\include&quot;,&quot;include\babel&quot;,&quot;c:\Qt\4.8.0\include\ActiveQt&quot;,&quot;debug&quot;,c:\Qt\4.8.0\mkspecs\win32-msvc2008"
+				AdditionalOptions="-Zm200 -w34100 -w34189"
+				AssemblerListingLocation="debug\"
+				BufferSecurityCheck="false"
+				DebugInformationFormat="3"
+				ExceptionHandling="1"
+				GeneratePreprocessedFile="0"
+				ObjectFile="debug\"
+				Optimization ="4"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,bbQT,QT_GUI_LIB,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT"
+				ProgramDataBaseFileName=".\"
+				RuntimeLibrary="3"
+				RuntimeTypeInfo="true"
+				StructMemberAlignment="3"
+				SuppressStartupBanner="true"
+				TreatWChar_tAsBuiltInType="true"
+				WarningLevel="3" />
+			<Tool
+				Name="VCCustomBuildTool" />
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\libqbabel.lib"
+				SuppressStartupBanner="true" />
+			<Tool
+				Name="VCMIDLTool"
+				DefaultCharType="0"
+				EnableErrorChecks="1"
+				WarningLevel="0" />
+			<Tool
+				Name="VCPostBuildEventTool" />
+			<Tool
+				Name="VCPreBuildEventTool" />
+			<Tool
+				Name="VCPreLinkEventTool" />
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,bbQT,QT_GUI_LIB,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT,_DEBUG"
+				ResourceOutputFileName="$(OutDir)\$(InputName).res" />
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="release\"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			ConfigurationType="4"
+			IntermediateDirectory="release\"
+			UseOfMfc="0">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;c:\Qt\4.8.0\include\QtCore&quot;,&quot;c:\Qt\4.8.0\include\QtGui&quot;,&quot;c:\Qt\4.8.0\include&quot;,&quot;include\babel&quot;,&quot;c:\Qt\4.8.0\include\ActiveQt&quot;,&quot;release&quot;,c:\Qt\4.8.0\mkspecs\win32-msvc2008"
+				AdditionalOptions="-Zm200 -w34100 -w34189"
+				AssemblerListingLocation="release\"
+				BufferSecurityCheck="false"
+				DebugInformationFormat="0"
+				ExceptionHandling="1"
+				GeneratePreprocessedFile="0"
+				ObjectFile="release\"
+				Optimization ="2"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,bbQT,QT_NO_DEBUG,QT_GUI_LIB,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT,NDEBUG"
+				ProgramDataBaseFileName=".\"
+				RuntimeLibrary="2"
+				RuntimeTypeInfo="true"
+				StructMemberAlignment="3"
+				SuppressStartupBanner="true"
+				TreatWChar_tAsBuiltInType="true"
+				WarningLevel="3" />
+			<Tool
+				Name="VCCustomBuildTool" />
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\libqbabel.lib"
+				SuppressStartupBanner="true" />
+			<Tool
+				Name="VCMIDLTool"
+				DefaultCharType="0"
+				EnableErrorChecks="1"
+				WarningLevel="0" />
+			<Tool
+				Name="VCPostBuildEventTool" />
+			<Tool
+				Name="VCPreBuildEventTool" />
+			<Tool
+				Name="VCPreLinkEventTool" />
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,bbQT,QT_NO_DEBUG,QT_GUI_LIB,QT_CORE_LIB,QT_HAVE_MMX,QT_HAVE_3DNOW,QT_HAVE_SSE,QT_HAVE_MMXEXT,QT_HAVE_SSE2,QT_THREAD_SUPPORT"
+				ResourceOutputFileName="$(OutDir)\$(InputName).res" />
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			<File
+				RelativePath="src\Arr.cpp" />
+			<File
+				RelativePath="src\Registry.cpp" />
+			<File
+				RelativePath="src\StrBuf.cpp" />
+			<File
+				RelativePath="src\Tree.cpp" />
+			<File
+				RelativePath="src\algo.c" />
+			<File
+				RelativePath="src\bit.c" />
+			<File
+				RelativePath="src\cpg_unicode.c" />
+			<File
+				RelativePath="src\dir.c" />
+			<File
+				RelativePath="src\enc.c" />
+			<File
+				RelativePath="src\enc_sbc.c" />
+			<File
+				RelativePath="src\enc_utf16.c" />
+			<File
+				RelativePath="src\enc_utf8.c" />
+			<File
+				RelativePath="src\err.c" />
+			<File
+				RelativePath="src\file.c" />
+			<File
+				RelativePath="src\fixmath.c" />
+			<File
+				RelativePath="src\heap.c" />
+			<File
+				RelativePath="src\log.c" />
+			<File
+				RelativePath="src\map.c" />
+			<File
+				RelativePath="src\mem.c" />
+			<File
+				RelativePath="src\str.c" />
+			<File
+				RelativePath="src\timedate.c" />
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath="include\babel\Arr.h" />
+			<File
+				RelativePath="include\babel\Registry.h" />
+			<File
+				RelativePath="include\babel\StrBuf.h" />
+			<File
+				RelativePath="include\babel\Tree.h" />
+			<File
+				RelativePath="include\babel\algo.h" />
+			<File
+				RelativePath="include\babel\babel.h" />
+			<File
+				RelativePath="include\babel\bit.h" />
+			<File
+				RelativePath="include\babel\cpg_unicode.h" />
+			<File
+				RelativePath="include\babel\defs.h" />
+			<File
+				RelativePath="include\babel\dir.h" />
+			<File
+				RelativePath="include\babel\enc.h" />
+			<File
+				RelativePath="include\babel\enc_dbc.h" />
+			<File
+				RelativePath="include\babel\enc_sbc.h" />
+			<File
+				RelativePath="include\babel\enc_utf16.h" />
+			<File
+				RelativePath="include\babel\enc_utf8.h" />
+			<File
+				RelativePath="include\babel\file.h" />
+			<File
+				RelativePath="include\babel\fixmath.h" />
+			<File
+				RelativePath="include\babel\heap.h" />
+			<File
+				RelativePath="include\babel\log.h" />
+			<File
+				RelativePath="include\babel\map.h" />
+			<File
+				RelativePath="include\babel\mem.h" />
+			<File
+				RelativePath="include\babel\str.h" />
+			<File
+				RelativePath="include\babel\timedate.h" />
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
