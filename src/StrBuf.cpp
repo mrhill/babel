@@ -171,7 +171,7 @@ bbCHAR* bbStrBuf::Cat(const char* pStr)
 }
 #endif
 
-bbStrBuf& bbStrBuf::operator+=(bbCHARCP cp)
+void bbStrBuf::Append(bbCHARCP cp)
 {
     bbUINT str_len = bbCP_LENGTH(cp);
     bbCHAR* pStr = Ensure(str_len);
@@ -181,7 +181,6 @@ bbStrBuf& bbStrBuf::operator+=(bbCHARCP cp)
         bbCP_APPEND_PTR(pStr, cp);
         *pStr=0;
     }
-    return *this;
 }
 
 bbCHAR* bbStrBuf::PrintHex(const bbU8* pData, bbUINT size)

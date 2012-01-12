@@ -68,13 +68,33 @@ extern const bbU8 bbgUTF8_CountTrailBytes[32];
 */
 #define bbUTF8_CU_IS_TRAIL(c) (((bbUINT)(c)&0xC0U)==0x80U)
 
+#define bbUTF8_CP_FWD_1(pStr, i) { \
+    (i)+=1+bbgUTF8_CountTrailBytes[(bbUINT)((pStr)[i]) >> 3] \
+}
 
-#define bbUTF8_CP_FWD_1(pStr, i)
-#define bbUTF8_CP_FWD_1_PTR(pStr)
-#define bbUTF8_CP_FWD_N(pStr, i, n)
-#define bbUTF8_CP_BACK_1(pStr, i)
-#define bbUTF8_CP_BACK_N(pStr, i, n)
-#define bbUTF8_CP_GET(pStr, i, cp)
+#define bbUTF8_CP_FWD_1_PTR(pStr) { \
+    (pStr)+=1+bbgUTF8_CountTrailBytes[(bbUINT)(*(pStr)) >> 3] \
+}
+
+#define bbUTF8_CP_FWD_N(pStr, i, n) { \
+    bbUINT __N=(n); \
+    while(__N>0) { \
+        bbUTF8_CP_FWD_1(pStr, i); \
+        --__N; \
+    } \
+}
+
+#define bbUTF8_CP_BACK_1(pStr, i) { \
+    while(bbUTF8_CU_IS_TRAIL((pStr)[--(i)])) {} \
+}
+
+#define bbUTF8_CP_BACK_N(pStr, i, n) { \
+    bbUINT __N=(n); \
+    while(__N>0) { \
+        bbUTF8_CP_BACK_1(pStr, i); \
+        --__N; \
+    } \
+}
 
 /** Get a code point from a string at a given code unit offset (must be code point boundary) and increment offset.
     If \a i points to a trail surrogate, it will be returned.
@@ -113,12 +133,92 @@ extern const bbU8 bbgUTF8_CountTrailBytes[32];
     } \
 }
 
-#define bbUTF8_CP_PREV(pStr, i, cp)
-#define bbUTF8_CP_PREV_PTR(pStr, cp)
-#define bbUTF8_CP_APPEND(pStr, i, cp)
-#define bbUTF8_CP_APPEND_PTR(pStr, cp)
-#define bbUTF8_CP_SETSTART(pStr, i)
+#define bbUTF8_CP_PREV(pStr, i, cp) { \
+    (cp)=(bbU8)(pStr)[--(i)]; \
+    if (bbUTF8_CU_IS_TRAIL(cp)) { \
+        bbU8 __b, __count=1, __shift=6; \
+        (cp)&=0x3f; \
+        for(;;) { \
+            __b=(bbU8)(pStr)[--(i)]; \
+            if(__b>=0xc0) { \
+                __b = bbUTF8_CU_MASK_LEAD(__b, __count); \
+                (cp)|=(bbU32)__b<<__shift; \
+                break; \
+            } else { \
+                (cp)|=(bbU32)(__b&0x3f)<<__shift; \
+                ++__count; \
+                __shift+=6; \
+            } \
+        } \
+    } \
+}
 
+#define bbUTF8_CP_PREV_PTR(pStr, cp) { \
+    (cp)=(bbU8)*--(pStr); \
+    if (bbUTF8_CU_IS_TRAIL(cp)) { \
+        bbU8 __b, __count=1, __shift=6; \
+        (cp)&=0x3f; \
+        for(;;) { \
+            __b=(bbU8)*--(pStr); \
+            if(__b>=0xc0) { \
+                __b = bbUTF8_CU_MASK_LEAD(__b, __count); \
+                (cp)|=(bbU32)__b<<__shift; \
+                break; \
+            } else { \
+                (cp)|=(bbU32)(__b&0x3f)<<__shift; \
+                ++__count; \
+                __shift+=6; \
+            } \
+        } \
+    } \
+}
+
+#define bbUTF8_CP_APPEND(pStr, i, cp) { \
+    if((bbU32)(cp)<0x80U) { \
+        (pStr)[(i)++]=(bbU8)(cp); \
+    } else { \
+        if((bbU32)(cp)<0x800U) { \
+            (pStr)[(i)++]=(bbU8)(((cp)>>6)|0xC0U); \
+        } else { \
+            if((bbU32)(cp)<0x10000U) { \
+                (pStr)[(i)++]=(bbU8)(((cp)>>12)|0xE0U); \
+            } else { \
+                (pStr)[(i)++]=(bbU8)(((cp)>>18)|0xF0U); \
+                (pStr)[(i)++]=(bbU8)((((cp)>>12)&0x3FU)|0x80U); \
+            } \
+            (pStr)[(i)++]=(bbU8)((((cp)>>6)&0x3FU)|0x80U); \
+        } \
+        (pStr)[(i)++]=(bbU8)(((cp)&0x3FU)|0x80U); \
+    } \
+}
+
+#define bbUTF8_CP_APPEND_PTR(pStr, cp) { \
+    if((bbU32)(cp)<0x80U) { \
+        *(pStr)++=(bbU8)(cp); \
+    } else { \
+        if((bbU32)(cp)<0x800U) { \
+            *(pStr)++=(bbU8)(((cp)>>6)|0xC0U); \
+        } else { \
+            if((bbU32)(cp)<0x10000U) { \
+                *(pStr)++=(bbU8)(((cp)>>12)|0xE0U); \
+            } else { \
+                *(pStr)++=(bbU8)(((cp)>>18)|0xF0U); \
+                *(pStr)++=(bbU8)((((cp)>>12)&0x3FU)|0x80U); \
+            } \
+            *(pStr)++=(bbU8)((((cp)>>6)&0x3FU)|0x80U); \
+        } \
+        *(pStr)++=(bbU8)(((cp)&0x3FU)|0x80U); \
+    } \
+}
+
+#define bbUTF8_CP_SETSTART(pStr, i) \
+    while(bbUTF8_CU_IS_TRAIL((pStr)[i])) { --(i); }
+
+#define bbUTF8_CP_GET(pStr, i, cp) { \
+    bbUINT __get_index=(bbUINT)(i); \
+    bbUTF8_CP_SETSTART(pStr, __get_index); \
+    bbUTF8_CP_NEXT(pStr, __get_index, cp); \
+}
 
 #ifdef  __cplusplus
 }

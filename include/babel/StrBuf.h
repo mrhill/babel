@@ -112,9 +112,10 @@ public:
         Will do nothing on failure.
         @param pStr String to append
     */
-    inline bbStrBuf& operator+=(const bbCHAR* const pStr) { Cat(pStr); return *this; }
+    inline bbStrBuf& operator+=(const bbCHAR* pStr) { Cat(pStr); return *this; }
 
-    bbStrBuf& operator+=(bbCHARCP cp);
+    void Append(bbCHARCP cp);
+    inline bbStrBuf& operator+=(bbCHARCP cp) { Append(cp); return *this; }
 
     #if bbSIZEOF_CHAR != 1
     inline bbStrBuf& operator+=(const char* pStr) { Cat(pStr); return *this; }

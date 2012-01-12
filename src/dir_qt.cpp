@@ -18,7 +18,9 @@ struct DirHandle
 
 extern "C" bbDIRH bbDirOpen(const bbCHAR* pPath)
 {
-    QDir dir(pPath);
+    QString path(pPath);
+    QDir dir(path.endsWith("/*") ? path.left(path.size()-2) : path);
+
     if (!dir.exists())
     {
         bbErrSet(bbEFILENOTFOUND);

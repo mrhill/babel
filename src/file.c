@@ -1,5 +1,3 @@
-/*  ANSI/Win32 C stdio.h based implementation */
-
 #include "mem.h"
 #include "str.h"
 #include "file.h"
@@ -14,17 +12,6 @@
 #include <sys/io.h>
 #else
 #include <io.h>
-#endif
-
-#if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WINCE) || (bbOS == bbOS_SYMBIAN)
-#define bbPATHDELIM '\\'
-#define bbEXTDELIM '.'
-#elif (bbOS == bbOS_RISCOS)
-#define bbPATHDELIM '.'
-#define bbEXTDELIM '/'
-#else
-#define bbPATHDELIM '/'
-#define bbEXTDELIM '.'
 #endif
 
 static bbERR errno2bbERR(const bbERR defaulterr);
@@ -329,7 +316,7 @@ bbCHAR* bbPathJoin(const bbCHAR* const pDir, const bbCHAR* const pFile, const bb
         if (pDir)
         {
             bbStrCpy( pTmp, pDir); pTmp += slen_dir;
-            bbCP_APPEND_PTR(pTmp, bbPATHDELIM);
+            bbCP_APPEND_PTR(pTmp, bbDIRDELIM);
         }
 
         if (pFile)
@@ -339,7 +326,7 @@ bbCHAR* bbPathJoin(const bbCHAR* const pDir, const bbCHAR* const pFile, const bb
 
         if (pExt)
         {
-            bbCP_APPEND_PTR(pTmp, bbEXTDELIM);
+            bbCP_APPEND_PTR(pTmp, bbFILEEXTDELIM);
             bbStrCpy( pTmp, pExt); pTmp += slen_ext;
         }
 

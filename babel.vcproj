@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory=".\Debug_babel"
+			IntermediateDirectory=".\Debug_babel"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -51,12 +51,12 @@
 				StructMemberAlignment="3"
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="false"
-				PrecompiledHeaderFile=".\Debug/babel.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
+				PrecompiledHeaderFile=".\Debug_babel/babel.pch"
+				AssemblerListingLocation=".\Debug_babel/"
+				ObjectFile=".\Debug_babel/"
+				ProgramDataBaseFileName=".\Debug_babel/"
 				BrowseInformation="1"
-				BrowseInformationFile=".\Debug/"
+				BrowseInformationFile=".\Debug_babel/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -74,7 +74,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile=".\Debug\babel.lib"
+				OutputFile=".\Debug_babel\babel.lib"
 				SuppressStartupBanner="true"
 			/>
 			<Tool
@@ -86,7 +86,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Debug/babel.bsc"
+				OutputFile=".\Debug_babel/babel.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -97,8 +97,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory=".\.\Release_babel"
+			IntermediateDirectory=".\.\Release_babel"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -130,10 +130,10 @@
 				RuntimeLibrary="0"
 				StructMemberAlignment="3"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/babel.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
+				PrecompiledHeaderFile=".\.\Release_babel/babel.pch"
+				AssemblerListingLocation=".\.\Release_babel/"
+				ObjectFile=".\.\Release_babel/"
+				ProgramDataBaseFileName=".\.\Release_babel/"
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
@@ -151,7 +151,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile=".\Release\babel.lib"
+				OutputFile=".\.\Release_babel\babel.lib"
 				SuppressStartupBanner="true"
 			/>
 			<Tool
@@ -163,7 +163,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/babel.bsc"
+				OutputFile=".\.\Release_babel/babel.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"

@@ -17,7 +17,7 @@ int bbStrLen_sbc(const bbCHAR8* pStr);
 #if bbOS == bbOS_PALMOS
 #define bbStrLen_sbc(pStr) StrLen((const Char*)pStr)
 #else
-#define bbStrLen_sbc(pStr) strlen((const char*)pStr)
+#define bbStrLen_sbc(pStr) strlen(pStr)
 #endif
 #endif
 
@@ -68,6 +68,11 @@ bbCHAR* bbStrStr_sbc(const bbCHAR8* pStr1, const bbCHAR8* pStr2);
 #else
 #define bbStrStr_sbc(pStr1, pStr2) (bbCHAR8*)strstr((const char*)pStr2, (const char*)pStr1)
 #endif
+
+#ifdef _MSC_VER
+char* strcasestr(const char *s, const char *find);
+#endif
+#define bbStrIStr_sbc(pStr1, pStr2) strcasestr(pStr1, pStr2)
 
 #if defined(bbNO_SPRINTF)
 int bbSprintf_sbc(bbCHAR8*, const bbCHAR8*, ...);

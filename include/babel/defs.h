@@ -749,13 +749,22 @@ void bbDEBUGMUTEX_UNLOCK(bbU32 id);
 #if (bbOS == bbOS_WINCE) || (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64)
 #define bbDIRDELIMSTR bbT("\\")
 #define bbDIRDELIM '\\'
+#define bbFILEEXTDELIMSTR bbT(".")
+#define bbFILEEXTDELIM '.'
+#define bbCSD bbT(".")
+#elif (bbOS == bbOS_RISCOS)
+#define bbDIRDELIMSTR bbT(".")
+#define bbDIRDELIM '.'
+#define bbFILEEXTDELIMSTR "/"
+#define bbFILEEXTDELIM '/'
+#define bbCSD bbT("@")
 #else
 #define bbDIRDELIMSTR bbT("/")
 #define bbDIRDELIM '/'
-#endif
-#define bbFILEEXTDELIM '.'
 #define bbFILEEXTDELIMSTR bbT(".")
+#define bbFILEEXTDELIM '.'
 #define bbCSD bbT(".")
+#endif
 
 /** @name Error codes and return codes
 @{*/

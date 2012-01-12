@@ -305,6 +305,7 @@ bbCHAR* bbStrStr(const bbCHAR* pStr, const bbCHAR* pSubStr);
 
 #define bbStrLen   bbStrLen_sbc
 #define bbStrCpy   bbStrCpy_sbc
+#define bbStrNCpy  bbStrNCpy_sbc
 #define bbStrCmp   bbStrCmp_sbc
 #define bbStrICmp  bbStrICmp_sbc
 #define bbStrNCmp  bbStrCmp_sbc
