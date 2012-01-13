@@ -77,7 +77,7 @@ bbU32 bbStrHash(const bbCHAR* const pStr)
         bbUINT c = pStr[i++];
         if (!c)
             break;
-        
+
         hash += (bbU32)c << ((i&3)<<3);
     }
     return hash;
@@ -1024,7 +1024,7 @@ bbCHAR* bbStrConvMemFrom( const bbUINT encoding, const bbUINT flags, const bbU8*
 
         switch (bbgCUSizes[ encoding & bbCEENCMASK ])
         {
-        case 1: srclen = bbStrLen_sbc(pSrc);               break;
+        case 1: srclen = bbStrLen_sbc((const bbCHAR*)pSrc); break;
         case 2: while (bbLD16(pSrc+srclen*2)!=0) srclen++; break;
         case 4: while (bbLD32(pSrc+srclen*4)!=0) srclen++; break;
         default: err = bbErrSet(bbEUK); goto bbStrConvMemFrom_err;

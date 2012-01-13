@@ -32,7 +32,7 @@ extern const bbU8 bbgUTF8_CountTrailBytes[32];
     @param count Number of trailbytes, as looked up via bbgUTF8_CountTrailBytes
     @return Codepoint data with topbits masked off
 */
-#define bbUTF8_CU_MASK_LEAD(c, count) ((bbUINT)(c)&(1<<(6-(count)))-1)
+#define bbUTF8_CU_MASK_LEAD(c, count) ((bbUINT)(c)&((1<<(6-(count)))-1))
 
 /** Get number of 8 bit code units needed to encode this Unicode code point.
     @param c Valid 32 bit code point
@@ -125,9 +125,9 @@ extern const bbU8 bbgUTF8_CountTrailBytes[32];
         bbUINT const __count = (bbUINT) bbgUTF8_CountTrailBytes[(bbUINT)cp >> 3]; \
         (cp) = bbUTF8_CU_MASK_LEAD(cp, __count); \
         switch(__count) { \
-        case 3: (cp)=((cp)<<6)|(*((pStr)++)&0x3FU); \
-        case 2: (cp)=((cp)<<6)|(*((pStr)++)&0x3FU); \
-        case 1: (cp)=((cp)<<6)|(*((pStr)++)&0x3FU); \
+        case 3: (cp)=((cp)<<6)|((*((pStr)++))&0x3FU); \
+        case 2: (cp)=((cp)<<6)|((*((pStr)++))&0x3FU); \
+        case 1: (cp)=((cp)<<6)|((*((pStr)++))&0x3FU); \
         break; \
         } \
     } \
