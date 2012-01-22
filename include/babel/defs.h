@@ -742,6 +742,8 @@ void bbDEBUGMUTEX_UNLOCK(bbU32 id);
 
 #if defined(_MSC_VER)
 #define bbINLINE __forceinline
+#elif defined(__cplusplus)
+#define bbINLINE inline
 #else
 #define bbINLINE
 #endif

@@ -149,7 +149,6 @@ bbDECLAREARR(bbU8, bbArrU8, 1);
 bbDECLAREARR(bbU16, bbArrU16, 2);
 bbDECLAREARR(bbU32, bbArrU32, 4);
 bbDECLAREARR(bbU64, bbArrU64, 8);
-bbDECLAREVEC(bbU64, bbVecU64, 8);
 bbDECLAREARR(double, bbArrF64, 8);
 bbDECLAREARRPTR(bbU8*, bbArrPU8);
 bbDECLAREARRPTR(bbU16*, bbArrPU16);
@@ -177,6 +176,9 @@ bbDECLAREARR(bbCHAR, bbArrCHAR, 4);
 #endif
 
 bbDECLAREVEC(bbU8, bbVecU8, 1);
+bbDECLAREVEC(bbU32, bbVecU16, 2);
+bbDECLAREVEC(bbU32, bbVecU32, 4);
+bbDECLAREVEC(bbU64, bbVecU64, 8);
 
 /** Array of strings.
     This class maintains an array of 0-terminated strings,
