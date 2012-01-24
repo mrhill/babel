@@ -544,6 +544,8 @@ typedef struct bbENCSTATE bbENCSTATE;
 #define bbLD24LE(adr) ((bbU32)*((bbU8*)(adr))|((bbU32)*(((bbU8*)(adr))+1)<<8)|((bbU32)*(((bbU8*)(adr))+2)<<16))
 /** Load little endian bbU32 (32 bit) from unaligned address */
 #define bbLD32LE(adr) ((bbU32)*((bbU8*)(adr))|((bbU32)*(((bbU8*)(adr))+1)<<8)|((bbU32)*(((bbU8*)(adr))+2)<<16)|((bbU32)*(((bbU8*)(adr))+3)<<24))
+/** Load little endian bbU64 (64 bit) from unaligned address */
+#define bbLD64LE(adr) ((bbU64)bbLD32LE(adr)|((bbU64)bbLD32LE((adr)+4)<<32))
 /** Store bbU16 (16 bit) to unaligned address, stores in little endian order */
 #define bbST16LE(adr,w) *(bbU8*)(adr)=(bbU8)(w),*((bbU8*)(adr)+1)=(bbU8)((w)>>8)
 /** Store 24 bit word (low 24 bit of a bbU32) to unaligned address, stores in little endian order */
@@ -572,6 +574,8 @@ typedef struct bbENCSTATE bbENCSTATE;
 
 /** Load big endian bbU32 (32 bit) from unaligned address */
 #define bbLD32BE(adr) ((((bbU32)*(bbU8*)(adr))<<24)|(((bbU32)*((bbU8*)(adr)+1))<<16)|(((bbU32)*((bbU8*)(adr)+2))<<8)|((bbU32)*((bbU8*)(adr)+3)))
+/** Load big endian bbU32 (64 bit) from unaligned address */
+#define bbLD64BE(adr) (((bbU64)bbLD32BE(adr)<<32)|(bbU64)bbLD32BE((adr)+4))
 /** Load big endian 24 bit word (low 24 bit of a bbU32) from unaligned address */
 #define bbLD24BE(adr) ((((bbU32)*(bbU8*)(adr))<<16)|(((bbU32)*((bbU8*)(adr)+1))<<8)|((bbU32)*((bbU8*)(adr)+2)))
 /** Load big endian bbU16 (16 bit) from unaligned address */
