@@ -51,7 +51,7 @@ extern "C" bbFILEH bbFileOpen(const bbCHAR* pFilename, bbUINT flags)
         return NULL;
     }
 
-    if ((flags & bbFILEOPEN_READWRITE) && !(flags & bbFILEOPEN_CREATE))
+    if ((flags & bbFILEOPEN_READWRITE) && !(flags & (bbFILEOPEN_CREATE|bbFILEOPEN_TRUNC)))
     {
         if (!pFile->exists())
         {
@@ -152,7 +152,9 @@ extern "C" bbERR bbFileRename(const bbCHAR* const pPath, const bbCHAR* const pNe
 extern "C" bbCHAR* bbPathNorm(const bbCHAR* const pPath)
 {
     QFileInfo info(pPath);
-    QByteArray norm = info.canonicalFilePath().toUtf8();
+    QDir dir = info.absoluteDir();
+    dir = QDir(dir.absolutePath());
+    QByteArray norm = QDir::toNativeSeparators(dir.absoluteFilePath(info.fileName())).toUtf8();
     bbCHAR* pNorm = bbStrAlloc(norm.size());
     if (pNorm)
         bbStrCpy(pNorm, norm.constData());
@@ -171,7 +173,7 @@ extern "C" bbCHAR* bbPathTemp(const bbCHAR* pDir)
         name.sprintf("%06X", r&0xFFFFFF);
         QFileInfo info(dir, name);
         if (!info.exists())
-            return bbStrFromQt(info.absoluteFilePath());
+            return bbStrFromQt(QDir::toNativeSeparators(info.absoluteFilePath()));
 
         r = ((r<<3)|(r>>(32-3))) ^ r;
         if (++i == 256)
