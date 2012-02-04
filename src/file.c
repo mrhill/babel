@@ -86,7 +86,11 @@ bbCHAR* bbPathTemp(const bbCHAR* pDir)
     if (!pDir)
     {
 #if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64) || (bbOS == bbOS_WINCE)
+        #if bbENC == bbENC_UTF8
+        pName = _tempnam(NULL, NULL);
+        #else
         pName = _wtempnam(NULL, NULL);
+        #endif
         if (!pName)
             bbErrSet(bbESYS);
         return pName;
@@ -123,7 +127,11 @@ bbERR bbFileStat(const bbCHAR* const pPath, bbFILESTAT* const pStat)
 #if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64) || (bbOS == bbOS_WINCE)
     struct _stati64 s;
 
+    #if bbSIZEOF_CHAR == 2
     if (_wstati64(pPath, &s))
+    #else
+    if (_stati64(pPath, &s))
+    #endif
     {
         return errno2bbERR(bbEUK);
     }
@@ -161,7 +169,11 @@ static bbERR errno2bbERR(const bbERR defaulterr)
 bbERR bbFileRename(const bbCHAR* const pPath, const bbCHAR* const pNewPath)
 {
 #if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64) || (bbOS == bbOS_WINCE)
+#if bbSIZEOF_CHAR == 2
     if (_wrename(pPath, pNewPath))
+#else
+    if (rename(pPath, pNewPath))
+#endif
         return errno2bbERR(bbEUK);
     return bbEOK;
 #else
@@ -172,7 +184,11 @@ bbERR bbFileRename(const bbCHAR* const pPath, const bbCHAR* const pNewPath)
 bbERR bbFileDelete(const bbCHAR* const pPath)
 {
 #if (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64) || (bbOS == bbOS_WINCE)
+#if bbSIZEOF_CHAR == 2
     if (_wremove(pPath))
+#else
+    if (remove(pPath))
+#endif
         return errno2bbERR(bbEUK);
     return bbEOK;
 #else

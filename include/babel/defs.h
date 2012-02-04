@@ -20,10 +20,6 @@ extern "C" {
 
 #define _CRT_SECURE_NO_DEPRECATE
 #define _CRT_NON_CONFORMING_SWPRINTFS
-/* Put windows headers into UNICODE mode */
-#ifndef UNICODE
-#define UNICODE
-#endif
 
 #define bbCFGENC_SBC   0
 #define bbCFGENC_DBC   1
@@ -289,8 +285,14 @@ extern "C" {
 #ifndef bbCFGENC
 #if bbOS==bbOS_QT
 #define bbCFGENC bbCFGENC_UTF8
+#elif bbOS==bbOS_WIN32
+  #ifdef UNICODE
+    #define bbCFGENC bbCFGENC_UTF16
+  #else
+    #define bbCFGENC bbCFGENC_UTF8
+  #endif
 #else
-#define bbCFGENC bbCFGENC_UTF16
+#define bbCFGENC bbCFGENC_UTF8
 #endif
 #endif
 
