@@ -13,10 +13,10 @@ class bbStrBuf
     bbUINT  mCapacity;
     bbCHAR  mBuf[bbSTRBUF_MINSIZE];
 
+public:
     int VPrintf(const bbCHAR* pFmt, bbVALIST args);
     int VCatf(const bbCHAR* pFmt, bbVALIST args);
 
-public:
     /** Construct 0 length and 0-terminated string.
         Always succeeds.
     */

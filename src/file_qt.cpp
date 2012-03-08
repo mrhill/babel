@@ -13,7 +13,7 @@
 
 extern "C" bbERR bbFileStat(const bbCHAR* const pPath, bbFILESTAT* const pStat)
 {
-    QFileInfo i(pPath);
+    QFileInfo i(QString::fromUtf8(pPath));
 
     bbMemClear(pStat, sizeof(bbFILESTAT));
 
@@ -44,7 +44,7 @@ extern "C" bbERR bbFileStat(const bbCHAR* const pPath, bbFILESTAT* const pStat)
 
 extern "C" bbFILEH bbFileOpen(const bbCHAR* pFilename, bbUINT flags)
 {
-    QFile* pFile = new QFile(pFilename);
+    QFile* pFile = new QFile(QString::fromUtf8(pFilename));
     if (!pFile)
     {
         bbErrSet(bbENOMEM);
@@ -137,21 +137,21 @@ extern "C" bbERR bbFileTrunc(bbFILEH handle)
 
 extern "C" bbERR bbFileDelete(const bbCHAR* const pPath)
 {
-    if (QFile::remove(pPath))
+    if (QFile::remove(QString::fromUtf8(pPath)))
         return bbEOK;
     return bbErrSet(bbEFILEACCESS);
 }
 
 extern "C" bbERR bbFileRename(const bbCHAR* const pPath, const bbCHAR* const pNewPath)
 {
-    if (QFile::rename(pPath, pNewPath))
+    if (QFile::rename(QString::fromUtf8(pPath), QString::fromUtf8(pNewPath)))
         return bbEOK;
     return bbErrSet(bbEFILEACCESS);
 }
 
 extern "C" bbCHAR* bbPathNorm(const bbCHAR* const pPath)
 {
-    QFileInfo info(pPath);
+    QFileInfo info(QString::fromUtf8(pPath));
     QDir dir = info.absoluteDir();
     dir = QDir(dir.absolutePath());
     QByteArray norm = QDir::toNativeSeparators(dir.absoluteFilePath(info.fileName())).toUtf8();
@@ -163,7 +163,7 @@ extern "C" bbCHAR* bbPathNorm(const bbCHAR* const pPath)
 
 extern "C" bbCHAR* bbPathTemp(const bbCHAR* pDir)
 {
-    QDir dir(pDir ? pDir : QDir::tempPath());
+    QDir dir(pDir ? QString::fromUtf8(pDir) : QDir::tempPath());
 
     bbU32 i = 0;
     bbU32 r = 0x2342;
