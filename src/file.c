@@ -357,7 +357,6 @@ bbERR bbPathSplit(const bbCHAR* const pPath, bbCHAR** const ppDir, bbCHAR** cons
     bbCHARCP cp;
 
     const bbCHAR* pTmp  = pPath;
-    const bbCHAR* pLast;
 
     const bbCHAR* pSrcDir  = pPath;
     const bbCHAR* pSrcFile = NULL;
@@ -374,7 +373,6 @@ bbERR bbPathSplit(const bbCHAR* const pPath, bbCHAR** const ppDir, bbCHAR** cons
 
     do
     {
-        pLast = pTmp;
         bbCP_NEXT_PTR(pTmp, cp);
 
         if (cp == bbDIRDELIM) pSrcFile = pTmp;

@@ -6,8 +6,8 @@ INCLUDEPATH += ./include/babel
 DEFINES += bbQT
 
 win32 {
-QMAKE_CXXFLAGS += /Zc:wchar_t /Zp4
-QMAKE_CXXFLAGS_DEBUG += /Zc:wchar_t /Zp4
+    QMAKE_CXXFLAGS += /Zc:wchar_t /Zp4
+    QMAKE_CXXFLAGS_DEBUG += /Zc:wchar_t /Zp4
 }
 
 # Input

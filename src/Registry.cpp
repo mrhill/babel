@@ -15,7 +15,7 @@ int bbRegistry::Add(void* const pObj)
 {
     int id = NextID();
 
-    if (id == mEntries.GetSize())
+    if ((unsigned)id == mEntries.GetSize())
     {
         if (!mEntries.Grow(1))
             return -1;

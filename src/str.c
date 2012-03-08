@@ -256,11 +256,10 @@ bbCHAR** bbStrSplit(const bbCHAR* pStr, bbU32 opt, bbUINT* const pCount)
 
 bbU32 bbStrToU32(const bbCHAR* pStr, bbUINT opt)
 {
-    bbERR err;
     bbS64 num;
 
     bbErrSet(bbEOK);
-    err = bbStrToS64((bbCHAR*)pStr, NULL, &num, opt);
+    bbStrToS64((bbCHAR*)pStr, NULL, &num, opt);
     if (bbErrGet() != bbEOK)
         return 0;
 
@@ -275,12 +274,11 @@ bbU32 bbStrToU32(const bbCHAR* pStr, bbUINT opt)
 
 bbS32 bbStrToS32(const bbCHAR* pStr, bbUINT opt)
 {
-    bbERR err;
     bbS64 num;
     bbS32 num32;
 
     bbErrSet(bbEOK);
-    err = bbStrToS64((bbCHAR*)pStr, NULL, &num, opt|bbSTROPT_MINUS);
+    bbStrToS64((bbCHAR*)pStr, NULL, &num, opt|bbSTROPT_MINUS);
     if (bbErrGet() != bbEOK)
         return 0;
 
