@@ -555,7 +555,7 @@ typedef struct bbENCSTATE bbENCSTATE;
 /** Store bbU32 (32 bit) to unaligned address, stores in little endian order */
 #define bbST32LE(adr,w) *(bbU8*)(adr)=(bbU8)(w),*((bbU8*)(adr)+1)=(bbU8)((w)>>8),*((bbU8*)(adr)+2)=(bbU8)((w)>>16),*((bbU8*)(adr)+3)=(bbU8)((w)>>24)
 /** Store bbU64 (64 bit) to unaligned address, stores in little endian order */
-#define bbST64LE(adr,w) bbST32LE(adr,(bbU32)w)),bbST32LE(adr,(bbU32)(w>>32)))
+#define bbST64LE(adr,w) bbST32LE(adr,(bbU32)w),bbST32LE(adr,(bbU32)(w>>32))
 /** Load little endian bbS16 (16 bit) from unaligned address and sign-extend */
 #define bbLDS16LE(adr) (bbS32)((bbU32)*((bbU8*)(adr))|((bbS32)*(((bbS8*)(adr))+1)<<8))
 /** Load little endian 24 bit word (low 24 bit of a bbU32) from unaligned address and sign-extend */
@@ -752,6 +752,12 @@ void bbDEBUGMUTEX_UNLOCK(bbU32 id);
 #define bbINLINE inline
 #else
 #define bbINLINE
+#endif
+
+#if defined(_MSC_VER)
+#define bbI64 bbT("I64")
+#else
+#define bbI64 bbT("ll")
 #endif
 
 #if (bbOS == bbOS_WINCE) || (bbOS == bbOS_WIN32) || (bbOS == bbOS_WIN64)

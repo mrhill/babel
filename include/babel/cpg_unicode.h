@@ -28,10 +28,10 @@ int bbCpgUnicode_IsWide(bbCHARCP const cp);
 int bbCpgUnicode_IsNonspace(bbCHARCP const cp);
 
 /** Upcase unicode codepoint.
-    @param cp Code point
-    @return Upcased version of character
+    @param (bbCHARCP) cp Code point
+    @return (bbCHARCP) Upcased version of character
 */
-bbINLINE bbCHARCP bbCpgUnicode_Upcase(bbCHARCP const cp) { return (cp-('z'-'a'))<=('z'-'a') ? (cp&0xDF) : cp; }
+#define bbCpgUnicode_Upcase(cp) (((cp)-('z'-'a'))<=('z'-'a') ? ((cp)&0xDF) : (cp))
 
 /** Get block ID for codepoint.
     @param cp Code point
