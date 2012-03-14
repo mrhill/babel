@@ -82,6 +82,7 @@ bbERR bbArr_SetSize12(void* const p, const bbUINT size) { return bbArr_SetSize<1
 bbERR bbArr_SetSize16(void* const p, const bbUINT size) { return bbArr_SetSize<16>(p, size); }
 bbERR bbArr_SetSize24(void* const p, const bbUINT size) { return bbArr_SetSize<24>(p, size); }
 bbERR bbArr_SetSize48(void* const p, const bbUINT size) { return bbArr_SetSize<48>(p, size); }
+bbERR bbArr_SetSize52(void* const p, const bbUINT size) { return bbArr_SetSize<52>(p, size); }
 
 void* bbArr_Grow1(void* const p, const int relsize) { return bbArr_Grow<1>(p, relsize); }
 void* bbArr_Grow2(void* const p, const int relsize) { return bbArr_Grow<2>(p, relsize); }
@@ -91,6 +92,7 @@ void* bbArr_Grow12(void* const p, const int relsize) { return bbArr_Grow<12>(p, 
 void* bbArr_Grow16(void* const p, const int relsize) { return bbArr_Grow<16>(p, relsize); }
 void* bbArr_Grow24(void* const p, const int relsize) { return bbArr_Grow<24>(p, relsize); }
 void* bbArr_Grow48(void* const p, const int relsize) { return bbArr_Grow<48>(p, relsize); }
+void* bbArr_Grow52(void* const p, const int relsize) { return bbArr_Grow<52>(p, relsize); }
 
 bbERR bbArr_CopyFrom1(void* const p, void* const pFrom) { return bbArr_CopyFrom<1>(p, pFrom);}
 bbERR bbArr_CopyFrom2(void* const p, void* const pFrom) { return bbArr_CopyFrom<2>(p, pFrom);}
@@ -100,6 +102,7 @@ bbERR bbArr_CopyFrom12(void* const p, void* const pFrom) { return bbArr_CopyFrom
 bbERR bbArr_CopyFrom16(void* const p, void* const pFrom) { return bbArr_CopyFrom<16>(p, pFrom);}
 bbERR bbArr_CopyFrom24(void* const p, void* const pFrom) { return bbArr_CopyFrom<24>(p, pFrom);}
 bbERR bbArr_CopyFrom48(void* const p, void* const pFrom) { return bbArr_CopyFrom<48>(p, pFrom);}
+bbERR bbArr_CopyFrom52(void* const p, void* const pFrom) { return bbArr_CopyFrom<52>(p, pFrom);}
 
 template<unsigned int N> static bbERR bbVec_SetCapacity(void* const p, const bbUINT size)
 {
