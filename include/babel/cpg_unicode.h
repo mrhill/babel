@@ -31,7 +31,7 @@ int bbCpgUnicode_IsNonspace(bbCHARCP const cp);
     @param (bbCHARCP) cp Code point
     @return (bbCHARCP) Upcased version of character
 */
-#define bbCpgUnicode_Upcase(cp) (((cp)-('z'-'a'))<=('z'-'a') ? ((cp)&0xDF) : (cp))
+#define bbCpgUnicode_Upcase(cp) ((bbU32)((cp)-'a')<=(bbU32)('z'-'a') ? ((cp)&0xDF) : (cp))
 
 /** Get block ID for codepoint.
     @param cp Code point
