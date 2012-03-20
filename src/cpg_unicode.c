@@ -19,6 +19,17 @@ int bbCpgUnicode_IsNonspace(bbCHARCP const cp)
     return ((cp == 0xFEFF) || (cp == 0xFFFE));//xxx
 }
 
+int bbCpgUnicode_IsAlphanum(bbCHARCP const cp)
+{
+    if ( ((bbU32)(cp - 'a') <= (bbU32)('z'-'a')) ||
+         ((bbU32)(cp - 'A') <= (bbU32)('Z'-'A')) ||
+         ((bbU32)(cp - '0') <= (bbU32)('9'-'0')) ||
+         (cp =='_') )
+         return 1;
+
+    return 0;
+}
+
 int bbCpgUnicode_IsWide(bbCHARCP const cp)
 {
     #if bbSIZEOF_CHARCP >= 2

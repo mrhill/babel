@@ -27,6 +27,12 @@ int bbCpgUnicode_IsWide(bbCHARCP const cp);
 */
 int bbCpgUnicode_IsNonspace(bbCHARCP const cp);
 
+/** Test if unicode codepoint is alpha-numberic character (letter, number, or underbar).
+    @param cp Code point
+    @return !=0 if alpha-numeric
+*/
+int bbCpgUnicode_IsAlphanum(bbCHARCP const cp);
+
 /** Upcase unicode codepoint.
     @param (bbCHARCP) cp Code point
     @return (bbCHARCP) Upcased version of character
