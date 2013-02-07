@@ -375,7 +375,7 @@ bbERR bbPathSplit(const bbCHAR* const pPath, bbCHAR** const ppDir, bbCHAR** cons
     {
         bbCP_NEXT_PTR(pTmp, cp);
 
-        if (cp == bbDIRDELIM) pSrcFile = pTmp;
+        if (cp == bbDIRDELIM) pSrcExt = NULL, pSrcFile = pTmp;
         if (cp == bbFILEEXTDELIM) pSrcExt = pTmp;
     } while (cp);
 
