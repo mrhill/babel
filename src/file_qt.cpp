@@ -154,7 +154,7 @@ extern "C" bbCHAR* bbPathNorm(const bbCHAR* const pPath)
     QFileInfo info(QString::fromUtf8(pPath));
     QDir dir = info.absoluteDir();
     dir = QDir(dir.absolutePath());
-    QByteArray norm = QDir::toNativeSeparators(dir.absoluteFilePath(info.fileName())).toUtf8();
+    QByteArray norm = dir.absoluteFilePath(info.fileName()).toUtf8();
     bbCHAR* pNorm = bbStrAlloc(norm.size());
     if (pNorm)
         bbStrCpy(pNorm, norm.constData());
@@ -173,7 +173,7 @@ extern "C" bbCHAR* bbPathTemp(const bbCHAR* pDir)
         name.sprintf("%06X", r&0xFFFFFF);
         QFileInfo info(dir, name);
         if (!info.exists())
-            return bbStrFromQt(QDir::toNativeSeparators(info.absoluteFilePath()));
+            return bbStrFromQt(info.absoluteFilePath());
 
         r = ((r<<3)|(r>>(32-3))) ^ r;
         if (++i == 256)
