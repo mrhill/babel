@@ -110,7 +110,7 @@ extern "C" {
 #define bbOS bbOS_SYMBIAN
 #elif defined(__MWERKS__)
 #define bbOS bbOS_PALMOS
-#elif defined(__FreeBSD__) || defined(ANDROID)
+#elif defined(__FreeBSD__) || defined(ANDROID) || defined(__linux__)
 #define bbOS bbOS_POSIX
 #else
 #error Could not autodetect OS
@@ -208,7 +208,9 @@ extern "C" {
 
 /* try sizeof() detections */
 #ifndef bbSIZEOF_INT
-#if defined(WIN32) || defined(__CYGWIN__) || defined(_X86_) || defined(ANDROID) || (bbOS==bbOS_QT)
+#if defined(__SIZEOF_INT__)
+#define bbSIZEOF_INT __SIZEOF_INT__
+#elif defined(WIN32) || defined(__CYGWIN__) || defined(_X86_) || defined(ANDROID) || (bbOS==bbOS_QT)
 #define bbSIZEOF_INT 4
 #else
 #error Cannot detect bbSIZEOF_INT
@@ -218,6 +220,8 @@ extern "C" {
 #ifndef bbSIZEOF_UPTR
 #if (bbOS==bbOS_QT)
 #define bbSIZEOF_UPTR QT_POINTER_SIZE
+#elif defined(__SIZEOF_POINTER__)
+#define bbSIZEOF_UPTR __SIZEOF_POINTER__
 #elif defined(WIN32) || defined(__CYGWIN__) || defined(_X86_) || defined(ANDROID)
 #define bbSIZEOF_UPTR 4
 #elif defined(WIN64)
