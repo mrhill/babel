@@ -30,7 +30,7 @@ extern "C" {
 #define bbCPG_ASCII 0
 /** Constant identifying Unicode 4.0 codepage. */
 #define bbCPG_UNICODE 1
-/** Constant identifying Unicode 1.1 (ISO 10646) codepage. */           
+/** Constant identifying Unicode 1.1 (ISO 10646) codepage. */
 #define bbCPG_UCS 2
 /** Constant identifying ISO-8859-1 (Latin 1) codepage. */
 #define bbCPG_ISO8859_1 3
@@ -179,6 +179,8 @@ extern "C" {
     #else
         #define bbCPU bbCPU_68K
     #endif
+#elif defined(__i386__)
+    #define bbCPU bbCPU_X86
 #elif defined(WIN32)
     #define bbCPU bbCPU_X86
 #else
