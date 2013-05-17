@@ -532,6 +532,8 @@ typedef struct bbENCSTATE bbENCSTATE;
 #define bbVAEND(ap) va_end(ap)
 #endif
 
+#define bbVACOPY va_copy
+
 /** Marshal bbU32 (32 bit) to little endian bytes */
 #define bbMA32LE(val) (bbU8)val,(bbU8)(val>>8),(bbU8)(val>>16),(bbU8)(val>>24)
 /** Marshal bbU32 (32 bit) to big endian bytes */

@@ -76,8 +76,8 @@ bbCHAR* bbStrBuf::Ensure(bbUINT str_len)
             bbCHAR* pNew = (bbCHAR*)bbMemAlloc(capacity * sizeof(bbCHAR));
             if (!pNew)
                 return NULL;
-            /* FIXME, is following assignment correct?*/
-            bbStrCpy((mpStr = pNew), mBuf);
+            mpStr = pNew;
+            bbStrCpy(pNew, mBuf);
         }
         else
         {
@@ -208,7 +208,11 @@ int bbStrBuf::VPrintf(const bbCHAR* pFmt, bbVALIST args)
     Clear();
     for(;;)
     {
-        size = bbVsnprintf(mpStr, mCapacity, pFmt, args);
+        bbVALIST tmp_args;
+        bbVACOPY(tmp_args, args);
+        size = bbVsnprintf(mpStr, mCapacity, pFmt, tmp_args);
+        bbVAEND(tmp_args);
+
         if ((size<0 || size>=(int)mCapacity) && (retried<4))
         {
             *mpStr = 0;
