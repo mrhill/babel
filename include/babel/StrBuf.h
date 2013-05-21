@@ -13,6 +13,8 @@ class bbStrBuf
     bbUINT  mCapacity;
     bbCHAR  mBuf[bbSTRBUF_MINSIZE];
 
+    inline void AddSize(bbUINT const increase) { mLen+=increase; }
+
 public:
     int VPrintf(const bbCHAR* pFmt, bbVALIST args);
     int VCatf(const bbCHAR* pFmt, bbVALIST args);
@@ -64,6 +66,14 @@ public:
     /** Clear string and reset capacity. */
     void Clear();
 
+    /** Set string length to given number of characters.
+        Capacity will be set to at least len + 1 (0-terminator) characters.
+        String contents will be uninitialized.
+        @param strlen Number of characters to ensure.
+        @return Pointer to start of string, or NULL on failure.
+    */
+    bbCHAR* SetLen(bbUINT strlen);
+
     /** Get pointer to string buffer.
         @return Pointer to 0-terminated string.
     */
@@ -73,9 +83,6 @@ public:
     inline bool empty() const { return mLen==0; }
 
     inline bbUINT GetCapacity() const { return mCapacity; }
-
-    /** @internal */
-    inline void AddSize(bbUINT const increase) { mLen+=increase; }
 
     /** Assign string buffer by copying from referenced string.
         Guaranted to succeed, if referenced string is less than bbSTRBUF_MINSIZE characters.
@@ -94,14 +101,14 @@ public:
 
     /** Concatenate string to end of buffer.
         @param pStr String to append
-        @return Pointer to start of inserted string in buffer, or NULL on failure 
+        @return Pointer to start of inserted string in buffer, or NULL on failure
     */
     bbCHAR* Cat(const bbCHAR* const pStr);
 
     #if bbSIZEOF_CHAR != 1
     /** Concatenate string to end of buffer.
         @param pStr String to append
-        @return Pointer to start of inserted string in buffer, or NULL on failure 
+        @return Pointer to start of inserted string in buffer, or NULL on failure
     */
     bbCHAR* Cat(const char* pStr);
     #endif
@@ -137,7 +144,7 @@ public:
     */
     int Catf(const bbCHAR*, ...);
 
-    /** Concatenate number as unsigned decimal. 
+    /** Concatenate number as unsigned decimal.
         @return New length of complete string
     */
     int CatN(bbU64 n);

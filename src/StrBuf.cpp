@@ -59,7 +59,7 @@ void bbStrBuf::Clear()
     mpStr = mBuf;
     mLen = 0;
     mBuf[0] = 0;
-    mCapacity = bbARRSIZE(mBuf);    
+    mCapacity = bbARRSIZE(mBuf);
 }
 
 bbCHAR* bbStrBuf::Ensure(bbUINT str_len)
@@ -91,6 +91,12 @@ bbCHAR* bbStrBuf::Ensure(bbUINT str_len)
     return mpStr + mLen;
 }
 
+bbCHAR* bbStrBuf::SetLen(bbUINT strlen)
+{
+    Clear();
+    return Ensure(strlen);
+}
+
 void bbStrBuf::Attach(bbCHAR* const pStr, bbUINT capacity, int len)
 {
     Clear();
@@ -111,7 +117,7 @@ bbCHAR* bbStrBuf::Detach()
         pStr = bbStrDup(mBuf);
     else
         pStr = mpStr;
-        
+
     mpStr = mBuf;
     Clear();
 
