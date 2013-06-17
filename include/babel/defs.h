@@ -629,7 +629,6 @@ typedef struct bbENCSTATE bbENCSTATE;
 #define bbST16(adr,w) bbST16BE(adr,w)
 #endif
 
-
 /** Load little endian bbU32 (32 bit) from aligned address */
 #if bbCPUE==bbCPUE_LE
 #define bbLDA32LE(adr) (*(const bbU32*)(adr))
@@ -644,11 +643,32 @@ typedef struct bbENCSTATE bbENCSTATE;
 #define bbSTA32LE(adr,w) *(bbU8*)(adr)=(bbU8)(w),*((bbU8*)(adr)+1)=(bbU8)((w)>>8),*((bbU8*)(adr)+2)=(bbU8)((w)>>16),*((bbU8*)(adr)+3)=(bbU8)((w)>>24)
 #endif
 
+/** Load little endian bbU64 (64 bit) from aligned address */
+#if bbCPUE==bbCPUE_LE
+#define bbLDA64LE(adr) (*(const bbU64*)(adr))
+#else
+#define bbLDA64LE(adr) bbLD64LE(adr)
+#endif
+
+/** Store bbU64 (64 bit) to aligned address, stores in little endian order */
+#if bbCPUE==bbCPUE_LE
+#define bbSTA64LE(adr,w) *(bbU64*)(adr)=(bbU64)(w)
+#else
+#define bbSTA64LE(adr,w) bbST64LE(adr,w)
+#endif
+
 /** Load little endian bbU16 (16 bit) from aligned address */
 #if bbCPUE==bbCPUE_LE
 #define bbLDA16LE(adr) (*(const bbU16*)(adr))
 #else
 #define bbLDA16LE(adr) bbLD16LE(adr)
+#endif
+
+/** Store bbU16 (16 bit) to aligned address, stores in little endian order */
+#if bbCPUE==bbCPUE_LE
+#define bbSTA16LE(adr,w) *(bbU16*)(adr)=(bbU16)(w)
+#else
+#define bbSTA16LE(adr,w) bbST16LE(adr,w)
 #endif
 
 /** Returns the minimum of a set of two values. */
