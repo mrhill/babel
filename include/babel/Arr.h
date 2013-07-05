@@ -24,6 +24,7 @@
     inline T *       Grow(const int relsize) { return (T*)bbArr_Grow##elsize (this, relsize); }\
     inline T *       Append(T const item) { T* p=Grow(1); if(p) *p=item; return p; }\
     inline void      Del(const bbUINT index) { bbMemMove(mpData+index, mpData+index+1, (mSize-index-1)*elsize); Grow(-1); }\
+    inline void      Del(const bbUINT index, const bbUINT count) { bbMemMove(mpData+index, mpData+index+count, (mSize-index-count)*elsize); Grow(-count); }\
     inline T *       GetPtr() { return (T*)mpData; }\
     inline T const * GetPtr() const { return (T const*)mpData; }\
     inline T *       GetPtr(const bbUINT idx) { bbASSERT(idx<mSize); return (T*)mpData + idx; }\
