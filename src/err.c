@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "str.h"
 
 bbERR  bbgErr;
 
@@ -6,7 +7,17 @@ bbCHAR bbgErrStr[bbERRSTRMAXLEN];
 
 const bbCHAR* bbGetErrStr(const bbERR err)
 {
-    bbgErrStr[0] = 0;
+    switch(err)
+    {
+    case bbENOMEM    : bbStrCpy(bbgErrStr, bbT("Out of memory")); break;
+    case bbENOTFOUND : bbStrCpy(bbgErrStr, bbT("Not found")); break;
+    case bbENOTSUP   : bbStrCpy(bbgErrStr, bbT("Operation not supported")); break;
+    case bbEBADPARAM : bbStrCpy(bbgErrStr, bbT("Bad parameter")); break;
+    case bbEBADSTATE : bbStrCpy(bbgErrStr, bbT("Bad state")); break;
+    case bbESYNTAX   : bbStrCpy(bbgErrStr, bbT("Syntax error")); break;
+    case bbEOVERFLOW : bbStrCpy(bbgErrStr, bbT("Overflow")); break;
+    default: bbSprintf(bbgErrStr, "Error %d", err); break;
+    }
     return bbgErrStr;
 }
 
