@@ -37,7 +37,7 @@ bbCHAR* bbPathNorm(const bbCHAR* const pPath)
     {
         if (bbEOK != bbMemRealloc(len*sizeof(bbCHAR), (void**)&pPath0))
             goto bbPathNorm_err0;
-        
+
         len0 = GetLongPathName(pPath, pPath0, len);
     }
 
@@ -153,8 +153,8 @@ bbERR bbFileStat(const bbCHAR* const pPath, bbFILESTAT* const pStat)
 static bbERR errno2bbERR(const bbERR defaulterr)
 {
     bbERR err = defaulterr;
-    if ((errno==EPERM) || 
-        (errno==EACCES) || 
+    if ((errno==EPERM) ||
+        (errno==EACCES) ||
         (errno==EROFS) )
         err = bbEFILEACCESS;
     else if (errno==ENOENT)
@@ -266,7 +266,7 @@ bbERR bbFileSeek(bbFILEH handle, const bbS64 offset, const bbUINT mode)
 
 bbERR bbFileRead(bbFILEH handle, void* pBuf, const bbU32 size)
 {
-    if (fread(pBuf, 1, size, handle) == size) 
+    if (fread(pBuf, 1, size, handle) == size)
         return bbEOK;
 
     if (feof(handle))
@@ -290,7 +290,7 @@ bbERR bbFileTrunc(bbFILEH handle)
     bbU64 pos = bbFileTell(handle);
 
     if ((fd == -1) || (pos > (bbU32)-1>>1))
-        return bbEUK;
+        return bbErrSet(bbESYS);
 
     if (_chsize(fd, (long)pos))
         return errno2bbERR(bbEUK);
@@ -440,7 +440,7 @@ bbERR bbPathSplit(const bbCHAR* const pPath, bbCHAR** const ppDir, bbCHAR** cons
 bbCHAR* bbPathDelimEx(const bbCHAR* const pPath, bbUINT extralen)
 {
     bbUINT len = bbStrLen(pPath);
-   
+
     bbCHAR* pTmp = (bbCHAR*) bbMemAlloc((len + extralen + 2) * sizeof(bbCHAR));
 
     if (pTmp)

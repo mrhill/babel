@@ -9,6 +9,7 @@ const bbCHAR* bbGetErrStr(const bbERR err)
 {
     switch(err)
     {
+    case bbEUK       : bbStrCpy(bbgErrStr, bbT("Unknown")); break;
     case bbENOMEM    : bbStrCpy(bbgErrStr, bbT("Out of memory")); break;
     case bbENOTFOUND : bbStrCpy(bbgErrStr, bbT("Not found")); break;
     case bbENOTSUP   : bbStrCpy(bbgErrStr, bbT("Operation not supported")); break;
