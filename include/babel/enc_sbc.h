@@ -27,7 +27,7 @@ bbCHAR8* bbStrCpy_sbc(bbCHAR8* pDst, const bbCHAR8* pSrc);
 #if bbOS == bbOS_PALMOS
 #define bbStrCpy_sbc(pDst, pSrc) (bbCHAR8*)StrCopy((Char*)pDst, (const Char*)pSrc)
 #else
-#define bbStrCpy_sbc(pDst, pSrc) (bbCHAR8*)strcpy((char*)pDst, (const char*)pSrc)
+#define bbStrCpy_sbc(pDst, pSrc) strcpy((char*)(pDst), (const char*)(pSrc))
 #endif
 #endif
 
@@ -54,7 +54,7 @@ int bbStrCmp_sbc(const bbCHAR8* pStr1, const bbCHAR8* pStr2);
 #if defined(bbNO_STRICMP)
 int bbStrICmp_sbc(const bbCHAR8* pStr1, const bbCHAR8* pStr2);
 #else
-#if bbOS == bbOS_PALMOS 
+#if bbOS == bbOS_PALMOS
 #define bbStrICmp_sbc(pStr1, pStr2) StrCaselessCompare((const Char*)pStr1, (const Char*)pStr2)
 #elif bbOS == bbOS_POSIX
 #define bbStrICmp_sbc(pStr1, pStr2) strcasecmp((const char*)pStr1, (const char*)pStr2)
@@ -81,7 +81,7 @@ char* strcasestr(const char *s, const char *find);
 #if defined(bbNO_SPRINTF)
 int bbSprintf_sbc(bbCHAR8*, const bbCHAR8*, ...);
 #else
-#if bbOS == bbOS_PALMOS 
+#if bbOS == bbOS_PALMOS
 #define bbSprintf_sbc StrPrintF
 #else
 #define bbSprintf_sbc sprintf
@@ -91,7 +91,7 @@ int bbSprintf_sbc(bbCHAR8*, const bbCHAR8*, ...);
 #if defined(bbNO_VSPRINTF)
 int bbVsnprintf_sbc(bbCHAR8*, bbUINT, const bbCHAR8*, bbVALIST);
 #else
-#if bbOS == bbOS_PALMOS 
+#if bbOS == bbOS_PALMOS
 #define bbVsnprintf_sbc StrVNPrintF
 #else
 #define bbVsnprintf_sbc vsnprintf

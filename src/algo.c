@@ -18,3 +18,24 @@ int bbCmp_bbU8(const void * p1, const void * p2)
     return 0;
 }
 
+void* bbBSearchGE(const void* pKey, const void* pBase, bbUINT nmemb, bbUINT size, bbCmpFn cmpFn)
+{
+    bbUINT mid;
+    const bbU8* pElGt = (const bbU8*)pBase + nmemb * size;
+
+    for (mid = nmemb; mid != 0; mid >>= 1)
+    {
+        const bbU8* pEl = (const bbU8*)pBase + (mid >> 1) * size;
+        int cmp = (*cmpFn)(pKey, pEl);
+
+        if (cmp == 0)
+            return (void*)pEl;
+
+        if (cmp > 0)
+            pBase = pEl + size, mid--;
+        else
+            pElGt = pEl;
+    }
+    return (void*)pElGt;
+}
+
