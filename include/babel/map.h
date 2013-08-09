@@ -59,7 +59,6 @@ struct bbMap
     bbMapKeyChunk* mpKeys;
     bbCmpFn    mCmpFn;
     bbUINT     mSize;
-    bbUINT     mCapacity;
     bbUINT     mKeyChunkUsed;
 
     #ifdef  __cplusplus

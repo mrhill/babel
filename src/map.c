@@ -1,5 +1,6 @@
 #include "map.h"
 #include "str.h"
+#include "fixmath.h"
 
 struct bbMapPair
 {
@@ -34,7 +35,6 @@ void bbMapInit(struct bbMap* pMap)
 
 void bbMapDestroy(struct bbMap* pMap)
 {
-    bbMapDump(pMap);
     bbMapKeyChunk* pChunk = pMap->mpKeys;
     while(pChunk)
     {
@@ -89,16 +89,13 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, void* val)
 
     if ((insertAt >= pMap->mSize) || ((*pMap->mCmpFn)(pKey, pInsert) != 0))
     {
+        bbUINT capacity = pMap->mSize ? 2 << bbGetTopBit(pMap->mSize-1) : 0;
         bbUINT newSize = pMap->mSize + 1;
-        if (newSize > pMap->mCapacity)
+        if (newSize > capacity)
         {
-            bbUINT newCapacity = pMap->mCapacity;
-            newCapacity = newCapacity ? newCapacity<<1 : 4;
-
-            if (bbMemRealloc(newCapacity * sizeof(bbMapPair), (void**)&pMap->mpPairs) != bbEOK)
+            capacity = capacity ? capacity<<1 : 2;
+            if (bbMemRealloc(capacity * sizeof(bbMapPair), (void**)&pMap->mpPairs) != bbEOK)
                 return bbELAST;
-            pMap->mCapacity = newCapacity;
-
             pInsert = pMap->mpPairs + insertAt;
         }
 
@@ -159,7 +156,7 @@ static int bbMapIsKeyExternal(const struct bbMap* pMap, const bbCHAR* pKey)
 void bbMapDump(const struct bbMap* pMap)
 {
     bbUINT i = 0;
-    bbPrintf("bbMap mSize:%u, mCapacity:%u, mKeyChunkUsed=%u\n", pMap->mSize, pMap->mCapacity, pMap->mKeyChunkUsed);
+    bbPrintf("bbMap mSize:%u, mKeyChunkUsed=%u\n", pMap->mSize, pMap->mKeyChunkUsed);
 
     const bbMapKeyChunk* pChunk = pMap->mpKeys;
     while(pChunk)
