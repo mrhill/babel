@@ -2,19 +2,20 @@
 #include "str.h"
 #include "fixmath.h"
 
-struct bbMapPair
+typedef struct bbMapPair
 {
     const bbCHAR* key;
     bbU64PTR val;
-};
+
+} bbMapPair;
 
 #define bbMAP_KEYCHUNKSIZE (256 - sizeof(void*))
 
-struct bbMapKeyChunk
+typedef struct bbMapKeyChunk
 {
     struct bbMapKeyChunk* next;
     bbCHAR str[bbMAP_KEYCHUNKSIZE];
-};
+} bbMapKeyChunk;
 
 int bbCmp_Str2MapPair(const void *p1, const void *p2)
 {
@@ -82,6 +83,8 @@ static const bbCHAR* bbMapAddKey(struct bbMap* pMap, const bbCHAR* pKey)
     return pKeyCopy;
 }
 
+#define bbMapGetCapcity(size) ((size) ? 2 << bbGetTopBit((size)-1) : 0)
+
 bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
     bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), pMap->mCmpFn);
@@ -89,7 +92,7 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 
     if ((insertAt >= pMap->mSize) || ((*pMap->mCmpFn)(pKey, pInsert) != 0))
     {
-        bbUINT capacity = pMap->mSize ? 2 << bbGetTopBit(pMap->mSize-1) : 0;
+        bbUINT capacity = bbMapGetCapcity(pMap->mSize);
         bbUINT newSize = pMap->mSize + 1;
         if (newSize > capacity)
         {
@@ -137,6 +140,35 @@ bbU64PTR bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey)
     return 0;
 }
 
+bbU64PTR bbMapDel(struct bbMap* pMap, const bbCHAR* pKey)
+{
+    bbU64PTR val = 0;
+    bbMapPair* pFound = NULL;
+
+    if (pKey)
+        pFound = bbBSearch(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), pMap->mCmpFn);
+
+    if (pFound)
+    {
+        bbUINT newSize = pMap->mSize - 1;
+        bbUINT capacity = bbMapGetCapcity(newSize);
+        bbUINT found = pFound - pMap->mpPairs;
+
+        bbErrSet(bbEOK);
+        val = pFound->val;
+
+        bbMemMove(pFound, pFound + 1, (newSize - found) * sizeof(bbMapPair));
+        bbMemRealloc(capacity * sizeof(bbMapPair), (void**)&pMap->mpPairs);
+        pMap->mSize = newSize;
+    }
+    else
+    {
+        bbErrSet(bbENOTFOUND);
+    }
+
+    return val;
+}
+
 void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR))
 {
     bbUINT i = 0;
@@ -169,7 +201,7 @@ void bbMapDump(const struct bbMap* pMap)
 {
     bbUINT i = 0, keychunks = 0;
     bbU32 datasize = 0, memsize = 0;
-    const bbCHAR* chunkPtrs[64*2];
+    const bbCHAR* chunkPtrs[256*2];
 
     bbPrintf("bbMap mSize:%u, mKeyChunkUsed=%u\n", pMap->mSize, pMap->mKeyChunkUsed);
 
@@ -199,7 +231,7 @@ void bbMapDump(const struct bbMap* pMap)
 
         datasize += sizeof(bbMapPair);
         memsize += sizeof(bbMapPair);
-        bbPrintf(" \"%s\":%p chunk %d\n", pMap->mpPairs[i].key, pMap->mpPairs[i].val, keychunk);
+        bbPrintf(" \"%s\":0x%"bbI64"u chunk %d\n", pMap->mpPairs[i].key, pMap->mpPairs[i].val, keychunk);
     }
 
     for(i=0; i<keychunks; i++)

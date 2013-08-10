@@ -11,10 +11,6 @@ struct bbMap;
 
 #ifdef  __cplusplus
 extern "C" {
-#else
-typedef struct bbMapPair bbMapPair;
-typedef struct bbMapKeyChunk bbMapKeyChunk;
-typedef struct bbMap bbMap;
 #endif
 
 /** Construct a map.
@@ -45,11 +41,18 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
 
 /** Search map for key.
     @param pMap Map
-    @param pKey Key, 0-terminated string
+    @param pKey Key, 0-terminated string, can be NULL to force failure.
     @return Returns value, or 0 if not found (bbENOTFOUND).
             Call bbErrGet() to distinguish between error and NULL-value.
 */
 bbU64PTR bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey);
+
+/** Remove a key-value pair and return the previously stored value.
+    @param pMap Map
+    @param pKey Key, 0-terminated string, can be NULL to force failure.
+    @return Returns value, or 0 if not found (bbENOTFOUND).
+*/
+bbU64PTR bbMapDel(struct bbMap* pMap, const bbCHAR* pKey);
 
 /** Return number of pairs in map.
     @param pMap Map
@@ -69,13 +72,23 @@ void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR)
 */
 void bbMapDump(const struct bbMap* pMap);
 
+/** Key-value map.
+
+    Keys are 0-terminated strings, and values are bbU64PTR.
+
+    If pairs are added via Add(), the key string is copied to internal storage.
+    If paris are added via AddC(), the original key string pointer is stored, and
+    the pointer must remain valid for the lifetime of the bbMap instance.
+
+    Keys are stored in a sorted array, insert time is O(N + logN), and look-up time is O(logN).
+*/
 struct bbMap
 {
-    bbMapPair* mpPairs;
-    bbMapKeyChunk* mpKeys;
-    bbCmpFn    mCmpFn;
-    bbUINT     mSize;
-    bbUINT     mKeyChunkUsed;
+    struct bbMapPair*     mpPairs;
+    struct bbMapKeyChunk* mpKeys;
+    bbCmpFn               mCmpFn;
+    bbUINT                mSize;
+    bbUINT                mKeyChunkUsed;
 
     #ifdef  __cplusplus
     inline bbMap() { bbMapInit(this); }
@@ -93,11 +106,16 @@ struct bbMap
     #endif
 };
 
+/** Callback to compare bbCHAR* against the key stored in a bbMapPair*, case-sensitive. */
 int bbCmp_Str2MapPair(const void *, const void *);
+
+/** Callback to compare bbCHAR* against the key stored in a bbMapPair*, case-insensitive. */
 int bbCmpI_Str2MapPair(const void *, const void *);
 
 #ifdef  __cplusplus
 }
+#else
+typedef struct bbMap bbMap;
 #endif
 
 #endif /* bbBABEL_MAP_H_ */
