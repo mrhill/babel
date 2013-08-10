@@ -145,36 +145,72 @@ void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, void*))
             break;
 }
 
-static int bbMapIsKeyExternal(const struct bbMap* pMap, const bbCHAR* pKey)
+static int bbMapGetChunkForKey(const struct bbMap* pMap, const bbCHAR* pKey)
 {
-    int external = 1;
+    int i = 0, chunk = -1;
     const bbMapKeyChunk* pChunk = pMap->mpKeys;
     while(pChunk)
     {
         if ((bbUPTR)pKey - (bbUPTR)pChunk < sizeof(bbMapKeyChunk))
         {
-            external = 0;
+            chunk = i;
             break;
         }
         pChunk = pChunk->next;
+        i++;
     }
-    return external;
+    return chunk;
 }
 
 void bbMapDump(const struct bbMap* pMap)
 {
-    bbUINT i = 0;
+#ifdef bbDEBUG
+    bbUINT i = 0, keychunks = 0;
+    bbU32 datasize = 0, memsize = 0;
+    const bbCHAR* chunkPtrs[64*2];
+
     bbPrintf("bbMap mSize:%u, mKeyChunkUsed=%u\n", pMap->mSize, pMap->mKeyChunkUsed);
 
     const bbMapKeyChunk* pChunk = pMap->mpKeys;
     while(pChunk)
     {
-        bbPrintf("keychunk %d: %s\n", i++, pChunk->str);
+        if (i < bbARRSIZE(chunkPtrs)/2)
+            chunkPtrs[i*2] = chunkPtrs[i*2+1] = pChunk->str;
         pChunk = pChunk->next;
+        i++;
     }
 
     for(i=0; i<pMap->mSize; i++)
-        bbPrintf("%s:%p %d\n", pMap->mpPairs[i].key, pMap->mpPairs[i].val, bbMapIsKeyExternal(pMap, pMap->mpPairs[i].key));
+    {
+        bbUINT keylen = bbStrLen(pMap->mpPairs[i].key) + 1;
+        bbUINT keychunk = bbMapGetChunkForKey(pMap, pMap->mpPairs[i].key);
 
+        if (keychunk < bbARRSIZE(chunkPtrs)/2)
+        {
+            const bbCHAR* pKeyEnd = pMap->mpPairs[i].key + keylen;
+            if (chunkPtrs[keychunk*2+1] < pKeyEnd)
+                chunkPtrs[keychunk*2+1] = pKeyEnd;
+            if (keychunk > keychunks)
+                keychunks = keychunk + 1;
+            datasize += keylen * sizeof(bbCHAR);
+        }
+
+        datasize += sizeof(bbMapPair);
+        memsize += sizeof(bbMapPair);
+        bbPrintf(" \"%s\":%p chunk %d\n", pMap->mpPairs[i].key, pMap->mpPairs[i].val, keychunk);
+    }
+
+    for(i=0; i<keychunks; i++)
+    {
+        bbU32 chunksize = (chunkPtrs[i*2+1] - chunkPtrs[i*2]) * sizeof(bbCHAR);
+        memsize += chunksize;
+        bbPrintf(" keychunk %u, size %u, \"", i, chunksize);
+        while(chunkPtrs[i*2] < chunkPtrs[i*2+1])
+            chunkPtrs[i*2] += bbPrintf("%s.", chunkPtrs[i*2]);
+        bbPrintf("\"\n");
+    }
+
+    bbPrintf(" datasize %u, memsize %u\n", datasize, memsize);
+#endif
 }
 
