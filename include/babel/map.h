@@ -51,6 +51,22 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, void* val);
 */
 void* bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey);
 
+/** Return number of pairs in map.
+    @param pMap Map
+    @return Number of entries
+*/
+#define bbMapGetSize(pMap) ((pMap)->mSize)
+
+/** Enumerate all entries in map.
+    @param pMap Map
+    @param cb   Callback function to process entries.
+                Key and value are passed as 1st and 2nd parameter, return !=0 to stop enumeration.
+*/
+void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, void*));
+
+/** Debug dump map to stdout
+    @param pMap Map
+*/
 void bbMapDump(const struct bbMap* pMap);
 
 struct bbMap
@@ -70,6 +86,8 @@ struct bbMap
     inline bbERR AddC(const bbCHAR* pKey, void* val) { return bbMapAddC(this, pKey, val); }
     inline void* Get(const bbCHAR* pKey) const { return bbMapGet(this, pKey); }
     inline void* operator[](const bbCHAR* pKey) const { return bbMapGet(this, pKey); }
+    inline bbUINT GetSize() const { return mSize; }
+    inline void Enumerate(int (*cb)(const bbCHAR*, void*)) { bbMapEnumerate(this, cb); }
     #endif
 };
 

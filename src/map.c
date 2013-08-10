@@ -137,6 +137,14 @@ void* bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey)
     return NULL;
 }
 
+void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, void*))
+{
+    bbUINT i = 0;
+    for(i=0; i<pMap->mSize; i++)
+        if ((*cb)(pMap->mpPairs[i].key, pMap->mpPairs[i].val))
+            break;
+}
+
 static int bbMapIsKeyExternal(const struct bbMap* pMap, const bbCHAR* pKey)
 {
     int external = 1;
