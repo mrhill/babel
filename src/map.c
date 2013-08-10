@@ -1,6 +1,7 @@
 #include "map.h"
 #include "str.h"
 #include "fixmath.h"
+#include "algo.h"
 
 typedef struct bbMapPair
 {
@@ -20,20 +21,14 @@ typedef struct bbMapKeyChunk
 
 } bbMapKeyChunk;
 
-int bbCmp_Str2MapPair(const void *p1, const void *p2)
+static int bbCmp_Str2MapPair(const void *p1, const void *p2)
 {
     return bbStrCmp((const bbCHAR*)p1, ((const bbMapPair*)p2)->key);
-}
-
-int bbCmpI_Str2MapPair(const void *p1, const void *p2)
-{
-    return bbStrICmp((const bbCHAR*)p1, ((const bbMapPair*)p2)->key);
 }
 
 void bbMapInit(struct bbMap* pMap)
 {
     bbMemClear(pMap, sizeof(bbMap));
-    pMap->mCmpFn = bbCmp_Str2MapPair;
 }
 
 void bbMapDestroy(struct bbMap* pMap)
@@ -115,10 +110,10 @@ static bbMapPair* bbMapInsertOne(struct bbMap* pMap, bbUINT insertAt)
 
 bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
-    bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), pMap->mCmpFn);
+    bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), bbCmp_Str2MapPair);
     bbUINT insertAt = pInsert - pMap->mpPairs;
 
-    if ((insertAt >= pMap->mSize) || ((*pMap->mCmpFn)(pKey, pInsert) != 0))
+    if ((insertAt >= pMap->mSize) || (bbCmp_Str2MapPair(pKey, pInsert) != 0))
     {
         pInsert = bbMapInsertOne(pMap, insertAt);
         if (!pInsert)
@@ -132,10 +127,10 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 
 bbERR bbMapAdd(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
-    bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), pMap->mCmpFn);
+    bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), bbCmp_Str2MapPair);
     bbUINT insertAt = pInsert - pMap->mpPairs;
 
-    if ((insertAt >= pMap->mSize) || ((*pMap->mCmpFn)(pKey, pInsert) != 0))
+    if ((insertAt >= pMap->mSize) || (bbCmp_Str2MapPair(pKey, pInsert) != 0))
     {
         const bbCHAR* pKeyCopy = bbMapAddKey(pMap, pKey);
         if (!pKeyCopy)
@@ -157,7 +152,7 @@ bbU64PTR bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey)
     bbMapPair* pFound = NULL;
 
     if (pKey)
-        pFound = bbBSearch(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), pMap->mCmpFn);
+        pFound = bbBSearch(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), bbCmp_Str2MapPair);
 
     if (pFound)
     {
@@ -195,7 +190,7 @@ bbU64PTR bbMapDel(struct bbMap* pMap, const bbCHAR* pKey)
     bbMapPair* pFound = NULL;
 
     if (pKey)
-        pFound = bbBSearch(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), pMap->mCmpFn);
+        pFound = bbBSearch(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), bbCmp_Str2MapPair);
 
     if (pFound)
     {

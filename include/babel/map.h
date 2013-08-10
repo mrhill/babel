@@ -3,7 +3,6 @@
 
 #include "defs.h"
 #include "mem.h"
-#include "algo.h"
 
 struct bbMapPair;
 struct bbMapKeyChunk;
@@ -88,14 +87,11 @@ struct bbMap
 {
     struct bbMapPair*     mpPairs;
     struct bbMapKeyChunk* mpKeyChunk;
-    bbCmpFn               mCmpFn;
     bbUINT                mSize;
 
     #ifdef  __cplusplus
     inline bbMap() { bbMapInit(this); }
-    inline bbMap(bbCmpFn cmpFn) { bbMapInit(this); mCmpFn = cmpFn; }
     inline ~bbMap() { bbMapDestroy(this); }
-    inline void SetCmpFn(bbCmpFn cmpFn) { mCmpFn = cmpFn; }
     inline bbERR Add(const bbCHAR* pKey, bbU64PTR val) { return bbMapAdd(this, pKey, val); }
     inline bbERR Add(const bbCHAR* pKey, void* val) { return bbMapAdd(this, pKey, (bbU64PTR)val); }
     inline bbERR AddC(const bbCHAR* pKey, bbU64PTR val) { return bbMapAddC(this, pKey, val); }
@@ -107,12 +103,6 @@ struct bbMap
     inline void Enumerate(int (*cb)(const bbCHAR*, bbU64PTR)) { bbMapEnumerate(this, cb); }
     #endif
 };
-
-/** Callback to compare bbCHAR* against the key stored in a bbMapPair*, case-sensitive. */
-int bbCmp_Str2MapPair(const void *, const void *);
-
-/** Callback to compare bbCHAR* against the key stored in a bbMapPair*, case-insensitive. */
-int bbCmpI_Str2MapPair(const void *, const void *);
 
 #ifdef  __cplusplus
 }
