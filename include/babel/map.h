@@ -102,6 +102,7 @@ struct bbMap
     inline bbERR AddC(const bbCHAR* pKey, void* val) { return bbMapAddC(this, pKey, (bbU64PTR)val); }
     inline bbU64PTR Get(const bbCHAR* pKey) const { return bbMapGet(this, pKey); }
     inline bbU64PTR operator[](const bbCHAR* pKey) const { return bbMapGet(this, pKey); }
+    inline bbU64PTR Del(const bbCHAR* pKey) { return bbMapDel(this, pKey); }
     inline bbUINT GetSize() const { return mSize; }
     inline void Enumerate(int (*cb)(const bbCHAR*, bbU64PTR)) { bbMapEnumerate(this, cb); }
     #endif
