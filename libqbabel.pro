@@ -10,6 +10,10 @@ win32 {
     QMAKE_CXXFLAGS_DEBUG += /Zc:wchar_t /Zp4
 }
 
+debug {
+DEFINES += DEBUG
+}
+
 # Input
 HEADERS += \
     include/babel/Arr.h \

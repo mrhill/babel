@@ -493,10 +493,9 @@ typedef bbU32 bbCHAR32;
 
 #define bbARRSIZE(arr) (sizeof(arr)/sizeof(arr[0]))
 
-/** Unsigned integer with the size of a pointer. */
-typedef unsigned long bbUPTR;
-
-typedef unsigned int bbERR; /**< Error code or function return code. */
+typedef unsigned long bbUPTR; /**< Unsigned integer with the size of a pointer. */
+typedef bbU64 bbU64PTR;       /**< Unsigned integer large enough to hold a pointer or a bbU64. */
+typedef unsigned int bbERR;   /**< Error code or function return code. */
 
 /** Handle to a heap block.
     @see groupHeap.

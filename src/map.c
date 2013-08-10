@@ -5,7 +5,7 @@
 struct bbMapPair
 {
     const bbCHAR* key;
-    void* val;
+    bbU64PTR val;
 };
 
 #define bbMAP_KEYCHUNKSIZE (256 - sizeof(void*))
@@ -82,7 +82,7 @@ static const bbCHAR* bbMapAddKey(struct bbMap* pMap, const bbCHAR* pKey)
     return pKeyCopy;
 }
 
-bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, void* val)
+bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
     bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), pMap->mCmpFn);
     bbUINT insertAt = pInsert - pMap->mpPairs;
@@ -108,7 +108,7 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, void* val)
     return bbEOK;
 }
 
-bbERR bbMapAdd(struct bbMap* pMap, const bbCHAR* pKey, void* val)
+bbERR bbMapAdd(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
     const bbCHAR* pKeyCopy = bbMapAddKey(pMap, pKey);
     if (!pKeyCopy)
@@ -120,7 +120,7 @@ bbERR bbMapAdd(struct bbMap* pMap, const bbCHAR* pKey, void* val)
     return bbEOK;
 }
 
-void* bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey)
+bbU64PTR bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey)
 {
     bbMapPair* pFound = NULL;
 
@@ -134,10 +134,10 @@ void* bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey)
     }
 
     bbErrSet(bbENOTFOUND);
-    return NULL;
+    return 0;
 }
 
-void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, void*))
+void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR))
 {
     bbUINT i = 0;
     for(i=0; i<pMap->mSize; i++)
@@ -145,6 +145,9 @@ void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, void*))
             break;
 }
 
+#ifndef bbDEBUG
+void bbMapDump(const struct bbMap* pMap) { pMap=pMap; }
+#else
 static int bbMapGetChunkForKey(const struct bbMap* pMap, const bbCHAR* pKey)
 {
     int i = 0, chunk = -1;
@@ -164,7 +167,6 @@ static int bbMapGetChunkForKey(const struct bbMap* pMap, const bbCHAR* pKey)
 
 void bbMapDump(const struct bbMap* pMap)
 {
-#ifdef bbDEBUG
     bbUINT i = 0, keychunks = 0;
     bbU32 datasize = 0, memsize = 0;
     const bbCHAR* chunkPtrs[64*2];
@@ -211,6 +213,6 @@ void bbMapDump(const struct bbMap* pMap)
     }
 
     bbPrintf(" datasize %u, memsize %u\n", datasize, memsize);
-#endif
 }
+#endif
 
