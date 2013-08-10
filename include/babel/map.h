@@ -74,22 +74,22 @@ void bbMapDump(const struct bbMap* pMap);
 
 /** Key-value map.
 
-    Keys are 0-terminated strings, and values are bbU64PTR.
+    Keys are 0-terminated strings, and values are bbU64PTR. Maximum key length is 65535, including terminator.
 
     If pairs are added via Add(), the key string is copied to internal storage.
     If paris are added via AddC(), the original key string pointer is stored.
     If AddC() is used, the key pointer must remain valid for the lifetime of the bbMap instance,
     even if the same key is added with Add() later.
 
-    Keys are stored in a sorted array, insert time is O(N + logN), and look-up time is O(logN).
+    Keys are stored in a sorted array, insert time is O(N + logN), look-up time is O(logN), and
+    delete time is O(N + logN).
 */
 struct bbMap
 {
     struct bbMapPair*     mpPairs;
-    struct bbMapKeyChunk* mpKeys;
+    struct bbMapKeyChunk* mpKeyChunk;
     bbCmpFn               mCmpFn;
     bbUINT                mSize;
-    bbUINT                mKeyChunkUsed;
 
     #ifdef  __cplusplus
     inline bbMap() { bbMapInit(this); }

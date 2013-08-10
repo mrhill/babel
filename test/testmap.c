@@ -3,7 +3,7 @@
 
 int cb(const bbCHAR* key, bbU64PTR val)
 {
-    printf("enum \"%s\" -> 0x%"bbI64"X\n", key, val);
+    printf("enum \"%s\" -> 0x%"bbI64"X ", key, val);
     return 0;
 }
 
@@ -41,6 +41,7 @@ int main(int argc, char** argv)
     i = bbMapGet(&map, 0); printf("(nil) -> %p\n", i);
 
     bbMapEnumerate(&map, cb);
+    printf("\n");
 
     printf("testmap: Del ----------------\n");
 
