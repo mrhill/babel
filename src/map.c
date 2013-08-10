@@ -96,6 +96,23 @@ static const bbCHAR* bbMapAddKey(struct bbMap* pMap, const bbCHAR* pKey)
 
 #define bbMapGetCapcity(size) ((size) ? 2 << bbGetTopBit((size)-1) : 0)
 
+static bbMapPair* bbMapInsertOne(struct bbMap* pMap, bbUINT insertAt)
+{
+    bbMapPair* pInsert;
+    bbUINT capacity = bbMapGetCapcity(pMap->mSize);
+    bbUINT newSize = pMap->mSize + 1;
+    if (newSize > capacity)
+    {
+        capacity = capacity ? capacity<<1 : 2;
+        if (bbMemRealloc(capacity * sizeof(bbMapPair), (void**)&pMap->mpPairs) != bbEOK)
+            return NULL;
+    }
+    pInsert = pMap->mpPairs + insertAt;
+    bbMemMove(pInsert + 1, pInsert, (pMap->mSize - insertAt) * sizeof(bbMapPair));
+    pMap->mSize = newSize;
+    return pInsert;
+}
+
 bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
     bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), pMap->mCmpFn);
@@ -103,18 +120,9 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 
     if ((insertAt >= pMap->mSize) || ((*pMap->mCmpFn)(pKey, pInsert) != 0))
     {
-        bbUINT capacity = bbMapGetCapcity(pMap->mSize);
-        bbUINT newSize = pMap->mSize + 1;
-        if (newSize > capacity)
-        {
-            capacity = capacity ? capacity<<1 : 2;
-            if (bbMemRealloc(capacity * sizeof(bbMapPair), (void**)&pMap->mpPairs) != bbEOK)
-                return bbELAST;
-            pInsert = pMap->mpPairs + insertAt;
-        }
-
-        bbMemMove(pInsert + 1, pInsert, (pMap->mSize - insertAt) * sizeof(bbMapPair));
-        pMap->mSize = newSize;
+        pInsert = bbMapInsertOne(pMap, insertAt);
+        if (!pInsert)
+            return bbELAST;
         pInsert->key = pKey;
     }
 
@@ -129,24 +137,13 @@ bbERR bbMapAdd(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 
     if ((insertAt >= pMap->mSize) || ((*pMap->mCmpFn)(pKey, pInsert) != 0))
     {
-        bbUINT capacity, newSize;
-
         const bbCHAR* pKeyCopy = bbMapAddKey(pMap, pKey);
         if (!pKeyCopy)
             return bbELAST;
 
-        capacity = bbMapGetCapcity(pMap->mSize);
-        newSize = pMap->mSize + 1;
-        if (newSize > capacity)
-        {
-            capacity = capacity ? capacity<<1 : 2;
-            if (bbMemRealloc(capacity * sizeof(bbMapPair), (void**)&pMap->mpPairs) != bbEOK)
-                return bbELAST;
-            pInsert = pMap->mpPairs + insertAt;
-        }
-
-        bbMemMove(pInsert + 1, pInsert, (pMap->mSize - insertAt) * sizeof(bbMapPair));
-        pMap->mSize = newSize;
+        pInsert = bbMapInsertOne(pMap, insertAt);
+        if (!pInsert)
+            return bbELAST;
 
         pInsert->key = pKeyCopy;
     }
