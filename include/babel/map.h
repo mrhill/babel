@@ -77,8 +77,9 @@ void bbMapDump(const struct bbMap* pMap);
     Keys are 0-terminated strings, and values are bbU64PTR.
 
     If pairs are added via Add(), the key string is copied to internal storage.
-    If paris are added via AddC(), the original key string pointer is stored, and
-    the pointer must remain valid for the lifetime of the bbMap instance.
+    If paris are added via AddC(), the original key string pointer is stored.
+    If AddC() is used, the key pointer must remain valid for the lifetime of the bbMap instance,
+    even if the same key is added with Add() later.
 
     Keys are stored in a sorted array, insert time is O(N + logN), and look-up time is O(logN).
 */

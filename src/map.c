@@ -201,31 +201,28 @@ void bbMapDump(const struct bbMap* pMap)
 {
     bbUINT i = 0, keychunks = 0;
     bbU32 datasize = 0, memsize = 0;
-    const bbCHAR* chunkPtrs[256*2];
+    const bbMapKeyChunk* pChunk;
+    const bbCHAR** chunkPtrs;
 
     bbPrintf("bbMap mSize:%u, mKeyChunkUsed=%u\n", pMap->mSize, pMap->mKeyChunkUsed);
 
-    const bbMapKeyChunk* pChunk = pMap->mpKeys;
-    while(pChunk)
-    {
-        if (i < bbARRSIZE(chunkPtrs)/2)
-            chunkPtrs[i*2] = chunkPtrs[i*2+1] = pChunk->str;
-        pChunk = pChunk->next;
-        i++;
-    }
+    for(keychunks = 0, pChunk = pMap->mpKeys; pChunk; pChunk = pChunk->next)
+        keychunks++;
+    chunkPtrs = bbMemAlloc(keychunks * 2 * sizeof(void*));
+
+    for(i = 0, pChunk = pMap->mpKeys; pChunk; i++, pChunk = pChunk->next)
+        chunkPtrs[i*2] = chunkPtrs[i*2+1] = pChunk->str;
 
     for(i=0; i<pMap->mSize; i++)
     {
         bbUINT keylen = bbStrLen(pMap->mpPairs[i].key) + 1;
         bbUINT keychunk = bbMapGetChunkForKey(pMap, pMap->mpPairs[i].key);
 
-        if (keychunk < bbARRSIZE(chunkPtrs)/2)
+        if (keychunk < keychunks)
         {
             const bbCHAR* pKeyEnd = pMap->mpPairs[i].key + keylen;
             if (chunkPtrs[keychunk*2+1] < pKeyEnd)
                 chunkPtrs[keychunk*2+1] = pKeyEnd;
-            if (keychunk > keychunks)
-                keychunks = keychunk + 1;
             datasize += keylen * sizeof(bbCHAR);
         }
 
@@ -245,6 +242,7 @@ void bbMapDump(const struct bbMap* pMap)
     }
 
     bbPrintf(" datasize %u, memsize %u\n", datasize, memsize);
+    bbMemFree(chunkPtrs);
 }
 #endif
 
