@@ -3,13 +3,6 @@
 #include "fixmath.h"
 #include "algo.h"
 
-typedef struct bbMapPair
-{
-    const bbCHAR* key;
-    bbU64PTR val;
-
-} bbMapPair;
-
 #define bbMAP_KEYCHUNKSIZE 256
 
 typedef struct bbMapKeyChunk
@@ -26,12 +19,12 @@ static int bbCmp_Str2MapPair(const void *p1, const void *p2)
     return bbStrCmp((const bbCHAR*)p1, ((const bbMapPair*)p2)->key);
 }
 
-void bbMapInit(struct bbMap* pMap)
+void bbMapInit(bbMap* pMap)
 {
     bbMemClear(pMap, sizeof(bbMap));
 }
 
-void bbMapDestroy(struct bbMap* pMap)
+void bbMapDestroy(bbMap* pMap)
 {
     bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
     while(pChunk)
@@ -43,10 +36,10 @@ void bbMapDestroy(struct bbMap* pMap)
 
     bbMemFree(pMap->mpPairs);
 
-    bbMemClear(pMap, sizeof(struct bbMap));
+    bbMemClear(pMap, sizeof(bbMap));
 }
 
-static bbMapKeyChunk* bbMapAddKeyChunk(struct bbMap* pMap, bbUINT keylen)
+static bbMapKeyChunk* bbMapAddKeyChunk(bbMap* pMap, bbUINT keylen)
 {
     if ((int)(keylen -= bbMAP_KEYCHUNKSIZE) < 0)
         keylen = 0;
@@ -63,7 +56,7 @@ static bbMapKeyChunk* bbMapAddKeyChunk(struct bbMap* pMap, bbUINT keylen)
     return pNewChunk;
 }
 
-static const bbCHAR* bbMapAddKey(struct bbMap* pMap, const bbCHAR* pKey)
+static const bbCHAR* bbMapAddKey(bbMap* pMap, const bbCHAR* pKey)
 {
     const bbCHAR* pKeyCopy;
     bbUINT keylen = bbStrLen(pKey) + 1;
@@ -91,7 +84,7 @@ static const bbCHAR* bbMapAddKey(struct bbMap* pMap, const bbCHAR* pKey)
 
 #define bbMapGetCapcity(size) ((size) ? 2 << bbGetTopBit((size)-1) : 0)
 
-static bbMapPair* bbMapInsertOne(struct bbMap* pMap, bbUINT insertAt)
+static bbMapPair* bbMapInsertOne(bbMap* pMap, bbUINT insertAt)
 {
     bbMapPair* pInsert;
     bbUINT capacity = bbMapGetCapcity(pMap->mSize);
@@ -108,7 +101,7 @@ static bbMapPair* bbMapInsertOne(struct bbMap* pMap, bbUINT insertAt)
     return pInsert;
 }
 
-bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
+bbERR bbMapAddC(bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
     bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), bbCmp_Str2MapPair);
     bbUINT insertAt = pInsert - pMap->mpPairs;
@@ -125,7 +118,7 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
     return bbEOK;
 }
 
-bbERR bbMapAdd(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
+bbERR bbMapAdd(bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
     bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), bbCmp_Str2MapPair);
     bbUINT insertAt = pInsert - pMap->mpPairs;
@@ -147,7 +140,7 @@ bbERR bbMapAdd(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val)
     return bbEOK;
 }
 
-bbU64PTR bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey)
+bbU64PTR bbMapGet(const bbMap* pMap, const bbCHAR* pKey)
 {
     bbMapPair* pFound = NULL;
 
@@ -164,7 +157,7 @@ bbU64PTR bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey)
     return 0;
 }
 
-static void bbMapDerefChunkForKey(struct bbMap* pMap, const bbCHAR* pKey)
+static void bbMapDerefChunkForKey(bbMap* pMap, const bbCHAR* pKey)
 {
     bbMapKeyChunk** pParent = &pMap->mpKeyChunk;
     bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
@@ -184,7 +177,7 @@ static void bbMapDerefChunkForKey(struct bbMap* pMap, const bbCHAR* pKey)
     }
 }
 
-bbU64PTR bbMapDel(struct bbMap* pMap, const bbCHAR* pKey)
+bbU64PTR bbMapDel(bbMap* pMap, const bbCHAR* pKey)
 {
     bbU64PTR val = 0;
     bbMapPair* pFound = NULL;
@@ -215,7 +208,7 @@ bbU64PTR bbMapDel(struct bbMap* pMap, const bbCHAR* pKey)
     return val;
 }
 
-void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR))
+void bbMapEnumerate(const bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR))
 {
     bbUINT i = 0;
     for(i=0; i<pMap->mSize; i++)
@@ -224,9 +217,9 @@ void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR)
 }
 
 #ifndef bbDEBUG
-void bbMapDump(const struct bbMap* pMap) { pMap=pMap; }
+void bbMapDump(const bbMap* pMap) { pMap=pMap; }
 #else
-static int bbMapGetChunkNumberForKey(const struct bbMap* pMap, const bbCHAR* pKey)
+static int bbMapGetChunkNumberForKey(const bbMap* pMap, const bbCHAR* pKey)
 {
     int i = 0, chunk = -1;
     const bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
@@ -243,7 +236,7 @@ static int bbMapGetChunkNumberForKey(const struct bbMap* pMap, const bbCHAR* pKe
     return chunk;
 }
 
-void bbMapDump(const struct bbMap* pMap)
+void bbMapDump(const bbMap* pMap)
 {
     bbUINT i = 0, keychunks = 0;
     bbU32 datasize = 0, memsize = 0, chunksize;

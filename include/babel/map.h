@@ -4,39 +4,55 @@
 #include "defs.h"
 #include "mem.h"
 
-struct bbMapPair;
+typedef struct bbMapPair
+{
+    const bbCHAR* key;
+    bbU64PTR val;
+
+} bbMapPair;
+
 struct bbMapKeyChunk;
-struct bbMap;
+
+struct bbMapRec
+{
+    struct bbMapPair*     mpPairs;
+    struct bbMapKeyChunk* mpKeyChunk;
+    bbUINT                mSize;
+};
 
 #ifdef  __cplusplus
 extern "C" {
+struct bbMap;
+#else
+typedef struct bbMapRec bbMap;
 #endif
+
 
 /** Construct a map.
     Only needed when used via C interface.
     @param pMap Map instance to be initialized, struct is under external control.
 */
-void bbMapInit(struct bbMap* pMap);
+void bbMapInit(bbMap* pMap);
 
 /** Destroy a map.
     Only needed when used via C interface.
     @param pMap Map instance to destroy, destroys all keys and values, struct stays under external control.
 */
-void bbMapDestroy(struct bbMap* pMap);
+void bbMapDestroy(bbMap* pMap);
 
 /** Add value-key pair to map.
     An existing key will be replaced.
     @param pKey Key, 0-terminated string, will be copied
     @param val  Data associated with key
 */
-bbERR bbMapAdd(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
+bbERR bbMapAdd(bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
 
 /** Add value-key pair to map (key string under external control).
     An existing key will be replaced.
     @param pKey Key, 0-terminated string, will not be copied
     @param val  Data associated with key
 */
-bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
+bbERR bbMapAddC(bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
 
 /** Search map for key.
     @param pMap Map
@@ -44,18 +60,25 @@ bbERR bbMapAddC(struct bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
     @return Returns value, or 0 if not found (bbENOTFOUND).
             Call bbErrGet() to distinguish between error and NULL-value.
 */
-bbU64PTR bbMapGet(const struct bbMap* pMap, const bbCHAR* pKey);
+bbU64PTR bbMapGet(const bbMap* pMap, const bbCHAR* pKey);
+
+/** Get value from map by index.
+    @param pMap (const struct bbMap*) Map
+    @param index (bbUINT) Element index, must be within 0 and bbMapGetSize()
+    @return (const bbMapPair*) Value-key pair, always succeeds.
+*/
+#define bbMapGetPair(pMap, index) ((pMap)->mpPairs + (index))
 
 /** Remove a key-value pair and return the previously stored value.
     @param pMap Map
     @param pKey Key, 0-terminated string, can be NULL to force failure.
     @return Returns value, or 0 if not found (bbENOTFOUND).
 */
-bbU64PTR bbMapDel(struct bbMap* pMap, const bbCHAR* pKey);
+bbU64PTR bbMapDel(bbMap* pMap, const bbCHAR* pKey);
 
 /** Return number of pairs in map.
-    @param pMap Map
-    @return Number of entries
+    @param pMap (const struct bbMap*) Map
+    @return (bbUINT) Number of entries
 */
 #define bbMapGetSize(pMap) ((pMap)->mSize)
 
@@ -64,12 +87,12 @@ bbU64PTR bbMapDel(struct bbMap* pMap, const bbCHAR* pKey);
     @param cb   Callback function to process entries.
                 Key and value are passed as 1st and 2nd parameter, return !=0 to stop enumeration.
 */
-void bbMapEnumerate(const struct bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR));
+void bbMapEnumerate(const bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR));
 
 /** Debug dump map to stdout
     @param pMap Map
 */
-void bbMapDump(const struct bbMap* pMap);
+void bbMapDump(const bbMap* pMap);
 
 /** Key-value map.
 
@@ -83,13 +106,9 @@ void bbMapDump(const struct bbMap* pMap);
     Keys are stored in a sorted array, insert time is O(N + logN), look-up time is O(logN), and
     delete time is O(N + logN).
 */
-struct bbMap
+#ifdef __cplusplus
+struct bbMap : bbMapRec
 {
-    struct bbMapPair*     mpPairs;
-    struct bbMapKeyChunk* mpKeyChunk;
-    bbUINT                mSize;
-
-    #ifdef  __cplusplus
     inline bbMap() { bbMapInit(this); }
     inline ~bbMap() { bbMapDestroy(this); }
     inline bbERR Add(const bbCHAR* pKey, bbU64PTR val) { return bbMapAdd(this, pKey, val); }
@@ -97,17 +116,20 @@ struct bbMap
     inline bbERR AddC(const bbCHAR* pKey, bbU64PTR val) { return bbMapAddC(this, pKey, val); }
     inline bbERR AddC(const bbCHAR* pKey, void* val) { return bbMapAddC(this, pKey, (bbU64PTR)val); }
     inline bbU64PTR Get(const bbCHAR* pKey) const { return bbMapGet(this, pKey); }
+    inline bbU8 GetU8(const bbCHAR* pKey) const { return (bbU8)bbMapGet(this, pKey); }
+    inline bbU16 GetU16(const bbCHAR* pKey) const { return (bbU16)bbMapGet(this, pKey); }
+    inline bbU32 GetU32(const bbCHAR* pKey) const { return (bbU32)bbMapGet(this, pKey); }
+    inline bbU64 GetU64(const bbCHAR* pKey) const { return (bbU64)bbMapGet(this, pKey); }
+    inline const bbCHAR* GetStr(const bbCHAR* pKey) const { return (const bbCHAR*)bbMapGet(this, pKey); }
+    inline const void* GetPtr(const bbCHAR* pKey) const { return (const void*)bbMapGet(this, pKey); }
+    inline const bbMapPair* GetPair(bbUINT index) const { return bbMapGetPair(this, index); }
     inline bbU64PTR operator[](const bbCHAR* pKey) const { return bbMapGet(this, pKey); }
     inline bbU64PTR Del(const bbCHAR* pKey) { return bbMapDel(this, pKey); }
     inline bbUINT GetSize() const { return mSize; }
     inline void Enumerate(int (*cb)(const bbCHAR*, bbU64PTR)) { bbMapEnumerate(this, cb); }
-    #endif
 };
 
-#ifdef  __cplusplus
 }
-#else
-typedef struct bbMap bbMap;
 #endif
 
 #endif /* bbBABEL_MAP_H_ */

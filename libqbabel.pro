@@ -39,6 +39,7 @@ HEADERS += \
     include/babel/mem.h \
     include/babel/str.h \
     include/babel/timedate.h \
+    include/babel/json.h
 
 SOURCES += \
     src/Arr.cpp \
@@ -64,3 +65,4 @@ SOURCES += \
     src/mem.c \
     src/str.c \
     src/timedate.c \
+    src/json.c
