@@ -181,7 +181,7 @@ bbCHAR* bbStrBufCatCStr(bbStrBuf* p, const char* pStr)
 }
 #endif
 
-void bbStrBufAppendCP(bbStrBuf* p, bbCHARCP cp)
+void bbStrBufCatCP(bbStrBuf* p, bbCHARCP cp)
 {
     bbUINT str_len = bbCP_LENGTH(cp);
     bbCHAR* pStr = bbStrBufEnsure(p, str_len);

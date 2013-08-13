@@ -109,6 +109,7 @@ void bbMapDump(const bbMap* pMap);
 #ifdef __cplusplus
 struct bbMap : bbMapRec
 {
+    //inline bbMap* operator() { return this; }
     inline bbMap() { bbMapInit(this); }
     inline ~bbMap() { bbMapDestroy(this); }
     inline bbERR Add(const bbCHAR* pKey, bbU64PTR val) { return bbMapAdd(this, pKey, val); }

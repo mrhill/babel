@@ -38,6 +38,8 @@ void bbStrBufInitStr(bbStrBuf* pStrBuf, const bbCHAR* pStr);
 
 #if bbSIZEOF_CHAR != 1
 void bbStrBufInitCStr(bbStrBuf* pStrBuf, const char* pStr);
+#else
+#define bbStrBufInitCStr(p, s) bbStrBufInitStr(p, s)
 #endif
 
 /** Construct string buffer by copying at most \a len chacters from referenced string.
@@ -135,9 +137,11 @@ bbCHAR* bbStrBufCatN(bbStrBuf* pStrBuf, const bbCHAR* pStr, bbUINT len);
     @return Pointer to start of inserted string in buffer, or NULL on failure
 */
 bbCHAR* bbStrBufCatCStr(bbStrBuf* pStrBuf, const char* pStr);
+#else
+#define bbStrBufCatCStr(p, s) bbStrBufCat(p, s)
 #endif
 
-void bbStrBufAppendCP(bbStrBuf* pStrBuf, bbCHARCP cp);
+void bbStrBufCatCP(bbStrBuf* pStrBuf, bbCHARCP cp);
 
 bbCHAR* bbStrBufPrintHex(bbStrBuf* pStrBuf, const bbU8* pData, bbUINT size);
 
@@ -189,13 +193,13 @@ struct bbStrBuf : bbStrBufRec
     inline bbCHAR* Cat(const char* pStr) { return bbStrBufCatCStr(this, pStr); }
     #endif
 
-    inline void Append(bbCHARCP cp) { bbStrBufAppendCP(this, cp); }
+    inline void CatCP(bbCHARCP cp) { bbStrBufCatCP(this, cp); }
 
     inline bbStrBuf& operator=(const bbCHAR* const pStr) { Assign(pStr); return *this; }
 
     /** Concatenate string to end of buffer, noop on failure. */
     inline bbStrBuf& operator+=(const bbCHAR* pStr) { Cat(pStr); return *this; }
-    inline bbStrBuf& operator+=(bbCHARCP cp) { Append(cp); return *this; }
+    inline bbStrBuf& operator+=(bbCHARCP cp) { CatCP(cp); return *this; }
 
     #if bbSIZEOF_CHAR != 1
     inline bbStrBuf& operator+=(const char* pStr) { Cat(pStr); return *this; }
