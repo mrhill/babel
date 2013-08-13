@@ -1,4 +1,4 @@
-#include <babel/StrBuf.h>
+#include <babel/strbuf.h>
 
 extern "C" int testStrBuf()
 {

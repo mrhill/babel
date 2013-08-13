@@ -18,7 +18,7 @@ DEFINES += DEBUG
 HEADERS += \
     include/babel/Arr.h \
     include/babel/Registry.h \
-    include/babel/StrBuf.h \
+    include/babel/strbuf.h \
     include/babel/Tree.h \
     include/babel/algo.h \
     include/babel/babel.h \
@@ -45,6 +45,7 @@ SOURCES += \
     src/Arr.cpp \
     src/Registry.cpp \
     src/StrBuf.cpp \
+    src/strbuf.c \
     src/Tree.cpp \
     src/algo.c \
     src/bit.c \

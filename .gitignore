@@ -1,0 +1,76 @@
+#
+# NOTE! Don't add files that are generated in specific
+# subdirectories here. Add them in the ".gitignore" file
+# in that subdirectory instead.
+#
+# NOTE! Please use 'git-ls-files -i --exclude-standard'
+# command after changing this file, to see if there are
+# any tracked files which get ignored after the change.
+#
+# Normal rules
+#
+.*
+*.o
+*.o.*
+*.a
+*.s
+*.ko
+*.so
+*.so.dbg
+*.i
+*.lst
+*.symtypes
+*.order
+*.elf
+*.bin
+*.gz
+*.pyc
+*.out
+*.head
+*.save
+*.swp
+non_git
+
+# VC related files
+*.user
+*.ilk
+*.exp
+*.ncb
+*.pdb
+*.suo
+*.dll
+*.lib
+*.exe
+*.aps
+*.idb
+
+# Other files
+changelist.tmp
+*.info
+ui_*.h
+moc_*.cpp
+
+# Generated folders
+Debug
+Release
+Debug_*
+Release_*
+bin
+
+#
+# Top-level generic files
+#
+tags
+TAGS
+!.gitignore
+
+# stgit generated dirs
+patches-*
+
+# quilt's files
+patches
+series
+
+*.orig
+*~
+\#*#
