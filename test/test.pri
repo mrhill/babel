@@ -1,13 +1,7 @@
 TEMPLATE = app
-TARGET =
-DEPENDPATH += .
+DEPENDPATH += . ../include ../src
 INCLUDEPATH += . ../include
 DEFINES += bbQT
-
-# Input
-HEADERS +=
-SOURCES += testmap.c
-RESOURCES +=
 
 debug {
 DEFINES += DEBUG
@@ -23,4 +17,3 @@ unix {
     LIBS += -lqbabel
     POST_TARGETDEPS += ../libqbabel.a
 }
-

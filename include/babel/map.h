@@ -4,14 +4,14 @@
 #include "defs.h"
 #include "mem.h"
 
+struct bbMapKeyChunk;
+
 typedef struct bbMapPair
 {
     const bbCHAR* key;
     bbU64PTR val;
 
 } bbMapPair;
-
-struct bbMapKeyChunk;
 
 struct bbMapRec
 {
@@ -22,9 +22,9 @@ struct bbMapRec
 
 #ifdef  __cplusplus
 extern "C" {
-struct bbMap;
 #else
-typedef struct bbMapRec bbMap;
+typedef struct bbMapRec bbMapRec;
+typedef bbMapRec bbMap;
 #endif
 
 
@@ -32,27 +32,27 @@ typedef struct bbMapRec bbMap;
     Only needed when used via C interface.
     @param pMap Map instance to be initialized, struct is under external control.
 */
-void bbMapInit(bbMap* pMap);
+void bbMapInit(bbMapRec* pMap);
 
 /** Destroy a map.
     Only needed when used via C interface.
     @param pMap Map instance to destroy, destroys all keys and values, struct stays under external control.
 */
-void bbMapDestroy(bbMap* pMap);
+void bbMapDestroy(bbMapRec* pMap);
 
 /** Add value-key pair to map.
     An existing key will be replaced.
     @param pKey Key, 0-terminated string, will be copied
     @param val  Data associated with key
 */
-bbERR bbMapAdd(bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
+bbERR bbMapAdd(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val);
 
 /** Add value-key pair to map (key string under external control).
     An existing key will be replaced.
     @param pKey Key, 0-terminated string, will not be copied
     @param val  Data associated with key
 */
-bbERR bbMapAddC(bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
+bbERR bbMapAddC(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val);
 
 /** Search map for key.
     @param pMap Map
@@ -60,7 +60,7 @@ bbERR bbMapAddC(bbMap* pMap, const bbCHAR* pKey, bbU64PTR val);
     @return Returns value, or 0 if not found (bbENOTFOUND).
             Call bbErrGet() to distinguish between error and NULL-value.
 */
-bbU64PTR bbMapGet(const bbMap* pMap, const bbCHAR* pKey);
+bbU64PTR bbMapGet(const bbMapRec* pMap, const bbCHAR* pKey);
 
 /** Get value from map by index.
     @param pMap (const struct bbMap*) Map
@@ -74,7 +74,7 @@ bbU64PTR bbMapGet(const bbMap* pMap, const bbCHAR* pKey);
     @param pKey Key, 0-terminated string, can be NULL to force failure.
     @return Returns value, or 0 if not found (bbENOTFOUND).
 */
-bbU64PTR bbMapDel(bbMap* pMap, const bbCHAR* pKey);
+bbU64PTR bbMapDel(bbMapRec* pMap, const bbCHAR* pKey);
 
 /** Return number of pairs in map.
     @param pMap (const struct bbMap*) Map
@@ -87,12 +87,12 @@ bbU64PTR bbMapDel(bbMap* pMap, const bbCHAR* pKey);
     @param cb   Callback function to process entries.
                 Key and value are passed as 1st and 2nd parameter, return !=0 to stop enumeration.
 */
-void bbMapEnumerate(const bbMap* pMap, int (*cb)(const bbCHAR*, bbU64PTR));
+void bbMapEnumerate(const bbMapRec* pMap, int (*cb)(const bbCHAR*, bbU64PTR));
 
 /** Debug dump map to stdout
     @param pMap Map
 */
-void bbMapDump(const bbMap* pMap);
+void bbMapDump(const bbMapRec* pMap);
 
 /** Key-value map.
 
@@ -109,7 +109,6 @@ void bbMapDump(const bbMap* pMap);
 #ifdef __cplusplus
 struct bbMap : bbMapRec
 {
-    //inline bbMap* operator() { return this; }
     inline bbMap() { bbMapInit(this); }
     inline ~bbMap() { bbMapDestroy(this); }
     inline bbERR Add(const bbCHAR* pKey, bbU64PTR val) { return bbMapAdd(this, pKey, val); }
