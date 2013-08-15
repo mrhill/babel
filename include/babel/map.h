@@ -40,6 +40,9 @@ void bbMapInit(bbMapRec* pMap);
 */
 void bbMapDestroy(bbMapRec* pMap);
 
+/** Copy a map. */
+bbERR bbMapInitCopy(bbMapRec* pDst, const bbMapRec* pSrc);
+
 /** Add value-key pair to map.
     An existing key will be replaced.
     @param pKey Key, 0-terminated string, will be copied
@@ -76,6 +79,13 @@ bbU64PTR bbMapGet(const bbMapRec* pMap, const bbCHAR* pKey);
 */
 bbU64PTR bbMapDel(bbMapRec* pMap, const bbCHAR* pKey);
 
+/** Remove a key-value pair by index and return the previously stored value.
+    @param pMap Map
+    @param index (bbUINT) Element index, must be within 0 and bbMapGetSize()
+    @return Returns value.
+*/
+bbU64PTR bbMapDelIndex(bbMapRec* pMap, bbUINT index);
+
 /** Return number of pairs in map.
     @param pMap (const struct bbMap*) Map
     @return (bbUINT) Number of entries
@@ -85,9 +95,10 @@ bbU64PTR bbMapDel(bbMapRec* pMap, const bbCHAR* pKey);
 /** Enumerate all entries in map.
     @param pMap Map
     @param cb   Callback function to process entries.
-                Key and value are passed as 1st and 2nd parameter, return !=0 to stop enumeration.
+                Key and value are passed as 1st and 2nd parameter, return error to stop enumeration.
+    @param user User context to pass into callback
 */
-void bbMapEnumerate(const bbMapRec* pMap, int (*cb)(const bbCHAR*, bbU64PTR));
+bbERR bbMapEnumerate(const bbMapRec* pMap, bbERR (*cb)(const bbCHAR*, bbU64PTR, void*), void* user);
 
 /** Debug dump map to stdout
     @param pMap Map

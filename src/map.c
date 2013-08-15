@@ -208,12 +208,46 @@ bbU64PTR bbMapDel(bbMapRec* pMap, const bbCHAR* pKey)
     return val;
 }
 
-void bbMapEnumerate(const bbMapRec* pMap, int (*cb)(const bbCHAR*, bbU64PTR))
+bbU64PTR bbMapDelIndex(bbMapRec* pMap, bbUINT index)
+{
+    bbMapPair* pFound = &pMap->mpPairs[index];
+    bbU64PTR val = pFound->val;
+
+    bbUINT newSize = pMap->mSize - 1;
+    bbUINT capacity = bbMapGetCapcity(newSize);
+
+    bbMapDerefChunkForKey(pMap, pFound->key);
+
+    bbMemMove(pFound, pFound + 1, (newSize - index) * sizeof(bbMapPair));
+    bbMemRealloc(capacity * sizeof(bbMapPair), (void**)&pMap->mpPairs);
+    pMap->mSize = newSize;
+
+    return val;
+}
+
+bbERR bbMapEnumerate(const bbMapRec* pMap, bbERR (*cb)(const bbCHAR*, bbU64PTR, void*), void* user)
 {
     bbUINT i = 0;
     for(i=0; i<pMap->mSize; i++)
-        if ((*cb)(pMap->mpPairs[i].key, pMap->mpPairs[i].val))
-            break;
+        if (bbEOK != (*cb)(pMap->mpPairs[i].key, pMap->mpPairs[i].val, user))
+            return bbELAST;
+    return bbEOK;
+}
+
+static bbERR map_copy(const bbCHAR* key, bbU64PTR val, void* pMap)
+{
+    return bbMapAdd((bbMapRec*)pMap, key, val);
+}
+
+bbERR bbMapInitCopy(bbMapRec* pDst, const bbMapRec* pSrc)
+{
+    bbMapInit(pDst);
+    if (bbEOK != bbMapEnumerate(pSrc, map_copy, pDst))
+    {
+        bbMapDestroy(pDst);
+        return bbELAST;
+    }
+    return bbEOK;
 }
 
 #ifndef bbDEBUG
