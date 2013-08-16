@@ -40,14 +40,18 @@ bbERR bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str);
 bbERR bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n);
 bbERR bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n);
 bbERR bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n);
+void  bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key);
+#define bbJsonObjGet(pVal, key) ((bbJsonVal*)(bbUPTR)bbMapGet(&(pVal)->u.object, key))
 
-bbERR bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj);
-bbERR bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str);
-bbERR bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n);
-bbERR bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n);
-bbERR bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n);
+bbERR  bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj);
+bbERR  bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str);
+bbERR  bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n);
+bbERR  bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n);
+bbERR  bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n);
+void   bbJsonArrDel(bbJsonVal* pVal, int pos);
+#define bbJsonArrGetSize(pVal) ((pVal)->u.array.length)
 
-bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s);
+bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent);
 
 bbJsonVal* bbJsonParse(const char* text, bbUINT length);
 

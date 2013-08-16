@@ -40,13 +40,8 @@ void bbJsonValInit(bbJsonVal* pVal)
 
 void bbJsonValInitType(bbJsonVal* pVal, bbJSONTYPE type)
 {
-    pVal->mParent = NULL;
+    bbMemClear(pVal, sizeof(bbJsonVal));
     pVal->mType = type;
-
-    if (type == bbJSONTYPE_OBJECT)
-        bbMapInit(&pVal->u.object);
-    else
-        bbMemClear(&pVal->u, sizeof(pVal->u));
 }
 
 void bbJsonValDestroy(bbJsonVal* value)
@@ -101,9 +96,9 @@ void bbJsonValDestroy(bbJsonVal* value)
     }
 }
 
-bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s)
+bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
 {
-    bbUINT i;
+    bbUINT i, j;
 
     switch (v->mType)
     {
@@ -116,9 +111,21 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s)
         for (i=0; i<bbMapGetSize(&v->u.object); ++i)
         {
             if (i) bbStrBufCatCP(s, ',');
+            if (indent)
+            {
+                bbStrBufCatCP(s, '\n');
+                for(j=0; j<indent; ++j)
+                    bbStrBufCatCP(s, '\t');
+            }
             bbStrBufCatf(s, bbT("\"%s\":"), bbMapGetPair(&v->u.object, i)->key);
-            if (bbEOK != bbJsonValDump((bbJsonVal*)(bbUPTR)bbMapGetPair(&v->u.object, i)->val, s))
+            if (bbEOK != bbJsonValDump((bbJsonVal*)(bbUPTR)bbMapGetPair(&v->u.object, i)->val, s, indent?indent+1:0))
                 return bbELAST;
+        }
+        if (indent)
+        {
+            bbStrBufCatCP(s, '\n');
+            for(j=1; j<indent; ++j)
+                bbStrBufCatCP(s, '\t');
         }
         bbStrBufCatCP(s, '}');
         break;
@@ -128,7 +135,7 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s)
         for (i=0; i<v->u.array.length; ++i)
         {
             if (i) bbStrBufCatCP(s, ',');
-            if (bbEOK != bbJsonValDump(v->u.array.values[i], s))
+            if (bbEOK != bbJsonValDump(v->u.array.values[i], s, 0))
                 return bbELAST;
         }
         bbStrBufCatCP(s, ']');
@@ -260,6 +267,18 @@ bbERR bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n)
     return bbJsonObjAddObj(pVal, key, &v);
 }
 
+void bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key)
+{
+    bbJsonVal* v;
+
+    if (pVal->mType != bbJSONTYPE_OBJECT)
+        return;
+
+    v = (bbJsonVal*)(bbUPTR)bbMapDel(&pVal->u.object, key);
+    bbJsonValDestroy(v);
+    bbMemFree(v);
+}
+
 bbERR bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
 {
     bbJsonVal* pNew;
@@ -332,4 +351,22 @@ bbERR bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n)
     return bbJsonArrInsObj(pVal, pos, &v);
 }
 
+void bbJsonArrDel(bbJsonVal* pVal, int pos)
+{
+    bbUINT newSize, capacity;
+    bbJsonVal** pFound;
+
+    if (pVal->mType != bbJSONTYPE_ARRAY || (bbUINT)pos >= pVal->u.array.length)
+        return;
+
+    newSize = pVal->u.array.length - 1;
+    capacity = newSize ? 2 << (newSize-1) : 0;
+
+    pFound = &pVal->u.array.values[pos];
+    bbJsonValDestroy(*pFound);
+    bbMemFree(*pFound);
+    bbMemMove(pFound, pFound + 1, (newSize - pos) * sizeof(bbJsonVal*));
+    bbMemRealloc(capacity * sizeof(bbJsonVal*), (void**)&pVal->u.array.values);
+    pVal->u.array.length = newSize;
+}
 
