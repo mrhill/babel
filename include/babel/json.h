@@ -74,7 +74,7 @@ struct bbJsonVal
 
         struct
         {
-            struct bbJsonVal** values;
+            struct bbJsonVal* values;
             bbUINT length;
         } array;
 
@@ -88,7 +88,7 @@ struct bbJsonVal
     bbERR Dump(bbStrBuf& s) const { return bbJsonValDump(this, &s); }
 
     const bbJsonVal& operator[](const bbCHAR* key) const { return *(const bbJsonVal*)bbMapGet(&u.object, key); }
-    const bbJsonVal& operator[](bbUINT idx) const { return *u.array.values[idx]; }
+    const bbJsonVal& operator[](bbUINT idx) const { return &u.array.values[idx]; }
     #endif
 };
 

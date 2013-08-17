@@ -65,7 +65,7 @@ void bbJsonValDestroy(bbJsonVal* value)
                 break;
             }
 
-            value = value->u.array.values [-- value->u.array.length];
+            value = &value->u.array.values [-- value->u.array.length];
             continue;
 
         case bbJSONTYPE_OBJECT:
@@ -91,7 +91,7 @@ void bbJsonValDestroy(bbJsonVal* value)
 
         cur_value = value;
         value = value->mParent;
-        if (value)
+        if (value && value->mType != bbJSONTYPE_ARRAY)
             bbMemFree(cur_value);
     }
 }
@@ -135,7 +135,7 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
         for (i=0; i<v->u.array.length; ++i)
         {
             if (i) bbStrBufCatCP(s, ',');
-            if (bbEOK != bbJsonValDump(v->u.array.values[i], s, 0))
+            if (bbEOK != bbJsonValDump(v->u.array.values + i, s, 0))
                 return bbELAST;
         }
         bbStrBufCatCP(s, ']');
@@ -179,11 +179,11 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
         break;
 
     case bbJSONTYPE_ARRAY:
-        pNew->u.array.values = bbMemAlloc(pVal->u.array.length * sizeof(struct bbJsonVal*));
+        pNew->u.array.values = bbMemAlloc(pVal->u.array.length * sizeof(struct bbJsonVal));
         if (!pNew->u.array.values)
             return bbELAST;
         pNew->u.array.length = pVal->u.array.length;
-        bbMemCpy(pNew->u.array.values, pVal->u.array.values, pVal->u.array.length  * sizeof(struct bbJsonVal*));
+        bbMemCpy(pNew->u.array.values, pVal->u.array.values, pVal->u.array.length  * sizeof(struct bbJsonVal));
         break;
 
     case bbJSONTYPE_STRING:
@@ -281,8 +281,7 @@ void bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key)
 
 bbERR bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
 {
-    bbJsonVal* pNew;
-    bbJsonVal** pInsert;
+    bbJsonVal* pInsert;
     bbUINT capacity = 0;
 
     if (pVal->mType == bbJSONTYPE_NONE)
@@ -294,27 +293,21 @@ bbERR bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
     if ((bbUINT)pos > pVal->u.array.length)
         pos = pVal->u.array.length;
 
-    if (!(pNew = bbJsonValCopy(pObj)))
-        return bbELAST;
-
     if (pVal->u.array.length)
         capacity = 2 << bbGetTopBit(pVal->u.array.length - 1);
 
     if ((pVal->u.array.length + 1) > capacity)
     {
         capacity = capacity ? capacity<<1 : 2;
-        if (bbEOK != bbMemRealloc(capacity * sizeof(struct bbJsonVal*), (void**)&pVal->u.array.values))
-        {
-            bbJsonValDestroy(pNew);
+        if (bbEOK != bbMemRealloc(capacity * sizeof(struct bbJsonVal), (void**)&pVal->u.array.values))
             return bbELAST;
-        }
     }
 
     pInsert = pVal->u.array.values + pos;
-    bbMemMove(pInsert + 1, pInsert, (pVal->u.array.length - pos) * sizeof(bbJsonVal*));
-    *pInsert = pNew;
+    bbMemMove(pInsert + 1, pInsert, (pVal->u.array.length - pos) * sizeof(bbJsonVal));
+    bbJsonValInitCopy(pInsert, pObj);
+    pInsert->mParent = pVal;
     pVal->u.array.length++;
-    pNew->mParent = pVal;
 
     return bbEOK;
 }
@@ -353,20 +346,23 @@ bbERR bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n)
 
 void bbJsonArrDel(bbJsonVal* pVal, int pos)
 {
-    bbUINT newSize, capacity;
-    bbJsonVal** pFound;
+    bbUINT newSize, capacity, newCapacity;
+    bbJsonVal* pFound;
 
     if (pVal->mType != bbJSONTYPE_ARRAY || (bbUINT)pos >= pVal->u.array.length)
         return;
 
     newSize = pVal->u.array.length - 1;
-    capacity = newSize ? 2 << (newSize-1) : 0;
 
     pFound = &pVal->u.array.values[pos];
-    bbJsonValDestroy(*pFound);
-    bbMemFree(*pFound);
-    bbMemMove(pFound, pFound + 1, (newSize - pos) * sizeof(bbJsonVal*));
-    bbMemRealloc(capacity * sizeof(bbJsonVal*), (void**)&pVal->u.array.values);
+    bbJsonValDestroy(pFound);
+    bbMemMove(pFound, pFound + 1, (newSize - pos) * sizeof(bbJsonVal));
+
+    capacity = newSize ? 2 << newSize : 0;
+    newCapacity = newSize ? 2 << (newSize-1) : 0;
+    if (newCapacity != capacity)
+        bbMemRealloc(newCapacity * sizeof(bbJsonVal), (void**)&pVal->u.array.values);
+
     pVal->u.array.length = newSize;
 }
 
