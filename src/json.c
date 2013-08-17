@@ -167,14 +167,42 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
     return bbEOK;
 }
 
+static bbERR bbJsonValCopyMapCB(const bbCHAR* key, bbU64PTR val, void* pMap)
+{
+    bbJsonVal* pValCopy = bbJsonValCopy((const bbJsonVal*)(bbUPTR)val);
+
+    if (!pValCopy || (bbMapAdd((bbMapRec*)pMap, key, (bbUPTR)pValCopy) != bbEOK))
+    {
+        bbJsonValDestroy(pValCopy);
+        bbMemFree(pValCopy);
+        return bbELAST;
+    }
+
+    return bbEOK;
+}
+
+static bbERR bbJsonValCopyMap(bbJsonVal* pNew, const bbJsonVal* pVal)
+{
+    bbMapInit(&pNew->u.object);
+    if (bbEOK != bbMapEnumerate(&pVal->u.object, bbJsonValCopyMapCB, &pNew->u.object))
+    {
+        bbJsonValDestroy(pNew);
+        return bbELAST;
+    }
+    return bbEOK;
+}
+
 bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
 {
+    bbUINT i;
+
     pNew->mParent = pVal->mParent;
     pNew->mType = pVal->mType;
+
     switch(pVal->mType)
     {
     case bbJSONTYPE_OBJECT:
-        if (bbEOK != bbMapInitCopy(&pNew->u.object, &pVal->u.object))
+        if (bbEOK != bbJsonValCopyMap(pNew, pVal))
             return bbELAST;
         break;
 
@@ -183,7 +211,17 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
         if (!pNew->u.array.values)
             return bbELAST;
         pNew->u.array.length = pVal->u.array.length;
-        bbMemCpy(pNew->u.array.values, pVal->u.array.values, pVal->u.array.length  * sizeof(struct bbJsonVal));
+        for (i=0; i<pVal->u.array.length; i++)
+        {
+            if (bbEOK != bbJsonValInitCopy(pNew->u.array.values + i, pVal->u.array.values + i))
+            {
+                while(i--)
+                    bbJsonValDestroy(pNew->u.array.values + i);
+                bbMemFree(pNew->u.array.values);
+                return bbELAST;
+            }
+            pNew->u.array.values[i].mParent = pNew;
+        }
         break;
 
     case bbJSONTYPE_STRING:
@@ -197,6 +235,7 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
         pNew->u.integer = pVal->u.integer;
         break;
     }
+
     return bbEOK;
 }
 
