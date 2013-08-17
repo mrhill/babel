@@ -101,7 +101,7 @@ static bbMapPair* bbMapInsertOne(bbMapRec* pMap, bbUINT insertAt)
     return pInsert;
 }
 
-bbERR bbMapAddC(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val)
+int bbMapAddC(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
     bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), bbCmp_Str2MapPair);
     bbUINT insertAt = pInsert - pMap->mpPairs;
@@ -110,15 +110,15 @@ bbERR bbMapAddC(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val)
     {
         pInsert = bbMapInsertOne(pMap, insertAt);
         if (!pInsert)
-            return bbELAST;
+            return -1;
         pInsert->key = pKey;
     }
 
     pInsert->val = val;
-    return bbEOK;
+    return insertAt;
 }
 
-bbERR bbMapAdd(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val)
+int bbMapAdd(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val)
 {
     bbMapPair* pInsert = bbBSearchGE(pKey, pMap->mpPairs, pMap->mSize, sizeof(bbMapPair), bbCmp_Str2MapPair);
     bbUINT insertAt = pInsert - pMap->mpPairs;
@@ -127,17 +127,17 @@ bbERR bbMapAdd(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val)
     {
         const bbCHAR* pKeyCopy = bbMapAddKey(pMap, pKey);
         if (!pKeyCopy)
-            return bbELAST;
+            return -1;
 
         pInsert = bbMapInsertOne(pMap, insertAt);
         if (!pInsert)
-            return bbELAST;
+            return -1;
 
         pInsert->key = pKeyCopy;
     }
 
     pInsert->val = val;
-    return bbEOK;
+    return insertAt;
 }
 
 bbU64PTR bbMapGet(const bbMapRec* pMap, const bbCHAR* pKey)
@@ -236,7 +236,7 @@ bbERR bbMapEnumerate(const bbMapRec* pMap, bbERR (*cb)(const bbCHAR*, bbU64PTR, 
 
 static bbERR map_copy(const bbCHAR* key, bbU64PTR val, void* pMap)
 {
-    return bbMapAdd((bbMapRec*)pMap, key, val);
+    return bbMapAdd((bbMapRec*)pMap, key, val)<0 ? bbELAST : bbEOK;
 }
 
 bbERR bbMapInitCopy(bbMapRec* pDst, const bbMapRec* pSrc)

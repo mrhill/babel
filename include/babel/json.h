@@ -28,32 +28,29 @@ struct bbJsonVal;
 typedef struct bbJsonVal bbJsonVal;
 #endif
 
-void  bbJsonValInit(bbJsonVal* pVal);
-void  bbJsonValInitType(bbJsonVal* pVal, bbJSONTYPE type);
-bbERR bbJsonValInitCopy(bbJsonVal* pVal, const bbJsonVal* pOther);
-void  bbJsonValDestroy(bbJsonVal* pVal);
+void    bbJsonValInit(bbJsonVal* pVal);
+void    bbJsonValInitType(bbJsonVal* pVal, bbJSONTYPE type);
+bbERR   bbJsonValInitCopy(bbJsonVal* pVal, const bbJsonVal* pOther);
+bbERR   bbJsonValInitParse(bbJsonVal* pVal, const bbCHAR* text, bbUINT length);
+void    bbJsonValDestroy(bbJsonVal* pVal);
+bbERR   bbJsonValDump(const bbJsonVal* pVal, bbStrBuf* pStr, bbUINT indent);
 
-bbJsonVal* bbJsonValCopy(const bbJsonVal* pVal);
-
-bbERR bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj);
-bbERR bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str);
-bbERR bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n);
-bbERR bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n);
-bbERR bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n);
-void  bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key);
+bbERR   bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj);
+bbERR   bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str);
+bbERR   bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n);
+bbERR   bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n);
+bbERR   bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n);
+void    bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key);
 #define bbJsonObjGet(pVal, key) ((bbJsonVal*)(bbUPTR)bbMapGet(&(pVal)->u.object, key))
 
-bbERR  bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj);
-bbERR  bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str);
-bbERR  bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n);
-bbERR  bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n);
-bbERR  bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n);
-void   bbJsonArrDel(bbJsonVal* pVal, int pos);
-#define bbJsonArrGetSize(pVal) ((pVal)->u.array.length)
+bbJsonVal* bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj);
+bbJsonVal* bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str);
+bbJsonVal* bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n);
+bbJsonVal* bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n);
+bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n);
+void       bbJsonArrDel(bbJsonVal* pVal, int pos);
+#define    bbJsonArrGetSize(pVal) ((pVal)->u.array.length)
 
-bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent);
-
-bbJsonVal* bbJsonParse(const char* text, bbUINT length);
 
 struct bbJsonVal
 {
@@ -80,6 +77,10 @@ struct bbJsonVal
 
         struct bbMapRec object;
     } u;
+
+    union {
+        int lastIdx;
+    } reserved;
 
     #ifdef  __cplusplus
     bbJsonVal() { bbJsonValInit(this); }

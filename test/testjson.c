@@ -8,6 +8,7 @@ int main(int argc, char** argv)
     bbJsonVal val;
     bbJsonVal val2;
     bbJsonVal val3;
+    bbJsonVal valp;
     bbJsonVal* pVal;
 
     bbStrBufInit(&str);
@@ -15,6 +16,7 @@ int main(int argc, char** argv)
     bbJsonValInit(&val);
     bbJsonValInitType(&val2, bbJSONTYPE_INTEGER);
     bbJsonValInit(&val3);
+    bbJsonValInit(&valp);
 
     bbJsonObjAddInt(&val, "fourtytwo", 42);
     bbJsonObjAddStr(&val, "key", "value");
@@ -52,6 +54,11 @@ int main(int argc, char** argv)
     err = bbJsonValDump(&val, &str, 1);
     bbPrintf(bbT("%s\n"), bbStrBufGetPtr(&str));
 
+    bbJsonValInitParse(&valp, bbStrBufGetPtr(&str), bbStrBufGetLen(&str));
+    err = bbJsonValDump(&valp, &str, 1);
+    bbPrintf(bbT("%s\n"), bbStrBufGetPtr(&str));
+
+    bbJsonValDestroy(&valp);
     bbJsonValDestroy(&val3);
     bbJsonValDestroy(&val2);
     bbJsonValDestroy(&val);

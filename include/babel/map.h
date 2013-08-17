@@ -47,15 +47,17 @@ bbERR bbMapInitCopy(bbMapRec* pDst, const bbMapRec* pSrc);
     An existing key will be replaced.
     @param pKey Key, 0-terminated string, will be copied
     @param val  Data associated with key
+    @return Insert index, or -1 on failure
 */
-bbERR bbMapAdd(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val);
+int bbMapAdd(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val);
 
 /** Add value-key pair to map (key string under external control).
     An existing key will be replaced.
     @param pKey Key, 0-terminated string, will not be copied
     @param val  Data associated with key
+    @return Insert index, or -1 on failure
 */
-bbERR bbMapAddC(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val);
+int bbMapAddC(bbMapRec* pMap, const bbCHAR* pKey, bbU64PTR val);
 
 /** Search map for key.
     @param pMap Map
@@ -122,10 +124,10 @@ struct bbMap : bbMapRec
 {
     inline bbMap() { bbMapInit(this); }
     inline ~bbMap() { bbMapDestroy(this); }
-    inline bbERR Add(const bbCHAR* pKey, bbU64PTR val) { return bbMapAdd(this, pKey, val); }
-    inline bbERR Add(const bbCHAR* pKey, void* val) { return bbMapAdd(this, pKey, (bbU64PTR)val); }
-    inline bbERR AddC(const bbCHAR* pKey, bbU64PTR val) { return bbMapAddC(this, pKey, val); }
-    inline bbERR AddC(const bbCHAR* pKey, void* val) { return bbMapAddC(this, pKey, (bbU64PTR)val); }
+    inline int Add(const bbCHAR* pKey, bbU64PTR val) { return bbMapAdd(this, pKey, val); }
+    inline int Add(const bbCHAR* pKey, void* val) { return bbMapAdd(this, pKey, (bbU64PTR)val); }
+    inline int AddC(const bbCHAR* pKey, bbU64PTR val) { return bbMapAddC(this, pKey, val); }
+    inline int AddC(const bbCHAR* pKey, void* val) { return bbMapAddC(this, pKey, (bbU64PTR)val); }
     inline bbU64PTR Get(const bbCHAR* pKey) const { return bbMapGet(this, pKey); }
     inline bbU8 GetU8(const bbCHAR* pKey) const { return (bbU8)bbMapGet(this, pKey); }
     inline bbU16 GetU16(const bbCHAR* pKey) const { return (bbU16)bbMapGet(this, pKey); }

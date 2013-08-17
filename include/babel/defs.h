@@ -840,6 +840,7 @@ enum
     bbEFILEWRITE,   /**< Error code, indicates file write error. */
     bbEFILEFORMAT,  /**< Error code, indicates file format error. */
     bbENOTAFILE,    /**< Error code, indicates not a file. */
+    bbEJSONSYNTAX,  /**< Error code, indicates JSON syntax error, check bbGetErrStr() for details. */
 
     bbELAST = ~0    /**< Error code, indicates error, error number can be found in #bbgErr. */
 };

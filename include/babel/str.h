@@ -166,7 +166,7 @@ bbCHAR* bbStrStr(const bbCHAR* pStr, const bbCHAR* pSubStr);
 /** Move the string offset from one code point boundary to the previous one.
     (Pre-decrementing backward iteration.)
     The input offset may be the same as the string length.
-    @param pStr (const bbCHAR* const) String pointer 
+    @param pStr (const bbCHAR* const) String pointer
     @param i    (int)                String offset, will be adjusted
 */
 #define bbCP_BACK_1(pStr, i)
@@ -485,7 +485,7 @@ bbCHAR* bbStrSkipSpace(const bbCHAR* pStr);
 /** Skip string until separator char or 0-terminator is reached.
     @param pStr      String to scan
     @param sepChar   Character code point of separator char, 0 to skip until next whitespace.
-    @param ppWordEnd Returns pointer to whitespace after last word end, 
+    @param ppWordEnd Returns pointer to whitespace after last word end,
                      or same as return value if no whitespace between wordend and separator. Can be NULL.
     @return Advanced string pointer
 */
@@ -626,7 +626,7 @@ bbCHAR* bbStrConvMemFrom( const bbUINT encoding, const bbUINT flags, const bbU8*
     @param flags see bbStrConvOpen()
     @param pSrc Pointer to 0-terminated source string in internal encoding.
     @return Pointer to allocated heap-block containing 0-terminated string in
-            encoding specified by \a encoding on success, or NULL on failure. 
+            encoding specified by \a encoding on success, or NULL on failure.
             Memory must be freed externally.
 */
 bbU8* bbStrConvMemTo( const bbUINT encoding, const bbUINT flags, const bbCHAR* pSrc);

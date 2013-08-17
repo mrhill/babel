@@ -1,37 +1,6 @@
-/*
- * Adapted for https://github.com/mrhill/babel
- *
- * Original copyright notice:
- *
- * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
- * https://github.com/udp/json-parser
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in the
- *   documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
 #include "json.h"
 #include "fixmath.h"
+#include <math.h>
 
 void bbJsonValInit(bbJsonVal* pVal)
 {
@@ -167,11 +136,22 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
     return bbEOK;
 }
 
+static bbJsonVal* bbJsonValCopy(const bbJsonVal* pVal)
+{
+    bbJsonVal* pNew = bbMemAlloc(sizeof(bbJsonVal));
+    if (pNew)
+    {
+        if (bbEOK != bbJsonValInitCopy(pNew, pVal))
+            bbMemFreeNull((void**)&pNew);
+    }
+    return pNew;
+}
+
 static bbERR bbJsonValCopyMapCB(const bbCHAR* key, bbU64PTR val, void* pMap)
 {
     bbJsonVal* pValCopy = bbJsonValCopy((const bbJsonVal*)(bbUPTR)val);
 
-    if (!pValCopy || (bbMapAdd((bbMapRec*)pMap, key, (bbUPTR)pValCopy) != bbEOK))
+    if (!pValCopy || (bbMapAdd((bbMapRec*)pMap, key, (bbUPTR)pValCopy) < 0))
     {
         bbJsonValDestroy(pValCopy);
         bbMemFree(pValCopy);
@@ -239,17 +219,6 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
     return bbEOK;
 }
 
-bbJsonVal* bbJsonValCopy(const bbJsonVal* pVal)
-{
-    bbJsonVal* pNew = bbMemAlloc(sizeof(bbJsonVal));
-    if (pNew)
-    {
-        if (bbEOK != bbJsonValInitCopy(pNew, pVal))
-            bbMemFreeNull((void**)&pNew);
-    }
-    return pNew;
-}
-
 bbERR bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj)
 {
     bbJsonVal* pNew;
@@ -263,7 +232,7 @@ bbERR bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj)
     if (!(pNew = bbJsonValCopy(pObj)))
         return bbELAST;
 
-    if (bbEOK != bbMapAdd(&pVal->u.object, key, (bbUPTR)pNew))
+    if (bbMapAdd(&pVal->u.object, key, (bbUPTR)pNew) < 0)
     {
         bbJsonValDestroy(pNew);
         return bbELAST;
@@ -318,7 +287,7 @@ void bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key)
     bbMemFree(v);
 }
 
-bbERR bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
+bbJsonVal* bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
 {
     bbJsonVal* pInsert;
     bbUINT capacity = 0;
@@ -327,7 +296,10 @@ bbERR bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
         pVal->mType = bbJSONTYPE_ARRAY;
 
     if (pVal->mType != bbJSONTYPE_ARRAY)
-        return bbErrSet(bbEBADPARAM);
+    {
+        bbErrSet(bbEBADPARAM);
+        return NULL;
+    }
 
     if ((bbUINT)pos > pVal->u.array.length)
         pos = pVal->u.array.length;
@@ -339,7 +311,7 @@ bbERR bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
     {
         capacity = capacity ? capacity<<1 : 2;
         if (bbEOK != bbMemRealloc(capacity * sizeof(struct bbJsonVal), (void**)&pVal->u.array.values))
-            return bbELAST;
+            return NULL;
     }
 
     pInsert = pVal->u.array.values + pos;
@@ -348,10 +320,10 @@ bbERR bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
     pInsert->mParent = pVal;
     pVal->u.array.length++;
 
-    return bbEOK;
+    return pInsert;
 }
 
-bbERR bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str)
+bbJsonVal* bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str)
 {
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_STRING);
@@ -359,7 +331,7 @@ bbERR bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str)
     return bbJsonArrInsObj(pVal, pos, &v);
 }
 
-bbERR bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n)
+bbJsonVal* bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n)
 {
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_INTEGER);
@@ -367,7 +339,7 @@ bbERR bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n)
     return bbJsonArrInsObj(pVal, pos, &v);
 }
 
-bbERR bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n)
+bbJsonVal* bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n)
 {
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_DOUBLE);
@@ -375,7 +347,7 @@ bbERR bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n)
     return bbJsonArrInsObj(pVal, pos, &v);
 }
 
-bbERR bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n)
+bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n)
 {
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_BOOLEAN);
@@ -403,5 +375,543 @@ void bbJsonArrDel(bbJsonVal* pVal, int pos)
         bbMemRealloc(newCapacity * sizeof(bbJsonVal), (void**)&pVal->u.array.values);
 
     pVal->u.array.length = newSize;
+}
+
+/*
+ * Function bbJsonValInitParse is adapted from:
+ *
+ * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
+ * https://github.com/udp/json-parser
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#define e_off (i - cur_line_begin)
+
+#define whitespace \
+   case '\n': ++ cur_line;  cur_line_begin = i; \
+   case ' ': case '\t': case '\r'
+
+#define isdigit(b) (((bbUINT)b-'0')<=('9'-'0'))
+
+static bbUINT hex_value(bbUINT cp)
+{
+    bbUINT val;
+    if ((val = (bbUINT)cp - '0') > ('9'-'0'))
+    {
+        if ((val = ((bbUINT)cp&0xDF) - 'A') <= ('F'-'A'))
+            val+=10;
+        else
+            return 0xFF;
+    }
+    return val;
+}
+
+#define flag_next           (1<<0)
+#define flag_reproc         (1<<1)
+#define flag_need_comma     (1<<2)
+#define flag_seek_value     (1<<3)
+#define flag_escaped        (1<<4)
+#define flag_string         (1<<5)
+#define flag_need_colon     (1<<6)
+#define flag_done           (1<<7)
+#define flag_num_negative   (1<<8)
+#define flag_num_zero       (1<<9)
+#define flag_num_e          (1<<10)
+#define flag_num_e_got_sign (1<<11)
+#define flag_num_e_negative (1<<12)
+
+static bbJsonVal* bbJsonValInitParse_LinkParent(bbJsonVal* pParent, bbJsonVal* pVal)
+{
+    if (pParent)
+    {
+        if (pParent->mType == bbJSONTYPE_ARRAY)
+        {
+            pVal = bbJsonArrInsObj(pParent, -1, pVal);
+        }
+        else if (pParent->mType == bbJSONTYPE_OBJECT)
+        {
+            pVal = bbJsonValCopy(pVal);
+            bbMapPair* pair = bbMapGetPair(&pParent->u.object, pParent->reserved.lastIdx);
+            pair->val = (bbUPTR)pVal;
+        }
+    }
+    return pVal;
+}
+
+bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
+{
+    bbJsonVal* pVal = pRoot, *pParent = NULL;
+    const bbCHAR* end = json + length;
+    const bbCHAR *cur_line_begin, *i;
+    unsigned int cur_line;
+    long flags;
+    long num_digits = 0, num_e = 0;
+    bbS64 num_fraction = 0;
+    bbUINT uc_b1, uc_b2, uc_b3, uc_b4;
+
+    bbJsonVal val;
+    bbStrBuf str;
+
+    bbJsonValInit(pVal);
+    bbStrBufInit(&str);
+    bbgErrStr[0] = 0;
+
+    flags = flag_seek_value;
+    cur_line = 1;
+    cur_line_begin = json;
+
+    for (i=json ;; ++i)
+    {
+        bbCHAR b = (i == end ? 0 : *i);
+
+        if (flags & flag_done)
+        {
+            if (!b)
+                break;
+
+            switch(b)
+            {
+            whitespace:
+                continue;
+            default:
+                bbSprintf(bbgErrStr, bbT("%d:%d: Trailing garbage: `%c`"), cur_line, e_off, b);
+                goto e_failed;
+            }
+        }
+
+        if (flags & flag_string)
+        {
+            if (!b)
+            {
+                bbSprintf(bbgErrStr, bbT("Unexpected EOF in string (at %d:%d)"), cur_line, e_off);
+                goto e_failed;
+            }
+
+            if (flags & flag_escaped)
+            {
+                flags &= ~ flag_escaped;
+
+                switch (b)
+                {
+                case 'b': bbStrBufCatCP(&str, '\b'); break;
+                case 'f': bbStrBufCatCP(&str, '\f'); break;
+                case 'n': bbStrBufCatCP(&str, '\n'); break;
+                case 'r': bbStrBufCatCP(&str, '\r'); break;
+                case 't': bbStrBufCatCP(&str, '\t'); break;
+                case 'u':
+                    if ((uc_b1 = hex_value(*++i)) == 0xFF || (uc_b2 = hex_value(*++i)) == 0xFF ||
+                        (uc_b3 = hex_value(*++i)) == 0xFF || (uc_b4 = hex_value(*++i)) == 0xFF)
+                    {
+                        bbSprintf(bbgErrStr, bbT("Invalid character value `%c` (at %d:%d)"), b, cur_line, e_off);
+                        goto e_failed;
+                    }
+                    uc_b1 = (uc_b1 << 4) + uc_b2;
+                    uc_b2 = (uc_b3 << 4) + uc_b4;
+                    bbStrBufCatCP(&str, ((bbCHARCP)uc_b1 << 8) + uc_b2);
+                    break;
+                default:
+                    bbStrBufCatCP(&str, b);
+                    break;
+                }
+                continue;
+            }
+
+            if (b == '\\')
+            {
+                flags |= flag_escaped;
+                continue;
+            }
+
+            if (b == '"')
+            {
+                flags &= ~ flag_string;
+
+                switch (pVal->mType)
+                {
+                case bbJSONTYPE_STRING:
+                    pVal->u.string.length = bbStrBufGetLen(&str);
+                    pVal->u.string.ptr = bbStrBufDetach(&str);
+                    flags |= flag_next;
+                    break;
+
+                case bbJSONTYPE_OBJECT:
+                    if ((pVal->reserved.lastIdx = bbMapAdd(&pVal->u.object, bbStrBufGetPtr(&str), 0)) < 0)
+                        goto e_alloc_failure;
+                    pParent = pVal;
+                    pVal = &val;
+                    flags |= flag_seek_value | flag_need_colon;
+                    continue;
+
+                default:
+                    break;
+                }
+            }
+            else
+            {
+                bbStrBufCatCP(&str, b);
+                continue;
+            }
+        }
+
+        if (flags & flag_seek_value)
+        {
+            switch (b)
+            {
+            whitespace:
+                continue;
+
+            case ']':
+                if (pVal->mType == bbJSONTYPE_ARRAY)
+                    flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
+                break;
+
+            default:
+                if (flags & flag_need_comma)
+                {
+                    if (b == ',')
+                    {
+                        flags &= ~ flag_need_comma;
+                        continue;
+                    }
+                    else
+                    {
+                        bbSprintf(bbgErrStr, bbT("%d:%d: Expected , before %c"), cur_line, e_off, b);
+                        goto e_failed;
+                    }
+                }
+
+                if (flags & flag_need_colon)
+                {
+                    if (b == ':')
+                    {
+                        flags &= ~ flag_need_colon;
+                        continue;
+                    }
+                    else
+                    {
+                        bbSprintf(bbgErrStr, bbT("%d:%d: Expected : before %c"), cur_line, e_off, b);
+                        goto e_failed;
+                    }
+                }
+
+                flags &= ~ flag_seek_value;
+
+                switch (b)
+                {
+                case '{':
+                    bbJsonValInitType(pVal, bbJSONTYPE_OBJECT);
+                    pVal->mParent = pParent;
+
+                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                        goto e_alloc_failure;
+
+                    continue;
+
+                case '[':
+                    bbJsonValInitType(pVal, bbJSONTYPE_ARRAY);
+                    pVal->mParent = pParent;
+
+                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                        goto e_alloc_failure;
+
+                    pParent = pVal;
+                    pVal = &val;
+                    flags |= flag_seek_value;
+                    continue;
+
+                case '"':
+                    bbJsonValInitType(pVal, bbJSONTYPE_STRING);
+                    pVal->mParent = pParent;
+
+                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                        goto e_alloc_failure;
+
+                    bbStrBufClear(&str);
+
+                    flags |= flag_string;
+                    continue;
+
+                 case 't':
+                    if ((end - i) < 3 || *(++ i) != 'r' || *(++ i) != 'u' || *(++ i) != 'e')
+                        goto e_unknown_value;
+
+                    bbJsonValInitType(pVal, bbJSONTYPE_BOOLEAN);
+                    pVal->mParent = pParent;
+                    pVal->u.boolean = 1;
+
+                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                        goto e_alloc_failure;
+
+                    flags |= flag_next;
+                    break;
+
+                 case 'f':
+                    if ((end - i) < 4 || *(++ i) != 'a' || *(++ i) != 'l' || *(++ i) != 's' || *(++ i) != 'e')
+                        goto e_unknown_value;
+
+                    bbJsonValInitType(pVal, bbJSONTYPE_BOOLEAN);
+                    pVal->mParent = pParent;
+
+                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                        goto e_alloc_failure;
+
+                    flags |= flag_next;
+                    break;
+
+                 case 'n':
+                    if ((end - i) < 3 || *(++ i) != 'u' || *(++ i) != 'l' || *(++ i) != 'l')
+                        goto e_unknown_value;
+
+                    bbJsonValInitType(pVal, bbJSONTYPE_NULL);
+                    pVal->mParent = pParent;
+
+                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                        goto e_alloc_failure;
+
+                    flags |= flag_next;
+                    break;
+
+                 default:
+                    if (isdigit(b) || b == '-')
+                    {
+                        bbJsonValInitType(pVal, bbJSONTYPE_INTEGER);
+                        pVal->mParent = pParent;
+
+                        if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                            goto e_alloc_failure;
+
+                        flags &= ~ (flag_num_negative | flag_num_e | flag_num_e_got_sign | flag_num_e_negative | flag_num_zero);
+
+                        num_digits = 0;
+                        num_fraction = 0;
+                        num_e = 0;
+
+                        if (b != '-')
+                        {
+                            flags |= flag_reproc;
+                            break;
+                        }
+
+                        flags |= flag_num_negative;
+                        continue;
+                    }
+                    else
+                    {
+                        bbSprintf(bbgErrStr, bbT("%d:%d: Unexpected %c when seeking value"), cur_line, e_off, b);
+                        goto e_failed;
+                    }
+                }
+            }
+        }
+        else
+        {
+            switch (pVal->mType)
+            {
+            case bbJSONTYPE_OBJECT:
+                switch (b)
+                {
+                whitespace:
+                    continue;
+
+                case '"':
+                    flags |= flag_string;
+                    bbStrBufClear(&str);
+                    break;
+
+                case '}':
+                    flags = (flags & ~ flag_need_comma) | flag_next;
+                    break;
+
+                case ',':
+                    if (flags & flag_need_comma)
+                    {
+                        flags &= ~ flag_need_comma;
+                        break;
+                    }
+
+                default:
+                    bbSprintf(bbgErrStr, bbT("%d:%d: Unexpected `%c` in object"), cur_line, e_off, b);
+                    goto e_failed;
+                }
+                break;
+
+            case bbJSONTYPE_INTEGER:
+            case bbJSONTYPE_DOUBLE:
+                if (isdigit(b))
+                {
+                    ++num_digits;
+
+                    if (pVal->mType == bbJSONTYPE_INTEGER || flags & flag_num_e)
+                    {
+                        if (! (flags & flag_num_e))
+                        {
+                            if (flags & flag_num_zero)
+                            {
+                                bbSprintf(bbgErrStr, bbT("%d:%d: Unexpected `0` before `%c`"), cur_line, e_off, b);
+                                goto e_failed;
+                            }
+
+                            if (num_digits == 1 && b == '0')
+                                flags |= flag_num_zero;
+                        }
+                        else
+                        {
+                            flags |= flag_num_e_got_sign;
+                            num_e = (num_e * 10) + (b - '0');
+                            continue;
+                        }
+
+                        pVal->u.integer = (pVal->u.integer * 10) + (b - '0');
+                        continue;
+                    }
+
+                    num_fraction = (num_fraction * 10) + (b - '0');
+                    continue;
+                }
+
+                if (b == '+' || b == '-')
+                {
+                    if ( (flags & flag_num_e) && !(flags & flag_num_e_got_sign))
+                    {
+                        flags |= flag_num_e_got_sign;
+                        if (b == '-')
+                            flags |= flag_num_e_negative;
+                        continue;
+                    }
+                }
+                else if (b == '.' && pVal->mType == bbJSONTYPE_INTEGER)
+                {
+                    if (!num_digits)
+                    {
+                        bbSprintf(bbgErrStr, bbT("%d:%d: Expected digit before `.`"), cur_line, e_off);
+                        goto e_failed;
+                    }
+
+                    pVal->mType = bbJSONTYPE_DOUBLE;
+                    pVal->u.dbl = (double) pVal->u.integer;
+
+                    num_digits = 0;
+                    continue;
+                }
+
+                if (! (flags & flag_num_e))
+                {
+                    if (pVal->mType == bbJSONTYPE_DOUBLE)
+                    {
+                        if (!num_digits)
+                        {
+                            bbSprintf(bbgErrStr, bbT("%d:%d: Expected digit after `.`"), cur_line, e_off);
+                            goto e_failed;
+                        }
+
+                        pVal->u.dbl += ((double) num_fraction) / (pow(10, (double) num_digits));
+                    }
+
+                    if (b == 'e' || b == 'E')
+                    {
+                        flags |= flag_num_e;
+
+                        if (pVal->mType == bbJSONTYPE_INTEGER)
+                        {
+                            pVal->mType = bbJSONTYPE_DOUBLE;
+                            pVal->u.dbl = (double) pVal->u.integer;
+                        }
+
+                        num_digits = 0;
+                        flags &= ~ flag_num_zero;
+                        continue;
+                    }
+                }
+                else
+                {
+                    if (!num_digits)
+                    {
+                        bbSprintf(bbgErrStr, bbT("%d:%d: Expected digit after `e`"), cur_line, e_off);
+                        goto e_failed;
+                    }
+
+                    pVal->u.dbl *= pow (10, (double) (flags & flag_num_e_negative ? - num_e : num_e));
+                }
+
+                if (flags & flag_num_negative)
+                {
+                    if (pVal->mType == bbJSONTYPE_INTEGER)
+                        pVal->u.integer = - pVal->u.integer;
+                    else
+                        pVal->u.dbl = - pVal->u.dbl;
+                }
+
+                flags |= flag_next | flag_reproc;
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        if (flags & flag_reproc)
+        {
+            flags &= ~ flag_reproc;
+            --i;
+        }
+
+        if (flags & flag_next)
+        {
+           flags = (flags & ~ flag_next) | flag_need_comma;
+
+           if (!pVal->mParent)
+           {
+              flags |= flag_done; /* root value done */
+              continue;
+           }
+
+           if (pVal->mParent->mType == bbJSONTYPE_ARRAY)
+              flags |= flag_seek_value;
+
+           pVal = pVal->mParent;
+           continue;
+        }
+    }
+
+    bbStrBufDestroy(&str);
+    return bbEOK;
+
+e_unknown_value:
+    bbSprintf(bbgErrStr, bbT("%d:%d: Unknown value"), cur_line, e_off);
+    goto e_failed;
+
+e_alloc_failure:
+    bbStrCpy(bbgErrStr, bbT("Memory allocation failure"));
+    goto e_failed;
+
+e_failed:
+    if (!bbgErrStr[0])
+        bbStrCpy(bbgErrStr, bbT("Unknown error"));
+
+    bbJsonValDestroy(pRoot);
+    bbStrBufDestroy(&str);
+    return bbELAST;
 }
 
