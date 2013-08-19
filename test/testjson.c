@@ -55,8 +55,10 @@ int main(int argc, char** argv)
     bbPrintf(bbT("%s\n"), bbStrBufGetPtr(&str));
 
     bbJsonValInitParse(&valp, bbStrBufGetPtr(&str), bbStrBufGetLen(&str));
+    //bbJsonValInitParse(&valp, bbT("{{{{23\":\"3\"}"), 1000);
+    bbStrBufClear(&str);
     err = bbJsonValDump(&valp, &str, 1);
-    bbPrintf(bbT("%s\n"), bbStrBufGetPtr(&str));
+    bbPrintf(bbT("%d: %s\n"), err, bbStrBufGetPtr(&str));
 
     bbJsonValDestroy(&valp);
     bbJsonValDestroy(&val3);

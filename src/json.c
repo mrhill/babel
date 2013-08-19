@@ -206,7 +206,7 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
 
     case bbJSONTYPE_STRING:
         pNew->u.string.ptr = bbStrDup(pVal->u.string.ptr);
-        if (!pNew->u.string.ptr)
+        if (!pNew->u.string.ptr && pVal->u.string.length)
             return bbELAST;
         pNew->u.string.length = pVal->u.string.length;
         break;
@@ -444,20 +444,27 @@ static bbUINT hex_value(bbUINT cp)
 
 static bbJsonVal* bbJsonValInitParse_LinkParent(bbJsonVal* pParent, bbJsonVal* pVal)
 {
-    if (pParent)
+    bbJsonVal* pValCopy;
+
+    if (!pParent)
+        return pVal;
+
+    bbASSERT(pVal->mParent == NULL);
+
+    if (pParent->mType == bbJSONTYPE_ARRAY)
     {
-        if (pParent->mType == bbJSONTYPE_ARRAY)
-        {
-            pVal = bbJsonArrInsObj(pParent, -1, pVal);
-        }
-        else if (pParent->mType == bbJSONTYPE_OBJECT)
-        {
-            pVal = bbJsonValCopy(pVal);
-            bbMapPair* pair = bbMapGetPair(&pParent->u.object, pParent->reserved.lastIdx);
-            pair->val = (bbUPTR)pVal;
-        }
+        pValCopy = bbJsonArrInsObj(pParent, -1, pVal);
     }
-    return pVal;
+    else if (pParent->mType == bbJSONTYPE_OBJECT)
+    {
+        pValCopy = bbJsonValCopy(pVal);
+        bbMapPair* pair = bbMapGetPair(&pParent->u.object, pParent->reserved.lastIdx);
+        pair->val = (bbUPTR)pValCopy;
+    }
+
+    bbJsonValDestroy(pVal);
+    pValCopy->mParent = pParent;
+    return pValCopy;
 }
 
 bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
@@ -583,8 +590,14 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                 continue;
 
             case ']':
-                if (pVal->mType == bbJSONTYPE_ARRAY)
-                    flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
+                if (!pParent || pParent->mType != bbJSONTYPE_ARRAY)
+                {
+                    bbSprintf(bbgErrStr, bbT("%d:%d: Unexpected %c"), cur_line, e_off, b);
+                    goto e_failed;
+                }
+                pVal = pParent;
+                pParent = pVal->mParent;
+                flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
                 break;
 
             default:
@@ -622,7 +635,6 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                 {
                 case '{':
                     bbJsonValInitType(pVal, bbJSONTYPE_OBJECT);
-                    pVal->mParent = pParent;
 
                     if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
                         goto e_alloc_failure;
@@ -631,7 +643,6 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
 
                 case '[':
                     bbJsonValInitType(pVal, bbJSONTYPE_ARRAY);
-                    pVal->mParent = pParent;
 
                     if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
                         goto e_alloc_failure;
@@ -643,7 +654,6 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
 
                 case '"':
                     bbJsonValInitType(pVal, bbJSONTYPE_STRING);
-                    pVal->mParent = pParent;
 
                     if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
                         goto e_alloc_failure;
@@ -658,10 +668,9 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                         goto e_unknown_value;
 
                     bbJsonValInitType(pVal, bbJSONTYPE_BOOLEAN);
-                    pVal->mParent = pParent;
                     pVal->u.boolean = 1;
 
-                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                    if (!(bbJsonValInitParse_LinkParent(pParent, pVal)))
                         goto e_alloc_failure;
 
                     flags |= flag_next;
@@ -672,9 +681,8 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                         goto e_unknown_value;
 
                     bbJsonValInitType(pVal, bbJSONTYPE_BOOLEAN);
-                    pVal->mParent = pParent;
 
-                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                    if (!(bbJsonValInitParse_LinkParent(pParent, pVal)))
                         goto e_alloc_failure;
 
                     flags |= flag_next;
@@ -685,9 +693,8 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                         goto e_unknown_value;
 
                     bbJsonValInitType(pVal, bbJSONTYPE_NULL);
-                    pVal->mParent = pParent;
 
-                    if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
+                    if (!(bbJsonValInitParse_LinkParent(pParent, pVal)))
                         goto e_alloc_failure;
 
                     flags |= flag_next;
@@ -697,7 +704,6 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                     if (isdigit(b) || b == '-')
                     {
                         bbJsonValInitType(pVal, bbJSONTYPE_INTEGER);
-                        pVal->mParent = pParent;
 
                         if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
                             goto e_alloc_failure;
@@ -879,19 +885,26 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
 
         if (flags & flag_next)
         {
-           flags = (flags & ~ flag_next) | flag_need_comma;
+            flags = (flags & ~ flag_next) | flag_need_comma;
 
-           if (!pVal->mParent)
-           {
-              flags |= flag_done; /* root value done */
-              continue;
-           }
+            if (!pParent)
+            {
+                flags |= flag_done; /* root value done */
+                continue;
+            }
 
-           if (pVal->mParent->mType == bbJSONTYPE_ARRAY)
-              flags |= flag_seek_value;
+            if (pParent->mType == bbJSONTYPE_ARRAY)
+            {
+                flags |= flag_seek_value;
+                pVal = &val;
+            }
+            else
+            {
+                pVal = pParent;
+                pParent = pVal->mParent;
+            }
 
-           pVal = pVal->mParent;
-           continue;
+            continue;
         }
     }
 
