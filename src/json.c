@@ -84,12 +84,17 @@ void bbJsonValClear(bbJsonVal* pVal)
 bbERR bbJsonValAssign(bbJsonVal* pVal, const bbJsonVal* pOther)
 {
     bbERR err = bbEOK;
-    bbJsonVal* parent = pVal->mParent;
-    pVal->mParent = NULL;
-    bbJsonValDestroy(pVal);
-    if (pOther)
-        err = bbJsonValInitCopy(pVal, pOther);
-    pVal->mParent = parent;
+    if (!pVal)
+        err = bbErrSet(bbEBADPARAM);
+    else
+    {
+        bbJsonVal* parent = pVal->mParent;
+        pVal->mParent = NULL;
+        bbJsonValDestroy(pVal);
+        if (pOther)
+            err = bbJsonValInitCopy(pVal, pOther);
+        pVal->mParent = parent;
+    }
     return err;
 }
 
@@ -250,7 +255,7 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
     return bbEOK;
 }
 
-bbERR bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj)
+bbJsonVal* bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj)
 {
     bbJsonVal* pNew;
 
@@ -258,23 +263,26 @@ bbERR bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj)
         pVal->mType = bbJSONTYPE_OBJECT;
 
     if (pVal->mType != bbJSONTYPE_OBJECT)
-        return bbErrSet(bbEBADPARAM);
+    {
+        bbErrSet(bbEBADPARAM);
+        return NULL;
+    }
 
     if (!(pNew = bbJsonValCopy(pObj)))
-        return bbELAST;
+        return NULL;
 
     if (bbMapAdd(&pVal->u.object, key, (bbUPTR)pNew) < 0)
     {
         bbJsonValDestroy(pNew);
-        return bbELAST;
+        return NULL;
     }
 
     pNew->mParent = pVal;
 
-    return bbEOK;
+    return pNew;
 }
 
-bbERR bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str)
+bbJsonVal* bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str)
 {
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_STRING);
@@ -282,7 +290,7 @@ bbERR bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str)
     return bbJsonObjAddObj(pVal, key, &v);
 }
 
-bbERR bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n)
+bbJsonVal* bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n)
 {
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_INTEGER);
@@ -290,7 +298,7 @@ bbERR bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n)
     return bbJsonObjAddObj(pVal, key, &v);
 }
 
-bbERR bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n)
+bbJsonVal* bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n)
 {
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_DOUBLE);
@@ -298,7 +306,7 @@ bbERR bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n)
     return bbJsonObjAddObj(pVal, key, &v);
 }
 
-bbERR bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n)
+bbJsonVal* bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n)
 {
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_BOOLEAN);
