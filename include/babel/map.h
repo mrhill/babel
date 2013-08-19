@@ -139,7 +139,7 @@ struct bbMap : bbMapRec
     inline bbU64PTR operator[](const bbCHAR* pKey) const { return bbMapGet(this, pKey); }
     inline bbU64PTR Del(const bbCHAR* pKey) { return bbMapDel(this, pKey); }
     inline bbUINT GetSize() const { return mSize; }
-    inline void Enumerate(int (*cb)(const bbCHAR*, bbU64PTR)) { bbMapEnumerate(this, cb); }
+    inline bbERR Enumerate(bbERR (*cb)(const bbCHAR*, bbU64PTR, void*), void* user) { return bbMapEnumerate(this, cb, user); }
 };
 
 }

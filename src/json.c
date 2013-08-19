@@ -176,8 +176,8 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
 {
     bbUINT i;
 
+    bbJsonValInitType(pNew, pVal->mType);
     pNew->mParent = pVal->mParent;
-    pNew->mType = pVal->mType;
 
     switch(pVal->mType)
     {
@@ -197,7 +197,7 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
             {
                 while(i--)
                     bbJsonValDestroy(pNew->u.array.values + i);
-                bbMemFree(pNew->u.array.values);
+                bbMemFreeNull((void**)&pNew->u.array.values);
                 return bbELAST;
             }
             pNew->u.array.values[i].mParent = pNew;

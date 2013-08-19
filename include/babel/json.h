@@ -85,11 +85,12 @@ struct bbJsonVal
     #ifdef  __cplusplus
     bbJsonVal() { bbJsonValInit(this); }
     bbJsonVal(bbJSONTYPE type) { bbJsonValInitType(this, type); }
+    bbJsonVal(const bbJsonVal& other) { bbJsonValInitCopy(this, &other); }
     ~bbJsonVal() { bbJsonValDestroy(this); }
-    bbERR Dump(bbStrBuf& s) const { return bbJsonValDump(this, &s); }
+    bbERR Dump(bbStrBuf& str, bbUINT indent) const { return bbJsonValDump(this, &str, indent); }
 
     const bbJsonVal& operator[](const bbCHAR* key) const { return *(const bbJsonVal*)bbMapGet(&u.object, key); }
-    const bbJsonVal& operator[](bbUINT idx) const { return &u.array.values[idx]; }
+    const bbJsonVal& operator[](bbUINT idx) const { return u.array.values[idx]; }
     #endif
 };
 
