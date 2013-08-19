@@ -28,11 +28,57 @@ struct bbJsonVal;
 typedef struct bbJsonVal bbJsonVal;
 #endif
 
+/** Construct a Json node of type bbJSONTYPE_NONE.
+    Always succeeds.
+    @param pVal Unitialized Json node
+*/
 void    bbJsonValInit(bbJsonVal* pVal);
+
+/** Construct a Json node of given type.
+    Always succeeds, nodes of type object, array, or string will be created with size 0.
+    @param pVal Unitialized Json node
+*/
 void    bbJsonValInitType(bbJsonVal* pVal, bbJSONTYPE type);
+
+/** Construct a Json node with deepcopy of given node.
+    @param pVal Unitialized Json node
+    @param pOther Valid node to copy, can be NULL to create bbJSONTYPE_NONE
+*/
 bbERR   bbJsonValInitCopy(bbJsonVal* pVal, const bbJsonVal* pOther);
+
+/** Construct a Json node from serialized JSON text.
+    @param pVal Unitialized Json node
+    @param text JSON-formatted text
+    @param length Size of text in number of characters, or (bbUINT)-1 to stop at 0-terminator
+*/
 bbERR   bbJsonValInitParse(bbJsonVal* pVal, const bbCHAR* text, bbUINT length);
+
+/** Destroy Json node and all its subnodes.
+    On exit the Json node will still be valid and of type bbJSONTYPE_NONE.
+    Destroying a node twice is safe.
+    @param pVal Json node to destroy
+*/
 void    bbJsonValDestroy(bbJsonVal* pVal);
+
+/** Clear json value and all its subnodes.
+    Sets the node to bbJSONTYPE_NONE, but does not unlink it from its parent.
+    @param pVal Json node
+*/
+void    bbJsonValClear(bbJsonVal* pVal);
+
+/** Assign Json node contents.
+    Replaces the Json node \a pVal with a deepcopy of \a pOther, but does
+    not unlink \a pVal from its parent.
+    @param pVal Json node to replace, must be initialized
+    @param pOther Json contents to assign, can be NULL to create bbJSONTYPE_NONE
+*/
+bbERR   bbJsonValAssign(bbJsonVal* pVal, const bbJsonVal* pOther);
+
+/** Dump Json tree into JSON-formatted text.
+    @param pVal Node to start dumping at
+    @param pStr String buffer
+    @param indent 0 for unformatted, 1 to format with indention
+*/
 bbERR   bbJsonValDump(const bbJsonVal* pVal, bbStrBuf* pStr, bbUINT indent);
 
 bbERR   bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj);
@@ -87,6 +133,8 @@ struct bbJsonVal
     bbJsonVal(bbJSONTYPE type) { bbJsonValInitType(this, type); }
     bbJsonVal(const bbJsonVal& other) { bbJsonValInitCopy(this, &other); }
     ~bbJsonVal() { bbJsonValDestroy(this); }
+    void Clear() { bbJsonValClear(this); }
+    bbJsonVal& operator=(const bbJsonVal& other) { bbJsonValAssign(this, &other); return *this; }
     bbERR Dump(bbStrBuf& str, bbUINT indent) const { return bbJsonValDump(this, &str, indent); }
 
     const bbJsonVal& operator[](const bbCHAR* key) const { return *(const bbJsonVal*)bbMapGet(&u.object, key); }

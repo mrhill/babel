@@ -23,7 +23,7 @@ void bbJsonValDestroy(bbJsonVal* value)
 
     value->mParent = 0;
 
-    while (value)
+    for(;;)
     {
         switch (value->mType)
         {
@@ -60,9 +60,37 @@ void bbJsonValDestroy(bbJsonVal* value)
 
         cur_value = value;
         value = value->mParent;
-        if (value && value->mType != bbJSONTYPE_ARRAY)
+        if (!value)
+        {
+            bbMemClear(&cur_value, sizeof(cur_value));
+            break;
+        }
+
+        if (value->mType != bbJSONTYPE_ARRAY)
             bbMemFree(cur_value);
     }
+}
+
+void bbJsonValClear(bbJsonVal* pVal)
+{
+    if (!pVal)
+        return;
+    bbJsonVal* parent = pVal->mParent;
+    pVal->mParent = NULL;
+    bbJsonValDestroy(pVal);
+    pVal->mParent = parent;
+}
+
+bbERR bbJsonValAssign(bbJsonVal* pVal, const bbJsonVal* pOther)
+{
+    bbERR err = bbEOK;
+    bbJsonVal* parent = pVal->mParent;
+    pVal->mParent = NULL;
+    bbJsonValDestroy(pVal);
+    if (pOther)
+        err = bbJsonValInitCopy(pVal, pOther);
+    pVal->mParent = parent;
+    return err;
 }
 
 bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
@@ -176,8 +204,11 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
 {
     bbUINT i;
 
-    bbJsonValInitType(pNew, pVal->mType);
+    bbJsonValInit(pNew);
+    if (!pVal)
+        return bbEOK;
     pNew->mParent = pVal->mParent;
+    pNew->mType = pVal->mType;
 
     switch(pVal->mType)
     {
