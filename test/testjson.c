@@ -22,22 +22,22 @@ int main(int argc, char** argv)
     bbJsonObjAddStr(&val, "key", "value");
 
     val2.u.integer = 23;
-    bbJsonObjAddObj(&val, bbT("Hallo"), &val2);
+    bbJsonObjAdd(&val, bbT("Hallo"), &val2);
 
-    bbJsonArrInsObj(&val3, -1, &val2);
-    bbJsonArrInsObj(&val3, -1, &val2);
-    bbJsonArrInsObj(&val3, -1, &val2);
+    bbJsonArrIns(&val3, -1, &val2, 1);
+    bbJsonArrIns(&val3, -1, &val2, 1);
+    bbJsonArrIns(&val3, -1, &val2, 1);
     bbJsonArrInsDbl(&val3, 1, 23.42);
     bbJsonArrInsStr(&val3, 0, bbT("My string"));
     bbJsonArrInsBool(&val3, 123, 1);
-    bbJsonArrInsObj(&val3, -1, &val2);
-    bbJsonObjAddObj(&val, bbT("arr"), &val3);
+    bbJsonArrIns(&val3, -1, &val2, 1);
+    bbJsonObjAdd(&val, bbT("arr"), &val3);
 
     bbJsonValInitType(&val2, bbJSONTYPE_OBJECT);
     bbJsonObjAddInt(&val2, "fourtythree", 43);
     bbJsonObjAddStr(&val2, "key2", "value2");
-    bbJsonObjAddObj(&val, bbT("xyz"), &val2);
-    bbJsonObjAddObj(&val, bbT("qwe"), &val2);
+    bbJsonObjAdd(&val, bbT("xyz"), &val2);
+    bbJsonObjAdd(&val, bbT("qwe"), &val2);
 
     err = bbJsonValDump(&val, &str, 1);
     bbPrintf(bbT("%s\n"), bbStrBufGetPtr(&str));

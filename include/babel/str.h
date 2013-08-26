@@ -470,7 +470,7 @@ bbCHAR* bbStrDup(const bbCHAR* const pStr);
 */
 bbCHAR* bbStrDupEx(const bbCHAR* const pStr, bbUINT const extralen);
 
-/** Calculate 32 bit has for string.
+/** Calculate 32 bit hash for string.
     @param pStr String to hash
     @return Hash value
 */

@@ -255,7 +255,7 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
     return bbEOK;
 }
 
-bbJsonVal* bbJsonObjAddObj(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj)
+bbJsonVal* bbJsonObjAdd(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj)
 {
     bbJsonVal* pNew;
 
@@ -287,7 +287,7 @@ bbJsonVal* bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_STRING);
     v.u.string.ptr = (bbCHAR*)str;
-    return bbJsonObjAddObj(pVal, key, &v);
+    return bbJsonObjAdd(pVal, key, &v);
 }
 
 bbJsonVal* bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n)
@@ -295,7 +295,7 @@ bbJsonVal* bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_INTEGER);
     v.u.integer = n;
-    return bbJsonObjAddObj(pVal, key, &v);
+    return bbJsonObjAdd(pVal, key, &v);
 }
 
 bbJsonVal* bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n)
@@ -303,7 +303,7 @@ bbJsonVal* bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_DOUBLE);
     v.u.dbl = n;
-    return bbJsonObjAddObj(pVal, key, &v);
+    return bbJsonObjAdd(pVal, key, &v);
 }
 
 bbJsonVal* bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n)
@@ -311,7 +311,7 @@ bbJsonVal* bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_BOOLEAN);
     v.u.boolean = n;
-    return bbJsonObjAddObj(pVal, key, &v);
+    return bbJsonObjAdd(pVal, key, &v);
 }
 
 void bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key)
@@ -326,18 +326,62 @@ void bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key)
     bbMemFree(v);
 }
 
-bbJsonVal* bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
+bbS64 bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
+{
+    bbJsonVal* v = bbJsonObjGet(pVal, key);
+    if (!v)
+        return dflt;
+
+    switch(v->mType)
+    {
+    case bbJSONTYPE_INTEGER:
+        return v->u.integer;
+    case bbJSONTYPE_DOUBLE:
+        return (bbS64)v->u.dbl;
+    case bbJSONTYPE_STRING:
+        {
+        bbS64 num;
+        if (bbEOK == bbStrToS64(v->u.string.ptr, NULL, &num, bbSTROPT_ALLFMT))
+            return num;
+        else
+            return dflt;
+        }
+    case bbJSONTYPE_BOOLEAN:
+        return v->u.boolean;
+    default:
+        return dflt;
+    }
+}
+
+int bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt)
+{
+    bbJsonVal* v = bbJsonObjGet(pVal, key);
+    if (!v)
+        return dflt;
+    if (v->mType == bbJSONTYPE_STRING)
+    {
+        if (!bbStrICmp(v->u.string.ptr, "TRUE"))
+            return !0;
+        if (!bbStrICmp(v->u.string.ptr, "FALSE"))
+            return 0;
+    }
+    return bbJsonObjGetInt(pVal, key, dflt) != 0;
+}
+
+bbJsonVal* bbJsonArrIns(bbJsonVal* pVal, int pos, const bbJsonVal* pObj, bbUINT count)
 {
     bbJsonVal* pInsert;
-    bbUINT capacity = 0;
+    bbUINT i, capacity = 0;
 
-    if (pVal->mType == bbJSONTYPE_NONE)
-        pVal->mType = bbJSONTYPE_ARRAY;
-
-    if (pVal->mType != bbJSONTYPE_ARRAY)
+    if (!pVal || pVal->mType != bbJSONTYPE_ARRAY)
     {
-        bbErrSet(bbEBADPARAM);
-        return NULL;
+        if (pVal && pVal->mType == bbJSONTYPE_NONE)
+            pVal->mType = bbJSONTYPE_ARRAY;
+        else
+        {
+            bbErrSet(bbEBADPARAM);
+            return NULL;
+        }
     }
 
     if ((bbUINT)pos > pVal->u.array.length)
@@ -346,19 +390,58 @@ bbJsonVal* bbJsonArrInsObj(bbJsonVal* pVal, int pos, const bbJsonVal* pObj)
     if (pVal->u.array.length)
         capacity = 2 << bbGetTopBit(pVal->u.array.length - 1);
 
-    if ((pVal->u.array.length + 1) > capacity)
-    {
+    i = capacity;
+    while ((pVal->u.array.length + count) > capacity)
         capacity = capacity ? capacity<<1 : 2;
-        if (bbEOK != bbMemRealloc(capacity * sizeof(struct bbJsonVal), (void**)&pVal->u.array.values))
-            return NULL;
-    }
+    if ((i != capacity) &&
+        (bbEOK != bbMemRealloc(capacity * sizeof(struct bbJsonVal), (void**)&pVal->u.array.values)))
+        return NULL;
 
     pInsert = pVal->u.array.values + pos;
-    bbMemMove(pInsert + 1, pInsert, (pVal->u.array.length - pos) * sizeof(bbJsonVal));
-    bbJsonValInitCopy(pInsert, pObj);
-    pInsert->mParent = pVal;
-    pVal->u.array.length++;
+    bbMemMove(pInsert + count, pInsert, (pVal->u.array.length - pos) * sizeof(bbJsonVal));
+    for(i=0; i<count; i++)
+    {
+        bbJsonValInitCopy(pInsert + i, pObj ? pObj + i : NULL);
+        pInsert[i].mParent = pVal;
+    }
+    pVal->u.array.length += count;
 
+    return pInsert;
+}
+
+bbJsonVal* bbJsonArrInsArrU8(bbJsonVal* pVal, int pos, const bbU8* pArr, bbUINT count)
+{
+    bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
+    if (pInsert)
+        while(count--)
+            pInsert[count].u.integer = pArr[count];
+    return pInsert;
+}
+
+bbJsonVal* bbJsonArrInsArrU16(bbJsonVal* pVal, int pos, const bbU16* pArr, bbUINT count)
+{
+    bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
+    if (pInsert)
+        while(count--)
+            pInsert[count].u.integer = pArr[count];
+    return pInsert;
+}
+
+bbJsonVal* bbJsonArrInsArrU32(bbJsonVal* pVal, int pos, const bbU32* pArr, bbUINT count)
+{
+    bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
+    if (pInsert)
+        while(count--)
+            pInsert[count].u.integer = pArr[count];
+    return pInsert;
+}
+
+bbJsonVal* bbJsonArrInsArrU64(bbJsonVal* pVal, int pos, const bbU64* pArr, bbUINT count)
+{
+    bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
+    if (pInsert)
+        while(count--)
+            pInsert[count].u.integer = pArr[count];
     return pInsert;
 }
 
@@ -367,7 +450,7 @@ bbJsonVal* bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_STRING);
     v.u.string.ptr = (bbCHAR*)str;
-    return bbJsonArrInsObj(pVal, pos, &v);
+    return bbJsonArrIns(pVal, pos, &v, 1);
 }
 
 bbJsonVal* bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n)
@@ -375,7 +458,7 @@ bbJsonVal* bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_INTEGER);
     v.u.integer = n;
-    return bbJsonArrInsObj(pVal, pos, &v);
+    return bbJsonArrIns(pVal, pos, &v, 1);
 }
 
 bbJsonVal* bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n)
@@ -383,7 +466,7 @@ bbJsonVal* bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_DOUBLE);
     v.u.dbl = n;
-    return bbJsonArrInsObj(pVal, pos, &v);
+    return bbJsonArrIns(pVal, pos, &v, 1);
 }
 
 bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n)
@@ -391,7 +474,7 @@ bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_BOOLEAN);
     v.u.boolean = n;
-    return bbJsonArrInsObj(pVal, pos, &v);
+    return bbJsonArrIns(pVal, pos, &v, 1);
 }
 
 void bbJsonArrDel(bbJsonVal* pVal, int pos)
@@ -492,7 +575,7 @@ static bbJsonVal* bbJsonValInitParse_LinkParent(bbJsonVal* pParent, bbJsonVal* p
 
     if (pParent->mType == bbJSONTYPE_ARRAY)
     {
-        pValCopy = bbJsonArrInsObj(pParent, -1, pVal);
+        pValCopy = bbJsonArrIns(pParent, -1, pVal, 1);
     }
     else if (pParent->mType == bbJSONTYPE_OBJECT)
     {
