@@ -151,6 +151,8 @@ struct bbJsonVal
     bbJsonVal& operator=(const bbJsonVal& other) { bbJsonValAssign(this, &other); return *this; }
     bbERR Dump(bbStrBuf& str, bbUINT indent) const { return bbJsonValDump(this, &str, indent); }
 
+    inline bbJsonVal* AddObj(const bbCHAR* key, const bbJsonVal& obj) { return bbJsonObjAddObj(this, key, &obj); }
+
     bbJsonVal& operator[](const bbCHAR* key) { return *bbJsonObjAddObj(this, key, NULL); }
 
     const bbJsonVal& operator[](bbUINT idx) const { return u.array.values[idx]; }
