@@ -207,6 +207,7 @@ struct bbStrBuf : bbStrBufRec
     #endif
 
     inline bbCHAR operator[](int i) const { return mpStr[i]; }
+    inline operator const bbCHAR*() const { return mpStr; }
 
     inline bbCHAR* PrintHex(const bbU8* pData, bbUINT size) { return bbStrBufPrintHex(this, pData, size); }
     inline int CatNumber(bbU64 n) { return bbStrBufCatNumber(this, n); }

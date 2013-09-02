@@ -1,5 +1,6 @@
 #include "json.h"
 #include "fixmath.h"
+#include "file.h"
 #include <math.h>
 
 void bbJsonValInit(bbJsonVal* pVal)
@@ -167,6 +168,25 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
         return bbErrSet(bbEBADPARAM);
     }
     return bbEOK;
+}
+
+bbERR bbJsonValSave(const bbJsonVal* v, const bbCHAR* pFile, bbUINT indent)
+{
+    bbERR err = bbELAST;
+    bbFILEH fh = bbFileOpen(pFile, bbFILEOPEN_READWRITE|bbFILEOPEN_TRUNC);
+    if (fh)
+    {
+        bbStrBuf str;
+        bbStrBufInit(&str);
+
+        if (bbEOK == (err = bbJsonValDump(v, &str, indent)))
+        {
+            err = bbFileWrite(fh, bbStrBufGetPtr(&str), bbStrBufGetLen(&str));
+        }
+
+        bbFileClose(fh);
+    }
+    return err;
 }
 
 static bbJsonVal* bbJsonValCopy(const bbJsonVal* pVal)
