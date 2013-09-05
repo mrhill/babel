@@ -120,7 +120,7 @@ bbCHAR* bbStrBufSetLen(bbStrBuf* pStrBuf, bbUINT strlen);
     @param pStr String to append, can be NULL
     @return Pointer to start of inserted string in buffer, or NULL on failure
 */
-bbCHAR* bbStrBufCat(bbStrBuf* pStrBuf, const bbCHAR* const pStr);
+bbCHAR* bbStrBufCat(bbStrBuf* pStrBuf, const bbCHAR* pStr);
 
 /** Concatenate string by copying at most \a len chacters from referenced string.
     If the source string is less than \a len characters, it will be copied only

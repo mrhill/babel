@@ -44,7 +44,7 @@ HEADERS += \
 SOURCES += \
     src/Arr.cpp \
     src/Registry.cpp \
-    src/StrBuf.cpp \
+    src/bbStrBuf.cpp \
     src/strbuf.c \
     src/Tree.cpp \
     src/algo.c \

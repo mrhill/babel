@@ -267,18 +267,20 @@ int bbStrBufVCatf(bbStrBuf* p, const bbCHAR* pFmt, bbVALIST args)
 
 int bbStrBufPrintf(bbStrBuf* p, const bbCHAR* pFmt, ...)
 {
+    int ret;
     bbVALIST args;
     bbVASTART(args, pFmt);
-    int ret = bbStrBufVPrintf(p, pFmt, args);
+    ret = bbStrBufVPrintf(p, pFmt, args);
     bbVAEND(args);
     return ret;
 }
 
 int bbStrBufCatf(bbStrBuf* p, const bbCHAR* pFmt, ...)
 {
+    int ret;
     bbVALIST args;
     bbVASTART(args, pFmt);
-    int ret = bbStrBufVCatf(p, pFmt, args);
+    ret = bbStrBufVCatf(p, pFmt, args);
     bbVAEND(args);
     return ret;
 }
