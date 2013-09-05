@@ -61,14 +61,13 @@ bbERR   bbJsonValInitParse(bbJsonVal* pVal, const bbCHAR* text, bbUINT length);
 void    bbJsonValDestroy(bbJsonVal* pVal);
 
 /** Clear json value and all its subnodes.
-    Sets the node to bbJSONTYPE_NONE, but does not unlink it from its parent.
+    Sets the node to bbJSONTYPE_NONE.
     @param pVal Json node
 */
-void    bbJsonValClear(bbJsonVal* pVal);
+#define bbJsonValClear(pVal) bbJsonValDestroy(pVal)
 
 /** Assign Json node contents.
-    Replaces the Json node \a pVal with a deepcopy of \a pOther, but does
-    not unlink \a pVal from its parent.
+    Replaces the Json node \a pVal with a deepcopy of \a pOther.
     @param pVal Json node to replace, must be initialized
     @param pOther Json contents to assign, can be NULL to create bbJSONTYPE_NONE
 */
@@ -136,7 +135,6 @@ bbJsonVal* bbJsonArrInsArrU64(bbJsonVal* pVal, int pos, const bbU64* pArr, bbUIN
 
 struct bbJsonVal
 {
-    struct bbJsonVal* mParent;
     bbJSONTYPE        mType;
 
     union {
@@ -160,7 +158,8 @@ struct bbJsonVal
         struct bbMapRec object;
     } u;
 
-    union {
+    struct {
+        struct bbJsonVal* mParent;
         int lastIdx;
     } reserved;
 
