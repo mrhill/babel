@@ -245,7 +245,7 @@ struct bbJsonVal
 
     inline bbJsonVal* InsArrU16(int pos, const bbU16* pArr, bbUINT count) { return bbJsonArrInsArrU16(this, pos, pArr, count); }
 
-    bbJsonVal& operator[](const bbCHAR* key) { return *bbJsonObjAdd(this, key, NULL); }
+    bbJsonVal& operator[](const bbCHAR* key) { bbJsonVal* v = bbJsonObjGet(this, key); return v?*v:*bbJsonObjAdd(this, key, NULL); }
     const bbJsonVal& operator[](const bbCHAR* key) const { return *bbJsonObjGet(this, key); }
 
     const bbJsonVal& operator[](bbUINT idx) const { return u.array.values[idx]; }

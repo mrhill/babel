@@ -105,14 +105,14 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
         for (i=0; i<v->u.array.length; ++i)
         {
             if (i) bbStrBufCatCP(s, ',');
-            if (bbEOK != bbJsonValDump(v->u.array.values + i, s, 0))
+            if (bbEOK != bbJsonValDump(v->u.array.values + i, s, indent))
                 return bbELAST;
         }
         bbStrBufCatCP(s, ']');
         break;
 
     case bbJSONTYPE_INTEGER:
-        bbStrBufCatf(s, bbT("%zd"), v->u.integer);
+        bbStrBufCatf(s, bbT("%ld"), v->u.integer);
         break;
 
     case bbJSONTYPE_DOUBLE:
@@ -397,7 +397,10 @@ bbJsonVal* bbJsonArrInsArrU8(bbJsonVal* pVal, int pos, const bbU8* pArr, bbUINT 
     bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
     if (pInsert)
         while(count--)
+        {
             pInsert[count].u.integer = pArr[count];
+            pInsert[count].mType = bbJSONTYPE_INTEGER;
+        }
     return pInsert;
 }
 
@@ -406,7 +409,10 @@ bbJsonVal* bbJsonArrInsArrU16(bbJsonVal* pVal, int pos, const bbU16* pArr, bbUIN
     bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
     if (pInsert)
         while(count--)
+        {
             pInsert[count].u.integer = pArr[count];
+            pInsert[count].mType = bbJSONTYPE_INTEGER;
+        }
     return pInsert;
 }
 
@@ -415,7 +421,10 @@ bbJsonVal* bbJsonArrInsArrU32(bbJsonVal* pVal, int pos, const bbU32* pArr, bbUIN
     bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
     if (pInsert)
         while(count--)
+        {
             pInsert[count].u.integer = pArr[count];
+            pInsert[count].mType = bbJSONTYPE_INTEGER;
+        }
     return pInsert;
 }
 
@@ -424,7 +433,10 @@ bbJsonVal* bbJsonArrInsArrU64(bbJsonVal* pVal, int pos, const bbU64* pArr, bbUIN
     bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
     if (pInsert)
         while(count--)
+        {
             pInsert[count].u.integer = pArr[count];
+            pInsert[count].mType = bbJSONTYPE_INTEGER;
+        }
     return pInsert;
 }
 
