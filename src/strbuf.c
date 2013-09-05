@@ -248,7 +248,11 @@ int bbStrBufVCatf(bbStrBuf* p, const bbCHAR* pFmt, bbVALIST args)
 
     for(;;)
     {
-        size = bbVsnprintf(p->mpStr+p->mLen, p->mCapacity-p->mLen, pFmt, args);
+        bbVALIST tmp_args;
+        bbVACOPY(tmp_args, args);
+        size = bbVsnprintf(p->mpStr+p->mLen, p->mCapacity-p->mLen, pFmt, tmp_args);
+        bbVAEND(tmp_args);
+
         if ((size<0 || size>=(int)(p->mCapacity-p->mLen)) && (retried<4))
         {
             if (!bbStrBufEnsure(p, (p->mCapacity<<2)-1))
