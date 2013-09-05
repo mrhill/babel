@@ -169,6 +169,10 @@ struct bbJsonVal
     bbJsonVal(bbJSONTYPE type) { bbJsonValInitType(this, type); }
     bbJsonVal(const bbJsonVal& other) { bbJsonValInitCopy(this, &other); }
 
+    #ifdef _MSC_VER
+    bbJsonVal(int v)    { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    bbJsonVal(bbUINT v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    #endif
     bbJsonVal(bbS64  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
     bbJsonVal(bbU64  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
     bbJsonVal(bbS32  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }

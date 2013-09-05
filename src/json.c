@@ -74,9 +74,10 @@ void bbJsonValDestroy(bbJsonVal* value)
 
 void bbJsonValClear(bbJsonVal* pVal)
 {
+    bbJsonVal* parent;
     if (!pVal)
         return;
-    bbJsonVal* parent = pVal->mParent;
+    parent = pVal->mParent;
     pVal->mParent = NULL;
     bbJsonValDestroy(pVal);
     pVal->mParent = parent;
@@ -600,8 +601,9 @@ static bbJsonVal* bbJsonValInitParse_LinkParent(bbJsonVal* pParent, bbJsonVal* p
     }
     else if (pParent->mType == bbJSONTYPE_OBJECT)
     {
+        bbMapPair* pair;
         pValCopy = bbJsonValCopy(pVal);
-        bbMapPair* pair = bbMapGetPair(&pParent->u.object, pParent->reserved.lastIdx);
+        pair = bbMapGetPair(&pParent->u.object, pParent->reserved.lastIdx);
         pair->val = (bbUPTR)pValCopy;
     }
     else

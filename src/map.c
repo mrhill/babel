@@ -5,14 +5,14 @@
 
 #define bbMAP_KEYCHUNKSIZE 256
 
-typedef struct bbMapKeyChunk
+struct bbMapKeyChunk
 {
     struct bbMapKeyChunk* next;
     bbU16 used;
     bbU16 refct;
     bbCHAR str[bbMAP_KEYCHUNKSIZE];
 
-} bbMapKeyChunk;
+};
 
 static int bbCmp_Str2MapPair(const void *p1, const void *p2)
 {
@@ -26,10 +26,10 @@ void bbMapInit(bbMapRec* pMap)
 
 void bbMapDestroy(bbMapRec* pMap)
 {
-    bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
+    struct bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
     while(pChunk)
     {
-        bbMapKeyChunk* pNext = pChunk->next;
+        struct bbMapKeyChunk* pNext = pChunk->next;
         bbMemFree(pChunk);
         pChunk = pNext;
     }
@@ -39,12 +39,14 @@ void bbMapDestroy(bbMapRec* pMap)
     bbMemClear(pMap, sizeof(bbMapRec));
 }
 
-static bbMapKeyChunk* bbMapAddKeyChunk(bbMapRec* pMap, bbUINT keylen)
+static struct bbMapKeyChunk* bbMapAddKeyChunk(bbMapRec* pMap, bbUINT keylen)
 {
+    struct bbMapKeyChunk* pNewChunk;
+
     if ((int)(keylen -= bbMAP_KEYCHUNKSIZE) < 0)
         keylen = 0;
 
-    bbMapKeyChunk* pNewChunk = bbMemAlloc(sizeof(bbMapKeyChunk) + keylen);
+    pNewChunk = bbMemAlloc(sizeof(struct bbMapKeyChunk) + keylen);
     if (pNewChunk)
     {
         pNewChunk->next = pMap->mpKeyChunk;
@@ -58,6 +60,7 @@ static bbMapKeyChunk* bbMapAddKeyChunk(bbMapRec* pMap, bbUINT keylen)
 
 static const bbCHAR* bbMapAddKey(bbMapRec* pMap, const bbCHAR* pKey)
 {
+    struct bbMapKeyChunk* pKeyChunk;
     const bbCHAR* pKeyCopy;
     bbUINT keylen = bbStrLen(pKey) + 1;
 
@@ -67,7 +70,7 @@ static const bbCHAR* bbMapAddKey(bbMapRec* pMap, const bbCHAR* pKey)
         return NULL;
     }
 
-    bbMapKeyChunk* pKeyChunk = pMap->mpKeyChunk;
+    pKeyChunk = pMap->mpKeyChunk;
     if (!pKeyChunk || (pKeyChunk->used + keylen) > bbMAP_KEYCHUNKSIZE)
     {
         if (!bbMapAddKeyChunk(pMap, keylen))
@@ -159,11 +162,11 @@ bbU64PTR bbMapGet(const bbMapRec* pMap, const bbCHAR* pKey)
 
 static void bbMapDerefChunkForKey(bbMapRec* pMap, const bbCHAR* pKey)
 {
-    bbMapKeyChunk** pParent = &pMap->mpKeyChunk;
-    bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
+    struct bbMapKeyChunk** pParent = &pMap->mpKeyChunk;
+    struct bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
     while(pChunk)
     {
-        if (((bbUPTR)pKey - (bbUPTR)pChunk) < sizeof(bbMapKeyChunk))
+        if (((bbUPTR)pKey - (bbUPTR)pChunk) < sizeof(struct bbMapKeyChunk))
         {
             if (--pChunk->refct == 0)
             {
@@ -256,10 +259,10 @@ void bbMapDump(const bbMapRec* pMap) { pMap=pMap; }
 static int bbMapGetChunkNumberForKey(const bbMapRec* pMap, const bbCHAR* pKey)
 {
     int i = 0, chunk = -1;
-    const bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
+    const struct bbMapKeyChunk* pChunk = pMap->mpKeyChunk;
     while(pChunk)
     {
-        if ((bbUPTR)pKey - (bbUPTR)pChunk < sizeof(bbMapKeyChunk))
+        if ((bbUPTR)pKey - (bbUPTR)pChunk < sizeof(struct bbMapKeyChunk))
         {
             chunk = i;
             break;
@@ -274,8 +277,8 @@ void bbMapDump(const bbMapRec* pMap)
 {
     bbUINT i = 0, keychunks = 0;
     bbU32 datasize = 0, memsize = 0, chunksize;
-    const bbMapKeyChunk* pChunk;
-    const bbMapKeyChunk** chunkPtrs;
+    const struct bbMapKeyChunk* pChunk;
+    const struct bbMapKeyChunk** chunkPtrs;
     const bbCHAR** chunkEnds;
     const bbCHAR* pStr;
 
@@ -323,8 +326,8 @@ void bbMapDump(const bbMapRec* pMap)
 
     bbPrintf(" datasize %u, memsize %u\n", datasize, memsize);
 
-    bbMemFree(chunkEnds);
-    bbMemFree(chunkPtrs);
+    bbMemFree((void*)chunkEnds);
+    bbMemFree((void*)chunkPtrs);
 }
 #endif
 
