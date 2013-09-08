@@ -66,6 +66,33 @@ bbERR bbJsonValAssign(bbJsonVal* pVal, const bbJsonVal* pOther)
     return err;
 }
 
+bbJsonVal* bbJsonIntAssign(bbJsonVal* pVal, bbS64 v)
+{
+    if (pVal)
+    {
+        bbJsonValClear(pVal);
+        pVal->mType = bbJSONTYPE_INTEGER;
+        pVal->u.integer = v;
+    }
+    return pVal;
+}
+
+bbJsonVal* bbJsonStrAssign(bbJsonVal* pVal, const bbCHAR* str)
+{
+    if (pVal)
+    {
+        bbJsonValClear(pVal);
+        pVal->mType = bbJSONTYPE_STRING;
+        if (str)
+        {
+            if (!(pVal->u.string.ptr = bbStrDup(str)))
+                return NULL;
+            pVal->u.string.length = bbStrLen(str);
+        }
+    }
+    return pVal;
+}
+
 bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
 {
     bbUINT i, j;
@@ -357,7 +384,7 @@ bbS64 bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
     case bbJSONTYPE_STRING:
         {
         bbS64 num;
-        if (bbEOK == bbStrToS64(v->u.string.ptr, NULL, &num, bbSTROPT_ALLFMT))
+        if (/*v->u.string.ptr && */(bbEOK == bbStrToS64(v->u.string.ptr, NULL, &num, bbSTROPT_ALLFMT)))
             return num;
         else
             return dflt;
@@ -374,7 +401,7 @@ int bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt)
     bbJsonVal* v = bbJsonObjGet(pVal, key);
     if (!v)
         return dflt;
-    if (v->mType == bbJSONTYPE_STRING)
+    if (v->mType == bbJSONTYPE_STRING && v->u.string.ptr)
     {
         if (!bbStrICmp(v->u.string.ptr, "TRUE"))
             return !0;
@@ -382,6 +409,27 @@ int bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt)
             return 0;
     }
     return bbJsonObjGetInt(pVal, key, dflt) != 0;
+}
+
+bbJsonVal* bbJsonObjEnsure(bbJsonVal* pVal, const bbCHAR* key)
+{
+    bbJsonVal* v = bbJsonObjGet(pVal, key);
+    return v ? v : bbJsonObjAdd(pVal, key, NULL);
+}
+
+bbERR bbJsonObjMerge(bbJsonVal* pVal, const bbJsonVal* pOther)
+{
+    if (pVal && pVal->mType == bbJSONTYPE_NONE)
+        pVal->mType = bbJSONTYPE_OBJECT;
+
+    if ((pVal && pVal->mType != bbJSONTYPE_OBJECT) ||
+        (pOther && pOther->mType != bbJSONTYPE_OBJECT))
+        return bbErrSet(bbEBADPARAM);
+
+    if (pVal && pOther)
+        return bbMapEnumerate(&pOther->u.object, bbJsonValCopyMapCB, &pVal->u.object);
+
+    return bbEOK;
 }
 
 #define bbJsonArrGetCapacity(size) ((size) ? 2 << bbGetTopBit((size)-1) : 0)

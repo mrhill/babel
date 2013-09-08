@@ -24,7 +24,7 @@ typedef enum
 
 struct bbJsonVal;
 
-#ifndef  __cplusplus
+#ifndef __cplusplus
 typedef struct bbJsonVal bbJsonVal;
 #endif
 
@@ -73,6 +73,22 @@ void    bbJsonValDestroy(bbJsonVal* pVal);
 */
 bbERR   bbJsonValAssign(bbJsonVal* pVal, const bbJsonVal* pOther);
 
+/** Assign Json node as integer.
+    Replaces the Json node \a pVal with bbJSONTYPE_INTEGER.
+    @param pVal Json node to replace, must be initialized
+    @param v Integer
+    @return \a pVal or NULL on failure
+*/
+bbJsonVal* bbJsonIntAssign(bbJsonVal* pVal, bbS64 v);
+
+/** Assign Json node as string.
+    Replaces the Json node \a pVal with bbJSONTYPE_STRING and a copy of \a str.
+    @param pVal Json node to replace, must be initialized
+    @param str 0-terminated string, can be NULL
+    @return \a pVal or NULL on failure
+*/
+bbJsonVal* bbJsonStrAssign(bbJsonVal* pVal, const bbCHAR* str);
+
 /** Dump Json tree into JSON-formatted text.
     @param pVal Node to start dumping at
     @param pStr String buffer
@@ -97,6 +113,7 @@ bbERR   bbJsonValLoad(bbJsonVal* v, const bbCHAR* pFile);
     @param pVal Json node to add to, must be of bbJSONTYPE_OBJECT, or bbJSONTYPE_NONE
     @param key  Key to create
     @param pObj Json contents to add, can be NULL to create bbJSONTYPE_NONE
+    @return Reference to created child node
 */
 bbJsonVal* bbJsonObjAdd(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj);
 bbJsonVal* bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str);
@@ -109,6 +126,22 @@ bbS64      bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
 int        bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt);
 #define    bbJsonObjGetSize(pVal) bbMapGetSize(&(pVal)->u.object)
 #define    bbJsonObjGetPair(pVal, index) bbMapGetPair(&(pVal)->u.object, (index))
+
+/** Ensure key in Json node of type object.
+    Returns reference for value under given key, or create a new value of bbJSONTYPE_NONE
+    if the key was not yet existent.
+    @param pVal Json node to add to, must be of bbJSONTYPE_OBJECT, or bbJSONTYPE_NONE
+    @param key  Key to ensure
+    @return Reference to value for key, or NULL on error
+*/
+bbJsonVal* bbJsonObjEnsure(bbJsonVal* pVal, const bbCHAR* key);
+
+/** Merge two Json nodes of type object.
+    If either \a pVal or \a pOther are NULL, nothing happens.
+    @param pVal Json node to merge into, must be of bbJSONTYPE_OBJECT, or bbJSONTYPE_NONE
+    @param pObject Json node of type bbJSONTYPE_OBJECT whose members to copy
+*/
+bbERR      bbJsonObjMerge(bbJsonVal* Val, const bbJsonVal* pOther);
 
 /** To node of type array append a deepcopies of given Json nodes.
     @param pVal Json node to add to, must be of bbJSONTYPE_ARRAY, or bbJSONTYPE_NONE
@@ -193,7 +226,6 @@ struct bbJsonVal
     bbJsonVal(bbS8   v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
     bbJsonVal(bbU8   v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
     bbJsonVal(bool   v) { bbJsonValInitType(this, bbJSONTYPE_BOOLEAN); this->u.boolean=v; }
-    bbJsonVal(const bbCHAR* v) { bbJsonValInitType(this, bbJSONTYPE_STRING);  if (v) this->u.string.ptr = bbStrDup(v), this->u.string.length = bbStrLen(v); }
 
     bbJsonVal(const bbU8*  arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU8 (this, 0, arr, count); }
     bbJsonVal(const bbU16* arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU16(this, 0, arr, count); }
@@ -211,10 +243,23 @@ struct bbJsonVal
     struct ArrU16 { const bbU16* ptr; bbUINT size; ArrU16(const bbU16* p, bbUINT s):ptr(p),size(s){} };
     struct ArrU32 { const bbU32* ptr; bbUINT size; ArrU32(const bbU32* p, bbUINT s):ptr(p),size(s){} };
     struct ArrU64 { const bbU64* ptr; bbUINT size; ArrU64(const bbU64* p, bbUINT s):ptr(p),size(s){} };
-    inline bbJsonVal& operator=(const ArrU8 & arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU8 (this, 0, arr.ptr, arr.size); return *this; }
-    inline bbJsonVal& operator=(const ArrU16& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU16(this, 0, arr.ptr, arr.size); return *this; }
-    inline bbJsonVal& operator=(const ArrU32& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU32(this, 0, arr.ptr, arr.size); return *this; }
-    inline bbJsonVal& operator=(const ArrU64& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU64(this, 0, arr.ptr, arr.size); return *this; }
+    inline bbJsonVal& operator=(const ArrU8 & arr) { bbJsonValClear(this); bbJsonArrInsArrU8 (this, 0, arr.ptr, arr.size); return *this; }
+    inline bbJsonVal& operator=(const ArrU16& arr) { bbJsonValClear(this); bbJsonArrInsArrU16(this, 0, arr.ptr, arr.size); return *this; }
+    inline bbJsonVal& operator=(const ArrU32& arr) { bbJsonValClear(this); bbJsonArrInsArrU32(this, 0, arr.ptr, arr.size); return *this; }
+    inline bbJsonVal& operator=(const ArrU64& arr) { bbJsonValClear(this); bbJsonArrInsArrU64(this, 0, arr.ptr, arr.size); return *this; }
+    #ifdef _MSC_VER
+    inline bbJsonVal& operator=(int v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bbUINT v) { return *bbJsonIntAssign(this, v); }
+    #endif
+    inline bbJsonVal& operator=(bbU8 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bbS8 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bbU16 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bbS16 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bbU32 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bbS32 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bbU64 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bbS64 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(const bbCHAR* str) { return *bbJsonStrAssign(this, str); }
 
     inline bbU32 u8() const { return this ? (bbU8)u.integer : 0; }   /**< Access JSON integer node as bbU8. */
     inline bbU32 u16() const { return this ? (bbU16)u.integer : 0; } /**< Access JSON integer node as bbU16. */
@@ -227,9 +272,11 @@ struct bbJsonVal
     inline void Print() const { bbStrBuf s; if (bbEOK == Dump(s, 1)) bbPrintf("%s\n", s.GetPtr()); }
 
     inline bbJsonVal* ObjAdd(const bbCHAR* key, const bbJsonVal* pObj) { return bbJsonObjAdd(this, key, pObj); }
+    inline bbJsonVal* ObjEnsure(const bbCHAR* key) { return bbJsonObjEnsure(this, key); }
     inline const bbJsonVal* ObjGet(const bbCHAR* key) const { return bbJsonObjGet(this, key); }
     inline bbUINT ObjGetSize() const { return bbJsonObjGetSize(this); }
     inline const bbMapPair* ObjGetPair(bbUINT index) const { return bbJsonObjGetPair(this, index); }
+    inline bbERR ObjMerge(const bbJsonVal& other) { return bbJsonObjMerge(this, &other); }
 
     inline bbU8 GetU8(const bbCHAR* key, bbU8 dflt=0) const { return (bbU8)bbJsonObjGetInt(this, key, dflt); }
     inline bbS8 GetS8(const bbCHAR* key, bbU8 dflt=0) const { return (bbS8)bbJsonObjGetInt(this, key, dflt); }
@@ -239,6 +286,8 @@ struct bbJsonVal
     inline bbS32 GetS32(const bbCHAR* key, bbU32 dflt=0) const { return (bbS32)bbJsonObjGetInt(this, key, dflt); }
     inline bbU64 GetU64(const bbCHAR* key, bbU64 dflt=0) const { return (bbU64)bbJsonObjGetInt(this, key, dflt); }
     inline bbS64 GetS64(const bbCHAR* key, bbU64 dflt=0) const { return (bbS64)bbJsonObjGetInt(this, key, dflt); }
+    inline int GetInt(const bbCHAR* key, int dflt=0) const { return (int)bbJsonObjGetInt(this, key, dflt); }
+    inline bbUINT GetUINT(const bbCHAR* key, bbUINT dflt=0) const { return (bbUINT)bbJsonObjGetInt(this, key, dflt); }
     inline bool GetBool(const bbCHAR* key, bool dflt=false) const { return bbJsonObjGetBool(this, key, dflt); }
 
     inline const bbJsonVal* SetU8(const bbCHAR* key, bbU8 val) { return bbJsonObjAddInt(this, key, val); }
@@ -263,9 +312,10 @@ struct bbJsonVal
     inline bbJsonVal* InsArrU32(int pos, const bbU32* pArr, bbUINT count) { return bbJsonArrInsArrU32(this, pos, pArr, count); }
     inline bbJsonVal* InsArrU64(int pos, const bbU64* pArr, bbUINT count) { return bbJsonArrInsArrU64(this, pos, pArr, count); }
 
-    inline bbJsonVal& operator[](const bbCHAR* key) { bbJsonVal* v = bbJsonObjGet(this, key); return v?*v:*bbJsonObjAdd(this, key, NULL); }
+    inline bbJsonVal& operator[](const bbCHAR* key) { return *bbJsonObjEnsure(this, key); }
     inline const bbJsonVal& operator[](const bbCHAR* key) const { return *bbJsonObjGet(this, key); }
     inline const bbJsonVal& operator[](bbUINT idx) const { return u.array.values[idx]; }
+    inline bbJsonVal& operator[](bbUINT idx) { return u.array.values[idx]; }
 
     #endif
 };
