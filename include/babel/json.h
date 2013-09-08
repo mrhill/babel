@@ -281,40 +281,40 @@ struct bbJsonVal
     inline bbERR ObjMerge(const bbJsonVal& other) { return bbJsonObjMerge(this, &other); }
     inline void ObjDel(const bbCHAR* key) { bbJsonObjDel(this, key); }
 
-    inline bbU8 GetU8(const bbCHAR* key, bbU8 dflt=0) const { return (bbU8)bbJsonObjGetInt(this, key, dflt); }
-    inline bbS8 GetS8(const bbCHAR* key, bbU8 dflt=0) const { return (bbS8)bbJsonObjGetInt(this, key, dflt); }
-    inline bbU16 GetU16(const bbCHAR* key, bbU16 dflt=0) const { return (bbU16)bbJsonObjGetInt(this, key, dflt); }
-    inline bbS16 GetS16(const bbCHAR* key, bbU16 dflt=0) const { return (bbS16)bbJsonObjGetInt(this, key, dflt); }
-    inline bbU32 GetU32(const bbCHAR* key, bbU32 dflt=0) const { return (bbU32)bbJsonObjGetInt(this, key, dflt); }
-    inline bbS32 GetS32(const bbCHAR* key, bbU32 dflt=0) const { return (bbS32)bbJsonObjGetInt(this, key, dflt); }
-    inline bbU64 GetU64(const bbCHAR* key, bbU64 dflt=0) const { return (bbU64)bbJsonObjGetInt(this, key, dflt); }
-    inline bbS64 GetS64(const bbCHAR* key, bbU64 dflt=0) const { return (bbS64)bbJsonObjGetInt(this, key, dflt); }
-    inline int GetInt(const bbCHAR* key, int dflt=0) const { return (int)bbJsonObjGetInt(this, key, dflt); }
-    inline bbUINT GetUINT(const bbCHAR* key, bbUINT dflt=0) const { return (bbUINT)bbJsonObjGetInt(this, key, dflt); }
-    inline bool GetBool(const bbCHAR* key, bool dflt=false) const { return bbJsonObjGetBool(this, key, dflt); }
-    inline const bbCHAR* GetStr(const bbCHAR* key, const bbCHAR* dflt = NULL) const { return bbJsonObjGetStr(this, key, dflt); }
+    inline bbU8 ObjGetU8(const bbCHAR* key, bbU8 dflt=0) const { return (bbU8)bbJsonObjGetInt(this, key, dflt); }
+    inline bbS8 ObjGetS8(const bbCHAR* key, bbU8 dflt=0) const { return (bbS8)bbJsonObjGetInt(this, key, dflt); }
+    inline bbU16 ObjGetU16(const bbCHAR* key, bbU16 dflt=0) const { return (bbU16)bbJsonObjGetInt(this, key, dflt); }
+    inline bbS16 ObjGetS16(const bbCHAR* key, bbU16 dflt=0) const { return (bbS16)bbJsonObjGetInt(this, key, dflt); }
+    inline bbU32 ObjGetU32(const bbCHAR* key, bbU32 dflt=0) const { return (bbU32)bbJsonObjGetInt(this, key, dflt); }
+    inline bbS32 ObjGetS32(const bbCHAR* key, bbU32 dflt=0) const { return (bbS32)bbJsonObjGetInt(this, key, dflt); }
+    inline bbU64 ObjGetU64(const bbCHAR* key, bbU64 dflt=0) const { return (bbU64)bbJsonObjGetInt(this, key, dflt); }
+    inline bbS64 ObjGetS64(const bbCHAR* key, bbU64 dflt=0) const { return (bbS64)bbJsonObjGetInt(this, key, dflt); }
+    inline int ObjGetInt(const bbCHAR* key, int dflt=0) const { return (int)bbJsonObjGetInt(this, key, dflt); }
+    inline bbUINT ObjGetUINT(const bbCHAR* key, bbUINT dflt=0) const { return (bbUINT)bbJsonObjGetInt(this, key, dflt); }
+    inline bool ObjGetBool(const bbCHAR* key, bool dflt=false) const { return bbJsonObjGetBool(this, key, dflt); }
+    inline const bbCHAR* ObjGetStr(const bbCHAR* key, const bbCHAR* dflt = NULL) const { return bbJsonObjGetStr(this, key, dflt); }
 
-    inline const bbJsonVal* SetU8(const bbCHAR* key, bbU8 val) { return bbJsonObjAddInt(this, key, val); }
-    inline const bbJsonVal* SetS8(const bbCHAR* key, bbS8 val) { return bbJsonObjAddInt(this, key, val); }
-    inline const bbJsonVal* SetU16(const bbCHAR* key, bbU16 val) { return bbJsonObjAddInt(this, key, val); }
-    inline const bbJsonVal* SetS16(const bbCHAR* key, bbS16 val) { return bbJsonObjAddInt(this, key, val); }
-    inline const bbJsonVal* SetU32(const bbCHAR* key, bbU32 val) { return bbJsonObjAddInt(this, key, val); }
-    inline const bbJsonVal* SetS32(const bbCHAR* key, bbS32 val) { return bbJsonObjAddInt(this, key, val); }
-    inline const bbJsonVal* SetU64(const bbCHAR* key, bbU64 val) { return bbJsonObjAddInt(this, key, val); }
-    inline const bbJsonVal* SetS64(const bbCHAR* key, bbS64 val) { return bbJsonObjAddInt(this, key, val); }
-    inline const bbJsonVal* SetBool(const bbCHAR* key, bool val) { return bbJsonObjAddBool(this, key, val); }
-    inline const bbJsonVal* SetF32(const bbCHAR* key, float val) { return bbJsonObjAddDbl(this, key, val); }
-    inline const bbJsonVal* SetF64(const bbCHAR* key, double val) { return bbJsonObjAddDbl(this, key, val); }
+    inline const bbJsonVal* ObjSetU8(const bbCHAR* key, bbU8 val) { return bbJsonObjAddInt(this, key, val); }
+    inline const bbJsonVal* ObjSetS8(const bbCHAR* key, bbS8 val) { return bbJsonObjAddInt(this, key, val); }
+    inline const bbJsonVal* ObjSetU16(const bbCHAR* key, bbU16 val) { return bbJsonObjAddInt(this, key, val); }
+    inline const bbJsonVal* ObjSetS16(const bbCHAR* key, bbS16 val) { return bbJsonObjAddInt(this, key, val); }
+    inline const bbJsonVal* ObjSetU32(const bbCHAR* key, bbU32 val) { return bbJsonObjAddInt(this, key, val); }
+    inline const bbJsonVal* ObjSetS32(const bbCHAR* key, bbS32 val) { return bbJsonObjAddInt(this, key, val); }
+    inline const bbJsonVal* ObjSetU64(const bbCHAR* key, bbU64 val) { return bbJsonObjAddInt(this, key, val); }
+    inline const bbJsonVal* ObjSetS64(const bbCHAR* key, bbS64 val) { return bbJsonObjAddInt(this, key, val); }
+    inline const bbJsonVal* ObjSetBool(const bbCHAR* key, bool val) { return bbJsonObjAddBool(this, key, val); }
+    inline const bbJsonVal* ObjSetF32(const bbCHAR* key, float val) { return bbJsonObjAddDbl(this, key, val); }
+    inline const bbJsonVal* ObjSetF64(const bbCHAR* key, double val) { return bbJsonObjAddDbl(this, key, val); }
 
     inline bbUINT ArrGetSize() const { return bbJsonArrGetSize(this); }
     inline const bbJsonVal* ArrGet(bbUINT idx) const { return bbJsonArrGet(this, idx); }
     inline bbJsonVal* ArrIns(int pos, const bbJsonVal* pObj, bbUINT count=1) { return bbJsonArrIns(this, pos, pObj, count); }
     inline void ArrDel(int pos, bbUINT count = 1) { bbJsonArrDel(this, pos, count); }
 
-    inline bbJsonVal* InsArrU8(int pos, const bbU8* pArr, bbUINT count) { return bbJsonArrInsArrU8(this, pos, pArr, count); }
-    inline bbJsonVal* InsArrU16(int pos, const bbU16* pArr, bbUINT count) { return bbJsonArrInsArrU16(this, pos, pArr, count); }
-    inline bbJsonVal* InsArrU32(int pos, const bbU32* pArr, bbUINT count) { return bbJsonArrInsArrU32(this, pos, pArr, count); }
-    inline bbJsonVal* InsArrU64(int pos, const bbU64* pArr, bbUINT count) { return bbJsonArrInsArrU64(this, pos, pArr, count); }
+    inline bbJsonVal* ArrInsArrU8(int pos, const bbU8* pArr, bbUINT count) { return bbJsonArrInsArrU8(this, pos, pArr, count); }
+    inline bbJsonVal* ArrInsArrU16(int pos, const bbU16* pArr, bbUINT count) { return bbJsonArrInsArrU16(this, pos, pArr, count); }
+    inline bbJsonVal* ArrInsArrU32(int pos, const bbU32* pArr, bbUINT count) { return bbJsonArrInsArrU32(this, pos, pArr, count); }
+    inline bbJsonVal* ArrInsArrU64(int pos, const bbU64* pArr, bbUINT count) { return bbJsonArrInsArrU64(this, pos, pArr, count); }
 
     inline bbJsonVal& operator[](const bbCHAR* key) { return *bbJsonObjEnsure(this, key); }
     inline const bbJsonVal& operator[](const bbCHAR* key) const { return *bbJsonObjGet(this, key); }
