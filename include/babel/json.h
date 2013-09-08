@@ -278,6 +278,7 @@ struct bbJsonVal
     inline bbUINT ObjGetSize() const { return bbJsonObjGetSize(this); }
     inline const bbMapPair* ObjGetPair(bbUINT index) const { return bbJsonObjGetPair(this, index); }
     inline bbERR ObjMerge(const bbJsonVal& other) { return bbJsonObjMerge(this, &other); }
+    inline void ObjDel(const bbCHAR* key) { bbJsonObjDel(this, key); }
 
     inline bbU8 GetU8(const bbCHAR* key, bbU8 dflt=0) const { return (bbU8)bbJsonObjGetInt(this, key, dflt); }
     inline bbS8 GetS8(const bbCHAR* key, bbU8 dflt=0) const { return (bbS8)bbJsonObjGetInt(this, key, dflt); }
