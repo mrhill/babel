@@ -51,6 +51,15 @@ void bbStrBufInitCStr(bbStrBuf* pStrBuf, const char* pStr);
 */
 void bbStrBufInitStrN(bbStrBuf* pStrBuf, const bbCHAR* pStr, bbUINT len);
 
+/** Construct string and allocate length to given number of characters.
+    Capacity will be set to at least len + 1 (0-terminator) characters.
+    String contents will be uninitialized.
+    @param pStrBuf String buffer object to initialize
+    @param strlen Number of characters to ensure.
+    @return Pointer to start of string, or NULL on failure.
+*/
+bbCHAR* bbStrBufInitLen(bbStrBuf* pStrBuf, bbUINT len);
+
 /** Destroy string.
     @param pStrBuf String buffer object to destroy
 */
@@ -100,6 +109,7 @@ bbCHAR* bbStrBufEnsure(bbStrBuf* pStrBuf, bbUINT strlen);
 /** Set string length to given number of characters.
     Capacity will be set to at least len + 1 (0-terminator) characters.
     String contents will be uninitialized.
+    @param pStrBuf String buffer object
     @param strlen Number of characters to ensure.
     @return Pointer to start of string, or NULL on failure.
 */
@@ -184,6 +194,7 @@ struct bbStrBuf : bbStrBufRec
     inline bbCHAR* SetLen(bbUINT strlen) { return bbStrBufSetLen(this, strlen); }
     inline bbCHAR* GetPtr() { return mpStr; }
     inline bbUINT GetLen() const { return mLen; }
+    inline bbUINT size() const { return mLen; }
     inline bool empty() const { return mLen==0; }
     inline bbUINT GetCapacity() const { return mCapacity; }
 

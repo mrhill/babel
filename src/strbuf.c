@@ -30,6 +30,12 @@ void bbStrBufInitCStr(bbStrBuf* p, const char* pStr)
 }
 #endif
 
+bbCHAR* bbStrBufInitLen(bbStrBuf* p, bbUINT len)
+{
+    bbStrBufInit(p);
+    return bbStrBufSetLen(p, len);
+}
+
 void bbStrBufClear(bbStrBuf* p)
 {
     if (p->mpStr != p->mBuf)
@@ -85,8 +91,11 @@ bbCHAR* bbStrBufEnsure(bbStrBuf* p, bbUINT str_len)
 
 bbCHAR* bbStrBufSetLen(bbStrBuf* p, bbUINT str_len)
 {
+    bbCHAR* buf;
     bbStrBufClear(p);
-    return bbStrBufEnsure(p, str_len);
+    if ((buf = bbStrBufEnsure(p, str_len)))
+        p->mLen = str_len;
+    return buf;
 }
 
 void bbStrBufAttach(bbStrBuf* p, bbCHAR* const pStr, bbUINT capacity, int len)

@@ -157,6 +157,35 @@ bbERR bbJsonValSave(const bbJsonVal* v, const bbCHAR* pFile, bbUINT indent)
     return err;
 }
 
+bbERR bbJsonValLoad(bbJsonVal* pVal, const bbCHAR* pFile)
+{
+    bbERR err = bbELAST;
+    bbCHAR* json;
+    bbFILEH fh = bbFileOpen(pFile, bbFILEOPEN_READ);
+    bbStrBuf str;
+    bbStrBufInit(&str);
+
+    if (!fh)
+        goto err;
+
+    json = bbStrBufSetLen(&str, bbFileExt(fh));
+    if (!json)
+        goto err;
+
+    if (bbEOK != bbFileRead(fh, json, bbStrBufGetLen(&str)))
+        goto err;
+
+    json[bbStrBufGetLen(&str)] = 0; // 0-terminate
+
+    bbJsonValDestroy(pVal);
+    err = bbJsonValInitParse(pVal, json, bbStrBufGetLen(&str));
+
+    err:
+    bbStrBufDestroy(&str);
+    bbFileClose(fh);
+    return err;
+}
+
 static bbJsonVal* bbJsonValCopy(const bbJsonVal* pVal)
 {
     bbJsonVal* pNew = bbMemAlloc(sizeof(bbJsonVal));
@@ -1047,6 +1076,6 @@ e_failed:
 
     bbJsonValDestroy(pRoot);
     bbStrBufDestroy(&str);
-    return bbELAST;
+    return bbErrSet(bbEJSONSYNTAX);
 }
 

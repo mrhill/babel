@@ -87,6 +87,12 @@ bbERR   bbJsonValDump(const bbJsonVal* pVal, bbStrBuf* pStr, bbUINT indent);
 */
 bbERR   bbJsonValSave(const bbJsonVal* pVal, const bbCHAR* pFile, bbUINT indent);
 
+/** Load serialized JSON text to node.
+    @param pVal Itialized Json node
+    @param pFile Filename to load from
+*/
+bbERR   bbJsonValLoad(bbJsonVal* v, const bbCHAR* pFile);
+
 /** To node of type object append a deepcopy of given Json node.
     @param pVal Json node to add to, must be of bbJSONTYPE_OBJECT, or bbJSONTYPE_NONE
     @param key  Key to create
@@ -192,24 +198,26 @@ struct bbJsonVal
     inline bool IsValid() const { return this && this->mType != bbJSONTYPE_NONE; }
     inline bbJSONTYPE GetType() const { return this ? this->mType : bbJSONTYPE_NONE; }
 
-    bbJsonVal& operator=(const bbJsonVal& other) { bbJsonValAssign(this, &other); return *this; }
+    inline bbJsonVal& operator=(const bbJsonVal& other) { bbJsonValAssign(this, &other); return *this; }
 
     struct ArrU8  { const bbU8*  ptr; bbUINT size; ArrU8 (const bbU8*  p, bbUINT s):ptr(p),size(s){} };
     struct ArrU16 { const bbU16* ptr; bbUINT size; ArrU16(const bbU16* p, bbUINT s):ptr(p),size(s){} };
     struct ArrU32 { const bbU32* ptr; bbUINT size; ArrU32(const bbU32* p, bbUINT s):ptr(p),size(s){} };
     struct ArrU64 { const bbU64* ptr; bbUINT size; ArrU64(const bbU64* p, bbUINT s):ptr(p),size(s){} };
-    bbJsonVal& operator=(const ArrU8 & arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU8 (this, 0, arr.ptr, arr.size); return *this; }
-    bbJsonVal& operator=(const ArrU16& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU16(this, 0, arr.ptr, arr.size); return *this; }
-    bbJsonVal& operator=(const ArrU32& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU32(this, 0, arr.ptr, arr.size); return *this; }
-    bbJsonVal& operator=(const ArrU64& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU64(this, 0, arr.ptr, arr.size); return *this; }
+    inline bbJsonVal& operator=(const ArrU8 & arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU8 (this, 0, arr.ptr, arr.size); return *this; }
+    inline bbJsonVal& operator=(const ArrU16& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU16(this, 0, arr.ptr, arr.size); return *this; }
+    inline bbJsonVal& operator=(const ArrU32& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU32(this, 0, arr.ptr, arr.size); return *this; }
+    inline bbJsonVal& operator=(const ArrU64& arr) { bbJsonValAssign(this, NULL); bbJsonArrInsArrU64(this, 0, arr.ptr, arr.size); return *this; }
 
     inline bbU32 u8() const { return this ? (bbU8)u.integer : 0; }   /**< Access JSON integer node as bbU8. */
     inline bbU32 u16() const { return this ? (bbU16)u.integer : 0; } /**< Access JSON integer node as bbU16. */
     inline bbU32 u32() const { return this ? (bbU32)u.integer : 0; } /**< Access JSON integer node as bbU32. */
     inline bbU32 u64() const { return this ? (bbU64)u.integer : 0; } /**< Access JSON integer node as bbU64. */
 
-    bbERR Dump(bbStrBuf& str, bbUINT indent) const { return bbJsonValDump(this, &str, indent); }
-    bbERR Save(const bbCHAR* pFile, bbUINT indent) const { return bbJsonValSave(this, pFile, indent); }
+    inline bbERR Dump(bbStrBuf& str, bbUINT indent) const { return bbJsonValDump(this, &str, indent); }
+    inline bbERR Save(const bbCHAR* pFile, bbUINT indent) const { return bbJsonValSave(this, pFile, indent); }
+    inline bbERR Load(const bbCHAR* pFile) { return bbJsonValLoad(this, pFile); }
+    inline void Print() const { bbStrBuf s; if (bbEOK == Dump(s, 1)) bbPrintf("%s\n", s.GetPtr()); }
 
     inline bbJsonVal* ObjAdd(const bbCHAR* key, const bbJsonVal* pObj) { return bbJsonObjAdd(this, key, pObj); }
     inline const bbJsonVal* ObjGet(const bbCHAR* key) const { return bbJsonObjGet(this, key); }
@@ -243,12 +251,14 @@ struct bbJsonVal
     inline bbJsonVal* ArrIns(int pos, const bbJsonVal* pObj, bbUINT count=1) { return bbJsonArrIns(this, pos, pObj, count); }
     inline void ArrDel(int pos) { bbJsonArrDel(this, pos); }
 
+    inline bbJsonVal* InsArrU8(int pos, const bbU8* pArr, bbUINT count) { return bbJsonArrInsArrU8(this, pos, pArr, count); }
     inline bbJsonVal* InsArrU16(int pos, const bbU16* pArr, bbUINT count) { return bbJsonArrInsArrU16(this, pos, pArr, count); }
+    inline bbJsonVal* InsArrU32(int pos, const bbU32* pArr, bbUINT count) { return bbJsonArrInsArrU32(this, pos, pArr, count); }
+    inline bbJsonVal* InsArrU64(int pos, const bbU64* pArr, bbUINT count) { return bbJsonArrInsArrU64(this, pos, pArr, count); }
 
-    bbJsonVal& operator[](const bbCHAR* key) { bbJsonVal* v = bbJsonObjGet(this, key); return v?*v:*bbJsonObjAdd(this, key, NULL); }
-    const bbJsonVal& operator[](const bbCHAR* key) const { return *bbJsonObjGet(this, key); }
-
-    const bbJsonVal& operator[](bbUINT idx) const { return u.array.values[idx]; }
+    inline bbJsonVal& operator[](const bbCHAR* key) { bbJsonVal* v = bbJsonObjGet(this, key); return v?*v:*bbJsonObjAdd(this, key, NULL); }
+    inline const bbJsonVal& operator[](const bbCHAR* key) const { return *bbJsonObjGet(this, key); }
+    inline const bbJsonVal& operator[](bbUINT idx) const { return u.array.values[idx]; }
 
     #endif
 };
