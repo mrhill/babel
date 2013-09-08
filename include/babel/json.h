@@ -125,7 +125,7 @@ void       bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key);
 bbS64      bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt);
 int        bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt);
 const bbCHAR* bbJsonObjGetStr(const bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* dflt);
-#define    bbJsonObjGetSize(pVal) bbMapGetSize(&(pVal)->u.object)
+bbUINT     bbJsonObjGetSize(const bbJsonVal* pVal);
 #define    bbJsonObjGetPair(pVal, index) bbMapGetPair(&(pVal)->u.object, (index))
 
 /** Ensure key in Json node of type object.
@@ -163,7 +163,7 @@ bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n);
     @param count Number of nodes to delete, count is truncated at array size
 */
 void       bbJsonArrDel(bbJsonVal* pVal, int pos, bbUINT count);
-#define    bbJsonArrGetSize(pVal) ((pVal)->u.array.length)
+bbUINT     bbJsonArrGetSize(const bbJsonVal* pVal);
 #define    bbJsonArrGet(pVal, idx) ((pVal)->u.array.values + (idx))
 
 /** To node of type array append a copy of integer array by creating as many Json nodes.

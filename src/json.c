@@ -300,6 +300,11 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
     return bbEOK;
 }
 
+bbUINT bbJsonObjGetSize(const bbJsonVal* pVal)
+{
+    return pVal && pVal->mType == bbJSONTYPE_OBJECT ? bbMapGetSize(&(pVal)->u.object) : 0;
+}
+
 bbJsonVal* bbJsonObjAdd(bbJsonVal* pVal, const bbCHAR* key, const bbJsonVal* pObj)
 {
     bbJsonVal* pNew;
@@ -442,6 +447,11 @@ bbERR bbJsonObjMerge(bbJsonVal* pVal, const bbJsonVal* pOther)
 }
 
 #define bbJsonArrGetCapacity(size) ((size) ? 2 << bbGetTopBit((size)-1) : 0)
+
+bbUINT bbJsonArrGetSize(const bbJsonVal* pVal)
+{
+    return pVal && pVal->mType == bbJSONTYPE_ARRAY ? pVal->u.array.length : 0;
+}
 
 bbJsonVal* bbJsonArrIns(bbJsonVal* pVal, int pos, const bbJsonVal* pObj, bbUINT count)
 {
