@@ -51,7 +51,7 @@ extern "C" bbFILEH bbFileOpen(const bbCHAR* pFilename, bbUINT flags)
         return NULL;
     }
 
-    if ((flags & bbFILEOPEN_READWRITE) && !(flags & (bbFILEOPEN_CREATE|bbFILEOPEN_TRUNC)))
+    if (flags == bbFILEOPEN_READ || ((flags & bbFILEOPEN_READWRITE) && !(flags & (bbFILEOPEN_CREATE|bbFILEOPEN_TRUNC))))
     {
         if (!pFile->exists())
         {
