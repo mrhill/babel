@@ -48,8 +48,8 @@ int main(int argc, char** argv)
 
     bbPrintf(bbT("Deleting elements in \"arr\"\n"));
     pVal = bbJsonObjGet(&val, "arr");
-    bbJsonArrDel(pVal, bbJsonArrGetSize(pVal)-1);
-    bbJsonArrDel(pVal, 0);
+    bbJsonArrDel(pVal, bbJsonArrGetSize(pVal)-2, 2);
+    bbJsonArrDel(pVal, 0, 1);
 
     err = bbJsonValDump(&val, &str, 1);
     bbPrintf(bbT("%s\n"), bbStrBufGetPtr(&str));

@@ -381,10 +381,12 @@ int bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt)
     return bbJsonObjGetInt(pVal, key, dflt) != 0;
 }
 
+#define bbJsonArrGetCapacity(size) ((size) ? 2 << bbGetTopBit((size)-1) : 0)
+
 bbJsonVal* bbJsonArrIns(bbJsonVal* pVal, int pos, const bbJsonVal* pObj, bbUINT count)
 {
     bbJsonVal* pInsert;
-    bbUINT i, capacity = 0;
+    bbUINT i, oldCapacity, newCapacity;
 
     if (!pVal || pVal->mType != bbJSONTYPE_ARRAY)
     {
@@ -400,22 +402,16 @@ bbJsonVal* bbJsonArrIns(bbJsonVal* pVal, int pos, const bbJsonVal* pObj, bbUINT 
     if ((bbUINT)pos > pVal->u.array.length)
         pos = pVal->u.array.length;
 
-    if (pVal->u.array.length)
-        capacity = 2 << bbGetTopBit(pVal->u.array.length - 1);
-
-    i = capacity;
-    while ((pVal->u.array.length + count) > capacity)
-        capacity = capacity ? capacity<<1 : 2;
-    if ((i != capacity) &&
-        (bbEOK != bbMemRealloc(capacity * sizeof(struct bbJsonVal), (void**)&pVal->u.array.values)))
+    oldCapacity = bbJsonArrGetCapacity(pVal->u.array.length);
+    newCapacity = bbJsonArrGetCapacity(pVal->u.array.length + count);
+    if ((oldCapacity != newCapacity) && (bbEOK != bbMemRealloc(newCapacity * sizeof(struct bbJsonVal), (void**)&pVal->u.array.values)))
         return NULL;
 
     pInsert = pVal->u.array.values + pos;
     bbMemMove(pInsert + count, pInsert, (pVal->u.array.length - pos) * sizeof(bbJsonVal));
     for(i=0; i<count; i++)
-    {
         bbJsonValInitCopy(pInsert + i, pObj ? pObj + i : NULL);
-    }
+
     pVal->u.array.length += count;
 
     return pInsert;
@@ -501,23 +497,28 @@ bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n)
     return bbJsonArrIns(pVal, pos, &v, 1);
 }
 
-void bbJsonArrDel(bbJsonVal* pVal, int pos)
+void bbJsonArrDel(bbJsonVal* pVal, int pos, bbUINT count)
 {
-    bbUINT newSize, capacity, newCapacity;
-    bbJsonVal* pFound;
+    bbUINT newSize, oldCapacity, newCapacity;
+    bbJsonVal *pDel, *pDelBegin;
 
     if (pVal->mType != bbJSONTYPE_ARRAY || (bbUINT)pos >= pVal->u.array.length)
         return;
 
-    newSize = pVal->u.array.length - 1;
+    if (pos + count > pVal->u.array.length)
+        count = pVal->u.array.length - pos;
 
-    pFound = &pVal->u.array.values[pos];
-    bbJsonValDestroy(pFound);
-    bbMemMove(pFound, pFound + 1, (newSize - pos) * sizeof(bbJsonVal));
+    newSize = pVal->u.array.length - count;
 
-    capacity = newSize ? 2 << newSize : 0;
-    newCapacity = newSize ? 2 << (newSize-1) : 0;
-    if (newCapacity != capacity)
+    pDelBegin = &pVal->u.array.values[pos];
+    pDel = pDelBegin + count;
+    while(pDel-- > pDelBegin)
+        bbJsonValDestroy(pDel);
+    bbMemMove(pDelBegin, pDelBegin + count, (newSize - pos) * sizeof(bbJsonVal));
+
+    oldCapacity = bbJsonArrGetCapacity(pVal->u.array.length);
+    newCapacity = bbJsonArrGetCapacity(newSize);
+    if (oldCapacity != newCapacity)
         bbMemRealloc(newCapacity * sizeof(bbJsonVal), (void**)&pVal->u.array.values);
 
     pVal->u.array.length = newSize;

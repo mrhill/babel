@@ -122,7 +122,13 @@ bbJsonVal* bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str);
 bbJsonVal* bbJsonArrInsInt(bbJsonVal* pVal, int pos, bbS64 n);
 bbJsonVal* bbJsonArrInsDbl(bbJsonVal* pVal, int pos, double n);
 bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n);
-void       bbJsonArrDel(bbJsonVal* pVal, int pos);
+
+/** Delete a segment of Json array.
+    @param pVal Json node to delete from, must be of bbJSONTYPE_ARRAY
+    @param pos Start index to delete from, do nothing if <0 or larger than array size
+    @param count Number of nodes to delete, count is truncated at array size
+*/
+void       bbJsonArrDel(bbJsonVal* pVal, int pos, bbUINT count);
 #define    bbJsonArrGetSize(pVal) ((pVal)->u.array.length)
 #define    bbJsonArrGet(pVal, idx) ((pVal)->u.array.values + (idx))
 
@@ -249,7 +255,7 @@ struct bbJsonVal
     inline bbUINT ArrGetSize() const { return bbJsonArrGetSize(this); }
     inline const bbJsonVal* ArrGet(bbUINT idx) const { return bbJsonArrGet(this, idx); }
     inline bbJsonVal* ArrIns(int pos, const bbJsonVal* pObj, bbUINT count=1) { return bbJsonArrIns(this, pos, pObj, count); }
-    inline void ArrDel(int pos) { bbJsonArrDel(this, pos); }
+    inline void ArrDel(int pos, bbUINT count = 1) { bbJsonArrDel(this, pos, count); }
 
     inline bbJsonVal* InsArrU8(int pos, const bbU8* pArr, bbUINT count) { return bbJsonArrInsArrU8(this, pos, pArr, count); }
     inline bbJsonVal* InsArrU16(int pos, const bbU16* pArr, bbUINT count) { return bbJsonArrInsArrU16(this, pos, pArr, count); }
