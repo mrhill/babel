@@ -219,27 +219,27 @@ struct bbJsonVal
 
     #ifdef  __cplusplus
     bbJsonVal() { bbJsonValInit(this); }
-    bbJsonVal(bbJSONTYPE type) { bbJsonValInitType(this, type); }
+    explicit bbJsonVal(bbJSONTYPE type) { bbJsonValInitType(this, type); }
     bbJsonVal(const bbJsonVal& other) { bbJsonValInitCopy(this, &other); }
 
     #ifdef _MSC_VER
-    bbJsonVal(int v)    { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bbUINT v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(int v)    { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bbUINT v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
     #endif
-    bbJsonVal(bbS64  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bbU64  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bbS32  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bbU32  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bbS16  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bbU16  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bbS8   v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bbU8   v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
-    bbJsonVal(bool   v) { bbJsonValInitType(this, bbJSONTYPE_BOOLEAN); this->u.boolean=v; }
+    explicit bbJsonVal(bbS64  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bbU64  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bbS32  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bbU32  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bbS16  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bbU16  v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bbS8   v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bbU8   v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
+    explicit bbJsonVal(bool   v) { bbJsonValInitType(this, bbJSONTYPE_BOOLEAN); this->u.boolean=v; }
 
-    bbJsonVal(const bbU8*  arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU8 (this, 0, arr, count); }
-    bbJsonVal(const bbU16* arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU16(this, 0, arr, count); }
-    bbJsonVal(const bbU32* arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU32(this, 0, arr, count); }
-    bbJsonVal(const bbU64* arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU64(this, 0, arr, count); }
+    explicit bbJsonVal(const bbU8*  arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU8 (this, 0, arr, count); }
+    explicit bbJsonVal(const bbU16* arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU16(this, 0, arr, count); }
+    explicit bbJsonVal(const bbU32* arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU32(this, 0, arr, count); }
+    explicit bbJsonVal(const bbU64* arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU64(this, 0, arr, count); }
 
     ~bbJsonVal() { bbJsonValDestroy(this); }
     void Clear() { bbJsonValClear(this); }
