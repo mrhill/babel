@@ -256,10 +256,13 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
         break;
 
     case bbJSONTYPE_STRING:
-        pNew->u.string.ptr = bbStrDup(pVal->u.string.ptr);
-        if (!pNew->u.string.ptr && pVal->u.string.length)
-            return bbELAST;
-        pNew->u.string.length = pVal->u.string.length;
+        if (pVal->u.string.ptr)
+        {
+            pNew->u.string.ptr = bbStrDup(pVal->u.string.ptr);
+            if (!pNew->u.string.ptr && pVal->u.string.length)
+                return bbELAST;
+            pNew->u.string.length = pVal->u.string.length;
+        }
         break;
 
     default:

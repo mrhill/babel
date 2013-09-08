@@ -193,6 +193,7 @@ struct bbJsonVal
     bbJsonVal(bbS8   v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
     bbJsonVal(bbU8   v) { bbJsonValInitType(this, bbJSONTYPE_INTEGER); this->u.integer=v; }
     bbJsonVal(bool   v) { bbJsonValInitType(this, bbJSONTYPE_BOOLEAN); this->u.boolean=v; }
+    bbJsonVal(const bbCHAR* v) { bbJsonValInitType(this, bbJSONTYPE_STRING);  if (v) this->u.string.ptr = bbStrDup(v), this->u.string.length = bbStrLen(v); }
 
     bbJsonVal(const bbU8*  arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU8 (this, 0, arr, count); }
     bbJsonVal(const bbU16* arr, bbUINT count) { bbJsonValInit(this); bbJsonArrInsArrU16(this, 0, arr, count); }
