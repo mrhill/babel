@@ -81,6 +81,14 @@ bbERR   bbJsonValAssign(bbJsonVal* pVal, const bbJsonVal* pOther);
 */
 bbJsonVal* bbJsonIntAssign(bbJsonVal* pVal, bbS64 v);
 
+/** Assign Json node as boolean.
+    Replaces the Json node \a pVal with bbJSONTYPE_BOOLEAN.
+    @param pVal Json node to replace, must be initialized
+    @param v Boolean
+    @return \a pVal or NULL on failure
+*/
+bbJsonVal* bbJsonBoolAssign(bbJsonVal* pVal, int v);
+
 /** Assign Json node as string.
     Replaces the Json node \a pVal with bbJSONTYPE_STRING and a copy of \a str.
     @param pVal Json node to replace, must be initialized
@@ -260,6 +268,7 @@ struct bbJsonVal
     inline bbJsonVal& operator=(bbS32 v) { return *bbJsonIntAssign(this, v); }
     inline bbJsonVal& operator=(bbU64 v) { return *bbJsonIntAssign(this, v); }
     inline bbJsonVal& operator=(bbS64 v) { return *bbJsonIntAssign(this, v); }
+    inline bbJsonVal& operator=(bool v) { return *bbJsonBoolAssign(this, v); }
     inline bbJsonVal& operator=(const bbCHAR* str) { return *bbJsonStrAssign(this, str); }
 
     inline bbU32 u8() const { return this && mType==bbJSONTYPE_INTEGER ? (bbU8)u.integer : 0; }   /**< Access JSON integer node as bbU8. */

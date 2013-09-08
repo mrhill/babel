@@ -77,6 +77,17 @@ bbJsonVal* bbJsonIntAssign(bbJsonVal* pVal, bbS64 v)
     return pVal;
 }
 
+bbJsonVal* bbJsonBoolAssign(bbJsonVal* pVal, int v)
+{
+    if (pVal)
+    {
+        bbJsonValClear(pVal);
+        pVal->mType = bbJSONTYPE_BOOLEAN;
+        pVal->u.boolean = v;
+    }
+    return pVal;
+}
+
 bbJsonVal* bbJsonStrAssign(bbJsonVal* pVal, const bbCHAR* str)
 {
     if (pVal)
