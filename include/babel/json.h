@@ -124,6 +124,7 @@ void       bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key);
 #define    bbJsonObjGet(pVal, key) ((bbJsonVal*)(bbUPTR)bbMapGet(&(pVal)->u.object, key))
 bbS64      bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt);
 int        bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt);
+const bbCHAR* bbJsonObjGetStr(const bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* dflt);
 #define    bbJsonObjGetSize(pVal) bbMapGetSize(&(pVal)->u.object)
 #define    bbJsonObjGetPair(pVal, index) bbMapGetPair(&(pVal)->u.object, (index))
 
@@ -289,6 +290,7 @@ struct bbJsonVal
     inline int GetInt(const bbCHAR* key, int dflt=0) const { return (int)bbJsonObjGetInt(this, key, dflt); }
     inline bbUINT GetUINT(const bbCHAR* key, bbUINT dflt=0) const { return (bbUINT)bbJsonObjGetInt(this, key, dflt); }
     inline bool GetBool(const bbCHAR* key, bool dflt=false) const { return bbJsonObjGetBool(this, key, dflt); }
+    inline const bbCHAR* GetStr(const bbCHAR* key, const bbCHAR* dflt = NULL) const { return bbJsonObjGetStr(this, key, dflt); }
 
     inline const bbJsonVal* SetU8(const bbCHAR* key, bbU8 val) { return bbJsonObjAddInt(this, key, val); }
     inline const bbJsonVal* SetS8(const bbCHAR* key, bbS8 val) { return bbJsonObjAddInt(this, key, val); }

@@ -384,7 +384,7 @@ bbS64 bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
     case bbJSONTYPE_STRING:
         {
         bbS64 num;
-        if (/*v->u.string.ptr && */(bbEOK == bbStrToS64(v->u.string.ptr, NULL, &num, bbSTROPT_ALLFMT)))
+        if (v->u.string.ptr && (bbEOK == bbStrToS64(v->u.string.ptr, NULL, &num, bbSTROPT_ALLFMT)))
             return num;
         else
             return dflt;
@@ -409,6 +409,15 @@ int bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt)
             return 0;
     }
     return bbJsonObjGetInt(pVal, key, dflt) != 0;
+}
+
+const bbCHAR* bbJsonObjGetStr(const bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* dflt)
+{
+    bbJsonVal* v = bbJsonObjGet(pVal, key);
+    if (v && v->mType==bbJSONTYPE_STRING)
+        return v->u.string.ptr;
+    else
+        return dflt;
 }
 
 bbJsonVal* bbJsonObjEnsure(bbJsonVal* pVal, const bbCHAR* key)
