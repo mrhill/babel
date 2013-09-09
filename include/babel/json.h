@@ -129,7 +129,7 @@ bbJsonVal* bbJsonObjAddInt(bbJsonVal* pVal, const bbCHAR* key, bbS64 n);
 bbJsonVal* bbJsonObjAddDbl(bbJsonVal* pVal, const bbCHAR* key, double n);
 bbJsonVal* bbJsonObjAddBool(bbJsonVal* pVal, const bbCHAR* key, int n);
 void       bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key);
-#define    bbJsonObjGet(pVal, key) ((bbJsonVal*)(bbUPTR)bbMapGet(&(pVal)->u.object, key))
+bbJsonVal* bbJsonObjGet(const bbJsonVal* pVal, const bbCHAR* key);
 bbS64      bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt);
 int        bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt);
 const bbCHAR* bbJsonObjGetStr(const bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* dflt);

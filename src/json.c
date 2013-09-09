@@ -206,7 +206,7 @@ bbERR bbJsonValLoad(bbJsonVal* pVal, const bbCHAR* pFile)
     if (!fh)
         goto err;
 
-    json = bbStrBufSetLen(&str, bbFileExt(fh));
+    json = bbStrBufSetLen(&str, (bbUINT)bbFileExt(fh));
     if (!json)
         goto err;
 
@@ -383,6 +383,14 @@ void bbJsonObjDel(bbJsonVal* pVal, const bbCHAR* key)
     v = (bbJsonVal*)(bbUPTR)bbMapDel(&pVal->u.object, key);
     bbJsonValDestroy(v);
     bbMemFree(v);
+}
+
+bbJsonVal* bbJsonObjGet(const bbJsonVal* pVal, const bbCHAR* key)
+{
+    bbJsonVal* v = NULL;
+    if (pVal && pVal->mType == bbJSONTYPE_OBJECT)
+        v = (bbJsonVal*)(bbUPTR)bbMapGet(&pVal->u.object, key);
+    return v;
 }
 
 bbS64 bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
