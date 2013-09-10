@@ -930,10 +930,16 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                     break;
 
                  case 'n':
-                    if ((end - i) < 3 || *(++ i) != 'u' || *(++ i) != 'l' || *(++ i) != 'l')
-                        goto e_unknown_value;
+                     if ((end - i) < 3)
+                         goto e_unknown_value;
 
-                    bbJsonValInitType(pVal, bbJSONTYPE_NULL);
+                    if (i[1] == 'u' && i[2] == 'l' && i[3] == 'l')
+                        bbJsonValInitType(pVal, bbJSONTYPE_NULL);
+                    else if (i[1] == 'o' && i[2] == 'n' && i[3] == 'e')
+                        bbJsonValInit(pVal);
+                    else
+                        goto e_unknown_value;
+                    i += 3;
 
                     if (!(bbJsonValInitParse_LinkParent(pParent, pVal)))
                         goto e_alloc_failure;
