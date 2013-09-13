@@ -158,7 +158,7 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
         break;
 
     case bbJSONTYPE_STRING:
-        bbStrBufCatf(s, bbT("\"%s\""), v->u.string.ptr);
+        bbStrBufCatf(s, bbT("\"%s\""), v->u.string.ptr ? v->u.string.ptr : "");
         break;
 
     case bbJSONTYPE_BOOLEAN:
