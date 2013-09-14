@@ -613,13 +613,6 @@ void bbJsonArrDel(bbJsonVal* pVal, int pos, bbUINT count)
     pVal->u.array.length = newSize;
 }
 
-void bbJsonArrClear(bbJsonVal* pVal)
-{
-    bbJsonValClear(pVal);
-    if (pVal)
-        pVal->mType = bbJSONTYPE_ARRAY;
-}
-
 /*
  * Function bbJsonValInitParse is adapted from:
  *

@@ -172,9 +172,6 @@ bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n);
 */
 void       bbJsonArrDel(bbJsonVal* pVal, int pos, bbUINT count);
 
-/** Reset Json array to size 0, deleting all elements. */
-void       bbJsonArrClear(bbJsonVal* pVal);
-
 /** Get size of Json array. */
 bbUINT     bbJsonArrGetSize(const bbJsonVal* pVal);
 
@@ -325,7 +322,7 @@ struct bbJsonVal
     inline bbUINT ArrGetSize() const { return bbJsonArrGetSize(this); }
     inline const bbJsonVal* ArrGet(bbUINT idx) const { return bbJsonArrGet(this, idx); }
     inline void ArrDel(int pos, bbUINT count = 1) { bbJsonArrDel(this, pos, count); }
-    inline void ArrClear() { bbJsonArrClear(this); }
+    inline void ArrClear() { bbJsonArrDel(this, 0, -1); }
     inline bbJsonVal* ArrIns(int pos, const bbJsonVal* pObj, bbUINT count=1) { return bbJsonArrIns(this, pos, pObj, count); }
     inline bbJsonVal* ArrInsStr(int pos, const bbCHAR* pStr) { return bbJsonArrInsStr(this, pos, pStr); }
     inline bbJsonVal* ArrInsArrU8(int pos, const bbU8* pArr, bbUINT count) { return bbJsonArrInsArrU8(this, pos, pArr, count); }
