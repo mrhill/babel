@@ -171,7 +171,14 @@ bbJsonVal* bbJsonArrInsBool(bbJsonVal* pVal, int pos, int n);
     @param count Number of nodes to delete, count is truncated at array size
 */
 void       bbJsonArrDel(bbJsonVal* pVal, int pos, bbUINT count);
+
+/** Reset Json array to size 0, deleting all elements. */
+void       bbJsonArrClear(bbJsonVal* pVal);
+
+/** Get size of Json array. */
 bbUINT     bbJsonArrGetSize(const bbJsonVal* pVal);
+
+/** Get Json array element. */
 #define    bbJsonArrGet(pVal, idx) ((pVal)->u.array.values + (idx))
 
 /** To node of type array append a copy of integer array by creating as many Json nodes.
@@ -317,9 +324,10 @@ struct bbJsonVal
 
     inline bbUINT ArrGetSize() const { return bbJsonArrGetSize(this); }
     inline const bbJsonVal* ArrGet(bbUINT idx) const { return bbJsonArrGet(this, idx); }
-    inline bbJsonVal* ArrIns(int pos, const bbJsonVal* pObj, bbUINT count=1) { return bbJsonArrIns(this, pos, pObj, count); }
     inline void ArrDel(int pos, bbUINT count = 1) { bbJsonArrDel(this, pos, count); }
-
+    inline void ArrClear() { bbJsonArrClear(this); }
+    inline bbJsonVal* ArrIns(int pos, const bbJsonVal* pObj, bbUINT count=1) { return bbJsonArrIns(this, pos, pObj, count); }
+    inline bbJsonVal* ArrInsStr(int pos, const bbCHAR* pStr) { return bbJsonArrInsStr(this, pos, pStr); }
     inline bbJsonVal* ArrInsArrU8(int pos, const bbU8* pArr, bbUINT count) { return bbJsonArrInsArrU8(this, pos, pArr, count); }
     inline bbJsonVal* ArrInsArrU16(int pos, const bbU16* pArr, bbUINT count) { return bbJsonArrInsArrU16(this, pos, pArr, count); }
     inline bbJsonVal* ArrInsArrU32(int pos, const bbU32* pArr, bbUINT count) { return bbJsonArrInsArrU32(this, pos, pArr, count); }
