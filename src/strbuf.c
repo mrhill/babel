@@ -75,7 +75,7 @@ bbCHAR* bbStrBufEnsure(bbStrBuf* p, bbUINT str_len)
             if (!pNew)
                 return NULL;
             p->mpStr = pNew;
-            bbStrCpy(pNew, p->mBuf);
+            bbMemMove(pNew, p->mBuf, p->mLen * sizeof(bbCHAR));
         }
         else
         {
