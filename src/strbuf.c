@@ -115,7 +115,13 @@ bbCHAR* bbStrBufDetach(bbStrBuf* p)
     bbCHAR* pStr;
 
     if (p->mpStr == p->mBuf)
-        pStr = bbStrDup(p->mBuf);
+    {
+        if ((pStr = bbStrAlloc(p->mLen)) != NULL)
+        {
+            bbMemMove(pStr, p->mBuf, p->mLen * sizeof(bbCHAR));
+            pStr[p->mLen] = 0;
+        }
+    }
     else
         pStr = p->mpStr;
 

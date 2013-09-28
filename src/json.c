@@ -104,6 +104,25 @@ bbJsonVal* bbJsonStrAssign(bbJsonVal* pVal, const bbCHAR* str)
     return pVal;
 }
 
+static bbERR bbJsonValDumpEscStr(bbStrBuf* s, const bbCHAR* pStr, bbUINT len)
+{
+    bbUINT i;
+    bbCHARCP cp;
+    bbStrBufCatCP(s, '"');
+    if (pStr) for(i=0; i<len;)
+    {
+        bbCP_NEXT(pStr, i, cp);
+        if (cp == '"' || cp == '\\')
+            bbStrBufCatf(s, bbT("\\%c"), cp);
+        else if (cp >= ' ')
+            bbStrBufCatCP(s, cp);
+        else
+            bbStrBufCatf(s, bbT("\\u%04X"), cp);
+    }
+    bbStrBufCatCP(s, '"');
+    return bbEOK;
+}
+
 bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
 {
     bbUINT i, j;
@@ -158,8 +177,7 @@ bbERR bbJsonValDump(const bbJsonVal* v, bbStrBuf* s, bbUINT indent)
         break;
 
     case bbJSONTYPE_STRING:
-        bbStrBufCatf(s, bbT("\"%s\""), v->u.string.ptr ? v->u.string.ptr : "");
-        break;
+        return bbJsonValDumpEscStr(s, v->u.string.ptr, v->u.string.length);
 
     case bbJSONTYPE_BOOLEAN:
         bbStrBufCatCStr(s, v->u.boolean ? "true" : "false");
@@ -296,10 +314,13 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
     case bbJSONTYPE_STRING:
         if (pVal->u.string.ptr)
         {
-            pNew->u.string.ptr = bbStrDup(pVal->u.string.ptr);
-            if (!pNew->u.string.ptr && pVal->u.string.length)
+            i = pVal->u.string.length;
+            pNew->u.string.ptr = bbStrAlloc(i);
+            if (!pNew->u.string.ptr)
                 return bbELAST;
-            pNew->u.string.length = pVal->u.string.length;
+            bbMemMove(pNew->u.string.ptr, pVal->u.string.ptr, sizeof(bbCHAR)*i);
+            pNew->u.string.ptr[i] = 0;
+            pNew->u.string.length = i;
         }
         break;
 
@@ -346,6 +367,8 @@ bbJsonVal* bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_STRING);
     v.u.string.ptr = (bbCHAR*)str;
+    if (str)
+        v.u.string.length = bbStrLen(str);
     return bbJsonObjAdd(pVal, key, &v);
 }
 
@@ -559,6 +582,8 @@ bbJsonVal* bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_STRING);
     v.u.string.ptr = (bbCHAR*)str;
+    if (str)
+        v.u.string.length = bbStrLen(str);
     return bbJsonArrIns(pVal, pos, &v, 1);
 }
 
