@@ -22,11 +22,12 @@ typedef enum
 
 } bbJSONTYPE;
 
-struct bbJsonVal;
+typedef struct bbJsonObjPair
+{
+    const bbCHAR* key;
+    const bbJsonVal* val;
 
-#ifndef __cplusplus
-typedef struct bbJsonVal bbJsonVal;
-#endif
+} bbJsonObjPair;
 
 /** Construct a Json node of type bbJSONTYPE_NONE.
     Always succeeds.
@@ -134,7 +135,7 @@ bbS64      bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
 int        bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt);
 const bbCHAR* bbJsonObjGetStr(const bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* dflt);
 bbUINT     bbJsonObjGetSize(const bbJsonVal* pVal);
-#define    bbJsonObjGetPair(pVal, index) bbMapGetPair(&(pVal)->u.object, (index))
+#define    bbJsonObjGetPair(pVal, index) ((bbJsonObjPair*)bbMapGetPair(&(pVal)->u.object, (index)))
 
 /** Ensure key in Json node of type object.
     Returns reference for value under given key, or create a new value of bbJSONTYPE_NONE
@@ -289,8 +290,9 @@ struct bbJsonVal
     inline bbJsonVal* ObjAdd(const bbCHAR* key, const bbJsonVal* pObj) { return bbJsonObjAdd(this, key, pObj); }
     inline bbJsonVal* ObjEnsure(const bbCHAR* key) { return bbJsonObjEnsure(this, key); }
     inline const bbJsonVal* ObjGet(const bbCHAR* key) const { return bbJsonObjGet(this, key); }
+    inline const bbJsonVal* ObjGet(bbUINT index) const { return bbJsonObjGetPair(this, index)->val; }
     inline bbUINT ObjGetSize() const { return bbJsonObjGetSize(this); }
-    inline const bbMapPair* ObjGetPair(bbUINT index) const { return bbJsonObjGetPair(this, index); }
+    inline const bbJsonObjPair* ObjGetPair(bbUINT index) const { return bbJsonObjGetPair(this, index); }
     inline bbERR ObjMerge(const bbJsonVal& other) { return bbJsonObjMerge(this, &other); }
     inline void ObjDel(const bbCHAR* key) { bbJsonObjDel(this, key); }
 

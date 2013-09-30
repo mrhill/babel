@@ -860,6 +860,11 @@ enum
 /** Error code base, mh library. @internal */
 #define bbEBASE_MH 0x700
 
+struct bbJsonVal;
+#ifndef __cplusplus
+typedef struct bbJsonVal bbJsonVal;
+#endif
+
 #ifdef  __cplusplus
 }
 #endif
