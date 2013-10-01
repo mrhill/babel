@@ -183,6 +183,27 @@ bbDECLAREVEC(bbU8, bbVecU8, 1);
 bbDECLAREVEC(bbU32, bbVecU16, 2);
 bbDECLAREVEC(bbU32, bbVecU32, 4);
 bbDECLAREVEC(bbU64, bbVecU64, 8);
+bbDECLAREVECPTR(void*, bbVecPVoid);
+
+template <class T> class bbVec { bbVec() {} };
+template <class T> class bbVec<T*> : public bbVecPVoid {
+public:
+    inline T**       Detach() { return (T**)bbVecPVoid::Detach(); }
+    inline T**       Grow(int relsize) { return (T**)bbVecPVoid::Grow(relsize); }
+    inline T**       Append(T* item) { return (T**)bbVecPVoid::Append((void*)item); }
+    inline T**       GetPtr() { return (T**)mpData; }
+    inline T*const * GetPtr() const { return (T*const *)mpData; }
+    inline T**       GetPtr(bbUINT idx) { bbASSERT(idx<mSize); return (T**)mpData + idx; }
+    inline T*const * GetPtr(bbUINT idx) const { bbASSERT(idx<mSize); return (T*const*)mpData + idx; }
+    inline T**       GetPtrLast() { return (T**)mpData + mSize - 1; }
+    inline T*const * GetPtrLast() const { return (T*const*)mpData + mSize - 1; }
+    inline T**       GetPtrEnd() { return (T**)mpData + mSize; }
+    inline T*const * GetPtrEnd() const { return (T*const*)mpData + mSize; }
+    inline T**       GetPtrCheck(bbUINT idx) {  return (idx<mSize) ? (T**)mpData + idx : NULL; }
+    inline T*const * GetPtrCheck(bbUINT idx) const {  return (idx<mSize) ? (T*const*)mpData + idx : NULL; }
+    inline T*&       operator[](bbUINT idx) { bbASSERT(idx<mSize); return ((T**)mpData)[idx]; }
+    inline T*const & operator[](bbUINT idx) const { bbASSERT(idx<mSize); return ((T* const*)mpData)[idx]; }
+};
 
 /** Array of strings.
     This class maintains an array of 0-terminated strings,
