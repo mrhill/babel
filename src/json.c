@@ -674,8 +674,6 @@ void bbJsonArrDel(bbJsonVal* pVal, int pos, bbUINT count)
    case '\n': ++ cur_line;  cur_line_begin = i; \
    case ' ': case '\t': case '\r'
 
-#define isdigit(b) (((bbUINT)b-'0')<=('9'-'0'))
-
 static bbUINT hex_value(bbUINT cp)
 {
     bbUINT val;
@@ -702,6 +700,7 @@ static bbUINT hex_value(bbUINT cp)
 #define flag_num_e          (1<<10)
 #define flag_num_e_got_sign (1<<11)
 #define flag_num_e_negative (1<<12)
+#define flag_num_hex        (1<<13)
 
 static bbJsonVal* bbJsonValInitParse_LinkParent(bbJsonVal* pParent, bbJsonVal* pVal)
 {
@@ -973,14 +972,14 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                     break;
 
                  default:
-                    if (isdigit(b) || b == '-')
+                    if ((((bbUINT)b-'0')<=('9'-'0')) || b == '-')
                     {
                         bbJsonValInitType(pVal, bbJSONTYPE_INTEGER);
 
                         if (!(pVal = bbJsonValInitParse_LinkParent(pParent, pVal)))
                             goto e_alloc_failure;
 
-                        flags &= ~ (flag_num_negative | flag_num_e | flag_num_e_got_sign | flag_num_e_negative | flag_num_zero);
+                        flags &= ~ (flag_num_negative | flag_num_e | flag_num_e_got_sign | flag_num_e_negative | flag_num_zero | flag_num_hex);
 
                         num_digits = 0;
                         num_fraction = 0;
@@ -1037,7 +1036,8 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
 
             case bbJSONTYPE_INTEGER:
             case bbJSONTYPE_DOUBLE:
-                if (isdigit(b))
+                if ( (((bbUINT)b-'0') <= ('9'-'0')) ||
+                     ((flags & flag_num_hex) && ((bbUINT)(b&0xDF)-'A') <= ('F'-'A')) )
                 {
                     ++num_digits;
 
@@ -1061,11 +1061,18 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                             continue;
                         }
 
-                        pVal->u.integer = (pVal->u.integer * 10) + (b - '0');
+                        pVal->u.integer = (flags & flag_num_hex) ? ((pVal->u.integer << 4) | hex_value(b)) :
+                                                                   ((pVal->u.integer * 10) + (b - '0'));
                         continue;
                     }
 
                     num_fraction = (num_fraction * 10) + (b - '0');
+                    continue;
+                }
+
+                if ((b & 0xDF) == 'X' && (flags & flag_num_zero) && (num_digits == 1))
+                {
+                    flags = (flags | flag_num_hex) &~ flag_num_zero;
                     continue;
                 }
 
