@@ -190,6 +190,7 @@ template <class T> class bbVec<T*> : public bbVecPVoid {
     bbVec(const bbVec&) {}
     bbVec& operator=(const bbVec&) { return *this; }
 public:
+    bbVec() {}
     inline T**       Detach() { return (T**)bbVecPVoid::Detach(); }
     inline T**       Grow(int relsize) { return (T**)bbVecPVoid::Grow(relsize); }
     inline T**       Append(T* item) { return (T**)bbVecPVoid::Append((void*)item); }
