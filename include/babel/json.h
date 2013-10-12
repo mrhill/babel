@@ -98,6 +98,29 @@ bbJsonVal* bbJsonBoolAssign(bbJsonVal* pVal, int v);
 */
 bbJsonVal* bbJsonStrAssign(bbJsonVal* pVal, const bbCHAR* str);
 
+/** Interprete Json node as integer.
+    @param pVal Json node, can be NULL
+    @param dflt Default value to return for invalid Json nodes
+    @return Json value casted to integer in the most meaningful way
+*/
+bbS64 bbJsonValAsInt(const bbJsonVal* pVal, bbS64 dflt);
+
+/** Interprete Json node as bool.
+    @param pVal Json node, can be NULL
+    @param dflt Default value to return for invalid Json nodes
+    @return Json value casted to bool in the most meaningful way
+*/
+int bbJsonValAsBool(const bbJsonVal* pVal, int dflt);
+
+/** Interprete Json node as string.
+    This function is not thread-safe, if the referenced Json node is of bbJSONTYPE_INTEGER,
+    or bbJSONTYPE_DOUBLE, because a pointer to a static buffer will be returned.
+    @param pVal Json node, can be NULL
+    @param dflt Default value to return for invalid Json nodes
+    @return Json value casted to string in the most meaningful way
+*/
+const bbCHAR* bbJsonValAsStr(const bbJsonVal* pVal, const bbCHAR* dflt);
+
 /** Dump Json tree into JSON-formatted text.
     @param pVal Node to start dumping at
     @param pStr String buffer
@@ -276,11 +299,11 @@ struct bbJsonVal
     inline bbJsonVal& operator=(bool v) { return *bbJsonBoolAssign(this, v); }
     inline bbJsonVal& operator=(const bbCHAR* str) { return *bbJsonStrAssign(this, str); }
 
-    inline bbU32 u8() const { return this && mType==bbJSONTYPE_INTEGER ? (bbU8)u.integer : 0; }   /**< Access JSON integer node as bbU8. */
-    inline bbU32 u16() const { return this && mType==bbJSONTYPE_INTEGER ? (bbU16)u.integer : 0; } /**< Access JSON integer node as bbU16. */
-    inline bbU32 u32() const { return this && mType==bbJSONTYPE_INTEGER ? (bbU32)u.integer : 0; } /**< Access JSON integer node as bbU32. */
-    inline bbU32 u64() const { return this && mType==bbJSONTYPE_INTEGER ? (bbU64)u.integer : 0; } /**< Access JSON integer node as bbU64. */
-    inline const bbCHAR* str() const { return this && mType==bbJSONTYPE_STRING ? u.string.ptr : NULL; }
+    inline bbU8  u8()  const { return (bbU8)bbJsonValAsInt(this, 0); }  /**< Access JSON integer node as bbU8. */
+    inline bbU16 u16() const { return (bbU16)bbJsonValAsInt(this, 0); } /**< Access JSON integer node as bbU16. */
+    inline bbU32 u32() const { return (bbU32)bbJsonValAsInt(this, 0); } /**< Access JSON integer node as bbU32. */
+    inline bbU64 u64() const { return bbJsonValAsInt(this, 0); }        /**< Access JSON integer node as bbU64. */
+    inline const bbCHAR* str() const { return bbJsonValAsStr(this, bbT("")); }
 
     inline bbERR Dump(bbStrBuf& str, bbUINT indent) const { return bbJsonValDump(this, &str, indent); }
     inline bbERR Save(const bbCHAR* pFile, bbUINT indent) const { return bbJsonValSave(this, pFile, indent); }

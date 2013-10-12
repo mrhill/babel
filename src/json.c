@@ -416,55 +416,84 @@ bbJsonVal* bbJsonObjGet(const bbJsonVal* pVal, const bbCHAR* key)
     return v;
 }
 
-bbS64 bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
+bbS64 bbJsonValAsInt(const bbJsonVal* pVal, bbS64 dflt)
 {
-    bbJsonVal* v = bbJsonObjGet(pVal, key);
-    if (!v)
+    if (!pVal)
         return dflt;
 
-    switch(v->mType)
+    switch(pVal->mType)
     {
     case bbJSONTYPE_INTEGER:
-        return v->u.integer;
+        return pVal->u.integer;
     case bbJSONTYPE_DOUBLE:
-        return (bbS64)v->u.dbl;
+        return (bbS64)pVal->u.dbl;
     case bbJSONTYPE_STRING:
         {
         bbS64 num;
-        if (v->u.string.ptr && (bbEOK == bbStrToS64(v->u.string.ptr, NULL, &num, bbSTROPT_ALLFMT)))
+        if (pVal->u.string.ptr && (bbEOK == bbStrToS64(pVal->u.string.ptr, NULL, &num, bbSTROPT_ALLFMT)))
             return num;
         else
             return dflt;
         }
     case bbJSONTYPE_BOOLEAN:
-        return v->u.boolean;
+        return pVal->u.boolean;
     default:
         return dflt;
     }
 }
 
-int bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt)
+bbS64 bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
 {
-    bbJsonVal* v = bbJsonObjGet(pVal, key);
-    if (!v)
+    return bbJsonValAsInt(bbJsonObjGet(pVal, key), dflt);
+}
+
+int bbJsonValAsBool(const bbJsonVal* pVal, int dflt)
+{
+    if (!pVal)
         return dflt;
-    if (v->mType == bbJSONTYPE_STRING && v->u.string.ptr)
+    if (pVal->mType == bbJSONTYPE_STRING && pVal->u.string.ptr)
     {
-        if (!bbStrICmp(v->u.string.ptr, "TRUE"))
+        if (!bbStrICmp(pVal->u.string.ptr, "TRUE"))
             return !0;
-        if (!bbStrICmp(v->u.string.ptr, "FALSE"))
+        if (!bbStrICmp(pVal->u.string.ptr, "FALSE"))
             return 0;
     }
-    return bbJsonObjGetInt(pVal, key, dflt) != 0;
+    return bbJsonValAsInt(pVal, dflt) != 0;
+}
+
+int bbJsonObjGetBool(const bbJsonVal* pVal, const bbCHAR* key, int dflt)
+{
+    return bbJsonValAsBool(bbJsonObjGet(pVal, key), dflt);
+}
+
+const bbCHAR* bbJsonValAsStr(const bbJsonVal* pVal, const bbCHAR* dflt)
+{
+    static bbCHAR str[32];
+    if (!pVal)
+        return dflt;
+    if (pVal->mType==bbJSONTYPE_STRING)
+        return pVal->u.string.ptr;
+    else if (pVal->mType==bbJSONTYPE_INTEGER)
+    {
+        bbSprintf(str, bbT("%")bbI64 bbT("d"), pVal->u.integer);
+        return str;
+    }
+    #if bbSIZEOF_CHAR == 1
+    else if (pVal->mType==bbJSONTYPE_DOUBLE)
+    {
+        snprintf(str, sizeof(str), "%f", pVal->u.dbl);
+        return str;
+    }
+    #endif
+    else if (pVal->mType==bbJSONTYPE_BOOLEAN)
+        return pVal->u.boolean ? bbT("true") : bbT("false");
+    else
+        return dflt;
 }
 
 const bbCHAR* bbJsonObjGetStr(const bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* dflt)
 {
-    bbJsonVal* v = bbJsonObjGet(pVal, key);
-    if (v && v->mType==bbJSONTYPE_STRING)
-        return v->u.string.ptr;
-    else
-        return dflt;
+    return bbJsonValAsStr(bbJsonObjGet(pVal, key), dflt);
 }
 
 bbJsonVal* bbJsonObjEnsure(bbJsonVal* pVal, const bbCHAR* key)
