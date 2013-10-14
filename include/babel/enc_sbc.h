@@ -88,6 +88,20 @@ int bbSprintf_sbc(bbCHAR8*, const bbCHAR8*, ...);
 #endif
 #endif
 
+#if bbOS == bbOS_PALMOS
+#define bbSnprintf_sbc StrNPrintF
+#elif bbOS == bbOS_QT
+  #ifdef _MSC_VER
+  #define bbSnprintf_sbc _snprintf
+  #else
+  #define bbSnprintf_sbc snprintf
+  #endif
+#elif bbOS == bbOS_WIN32 || bbOS == bbOS_WINCE
+#define bbSnprintf_sbc _snprintf
+#else
+#define bbSnprintf_sbc snprintf
+#endif
+
 #if defined(bbNO_VSPRINTF)
 int bbVsnprintf_sbc(bbCHAR8*, bbUINT, const bbCHAR8*, bbVALIST);
 #else

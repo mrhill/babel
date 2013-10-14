@@ -248,6 +248,7 @@ bbCHAR* bbStrStr(const bbCHAR* pStr, const bbCHAR* pSubStr);
 #define bbStrIStr  bbStrIStr_sbc
 
 #define bbSprintf  bbSprintf_sbc
+#define bbSnprintf  bbSnprintf_sbc
 #define bbVsnprintf bbVsnprintf_sbc
 #define bbPrintf   bbPrintf_sbc
 #define bbVprintf  bbVprintf_sbc
@@ -281,6 +282,7 @@ bbCHAR* bbStrStr(const bbCHAR* pStr, const bbCHAR* pSubStr);
 #define bbStrIStr   bbStrIStr_dbc
 
 #define bbSprintf  bbSprintf_dbc
+#define bbSnprintf  bbSnprintf_dbc
 #define bbVsnprintf bbVsnprintf_dbc
 #define bbPrintf   bbPrintf_dbc
 #define bbVprintf  bbVprintf_dbc
@@ -314,6 +316,7 @@ bbCHAR* bbStrStr(const bbCHAR* pStr, const bbCHAR* pSubStr);
 #define bbStrIStr  bbStrIStr_sbc
 
 #define bbSprintf  bbSprintf_sbc
+#define bbSnprintf  bbSnprintf_sbc
 #define bbVsnprintf bbVsnprintf_sbc
 #define bbPrintf   bbPrintf_sbc
 #define bbVprintf  bbVprintf_sbc
@@ -347,6 +350,7 @@ bbCHAR* bbStrStr(const bbCHAR* pStr, const bbCHAR* pSubStr);
 #define bbStrIStr  bbStrIStr_dbc //xxx
 
 #define bbSprintf  bbSprintf_dbc
+#define bbSnprintf  bbSnprintf_dbc
 #define bbVsnprintf bbVsnprintf_dbc
 #define bbPrintf   bbPrintf_dbc
 #define bbVprintf  bbVprintf_dbc

@@ -478,13 +478,11 @@ const bbCHAR* bbJsonValAsStr(const bbJsonVal* pVal, const bbCHAR* dflt)
         bbSprintf(str, bbT("%")bbI64 bbT("d"), pVal->u.integer);
         return str;
     }
-    #if bbSIZEOF_CHAR == 1
     else if (pVal->mType==bbJSONTYPE_DOUBLE)
     {
-        snprintf(str, sizeof(str), "%f", pVal->u.dbl);
+        bbSnprintf(str, sizeof(str), "%f", pVal->u.dbl);
         return str;
     }
-    #endif
     else if (pVal->mType==bbJSONTYPE_BOOLEAN)
         return pVal->u.boolean ? bbT("true") : bbT("false");
     else

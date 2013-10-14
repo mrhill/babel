@@ -76,6 +76,12 @@ int bbSprintf_dbc(const bbCHAR16*, ...);
 #define bbSprintf_dbc swprintf
 #endif
 
+#if bbOS == bbOS_WIN32 || bbOS == bbOS_WINCE
+#define bbSnprintf_dbc _snwprintf
+#else
+#define bbSnprintf_dbc snwprintf
+#endif
+
 #if defined(bbNO_VSWPRINTF)
 int bbVsnprintf_dbc(bbCHAR16*, bbUINT, const bbCHAR16*, bbVALIST);
 #else
