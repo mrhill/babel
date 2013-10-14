@@ -136,7 +136,7 @@ static const bbU8 gChr2UTF7Type[128/4] = // 2 bit array, 0=invalid, 1=base64, 2=
     0x00,0x00,0x28,0x08,0x00,0x00,0x00,0x00,0xFC,0xB0,0x78,0x68,0x54,0x54,0xE4,0xBC,
     0x54,0x54,0x54,0x54,0x54,0x54,0xD4,0xFC,0x54,0x54,0x54,0x54,0x54,0x54,0xD4,0x0C
 };
- 
+
 static bbCHARCP bbEncGetCP_utf7(bbENCSTATE* const pState)
 {
     bbU8*  pStr  = pState->pStr;
@@ -226,7 +226,7 @@ static const bbENCTABLE gEncTabLookUp[] =
         1,
         0
     },
-    
+
     #if bbENC_UTF8 != 1
     #error
     #endif
@@ -237,13 +237,13 @@ static const bbENCTABLE gEncTabLookUp[] =
         bbEncPutCP_utf8,
         bbEncInit_null,
         bbT("UTF-8"),
-        NULL,
+        bbT("8-bit unicode encoding"),
         1,
         bbUTF8_CP_MAXCU,
         1,
         0
     },
-    
+
     #if bbENC_DBCLE != 2
     #error
     #endif
@@ -260,7 +260,7 @@ static const bbENCTABLE gEncTabLookUp[] =
         1,
         0
     },
-    
+
     #if bbENC_DBCBE != 3
     #error
     #endif
@@ -277,7 +277,7 @@ static const bbENCTABLE gEncTabLookUp[] =
         1,
         0
     },
-    
+
     #if bbENC_UTF16LE != 4
     #error
     #endif
@@ -294,7 +294,7 @@ static const bbENCTABLE gEncTabLookUp[] =
         1,
         5
     },
-    
+
     #if bbENC_UTF16BE != 5
     #error
     #endif
@@ -311,7 +311,7 @@ static const bbENCTABLE gEncTabLookUp[] =
         1,
         5
     },
-    
+
     #if bbENC_UTF32LE != 6
     #error
     #endif
@@ -328,7 +328,7 @@ static const bbENCTABLE gEncTabLookUp[] =
         1,
         4
     },
-    
+
     #if bbENC_UTF32BE != 7
     #error
     #endif
@@ -345,7 +345,7 @@ static const bbENCTABLE gEncTabLookUp[] =
         1,
         4
     },
-    
+
     #if bbENC_UTF7 != 8
     #error
     #endif
@@ -362,7 +362,7 @@ static const bbENCTABLE gEncTabLookUp[] =
         0,
         4
     },
-    
+
     #if bbENC_SCSU != 9
     #error
     #endif
