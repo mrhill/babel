@@ -152,6 +152,7 @@ bbCHAR* bbStrBufCatCStr(bbStrBuf* pStrBuf, const char* pStr);
 #endif
 
 void bbStrBufCatCP(bbStrBuf* pStrBuf, bbCHARCP cp);
+void bbStrBufCatChar(bbStrBuf* pStrBuf, char c);
 
 bbCHAR* bbStrBufPrintHex(bbStrBuf* pStrBuf, const bbU8* pData, bbUINT size);
 
@@ -205,6 +206,7 @@ struct bbStrBuf : bbStrBufRec
     #endif
 
     inline void CatCP(bbCHARCP cp) { bbStrBufCatCP(this, cp); }
+    inline void CatChar(char c) { bbStrBufCatChar(this, c); }
 
     inline bbStrBuf& operator=(const bbCHAR* const pStr) { Assign(pStr); return *this; }
 

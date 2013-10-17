@@ -831,7 +831,7 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                     bbStrBufCatCP(&str, ((bbCHARCP)uc_b1 << 8) + uc_b2);
                     break;
                 default:
-                    bbStrBufCatCP(&str, b);
+                    bbStrBufCatChar(&str, b);
                     break;
                 }
                 continue;
@@ -869,7 +869,7 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
             }
             else
             {
-                bbStrBufCatCP(&str, b);
+                bbStrBufCatChar(&str, b);
                 continue;
             }
         }

@@ -204,7 +204,18 @@ void bbStrBufCatCP(bbStrBuf* p, bbCHARCP cp)
     {
         p->mLen += str_len;
         bbCP_APPEND_PTR(pStr, cp);
-        *pStr=0;
+        *pStr = 0;
+    }
+}
+
+void bbStrBufCatChar(bbStrBuf* pStrBuf, char c)
+{
+    bbCHAR* pStr = bbStrBufEnsure(pStrBuf, 1);
+    if (pStr)
+    {
+        pStrBuf->mLen++;
+        pStr[0] = c;
+        pStr[1] = 0;
     }
 }
 
