@@ -105,7 +105,7 @@ extern const bbU8 bbgUTF8_CountTrailBytes[32];
     @param cp   (bbU32)             Output variable, will be filled with code point
 */
 #define bbUTF8_CP_NEXT(pStr, i, cp) { \
-    (cp)=(pStr)[(i)++]; \
+    (cp)=(bbU8)((pStr)[(i)++]); \
     if(((bbUINT)(cp)-0xC0U) < 0x35U) { \
         bbUINT const __count = (bbUINT) bbgUTF8_CountTrailBytes[(bbUINT)cp >> 3]; \
         (cp) = bbUTF8_CU_MASK_LEAD(cp, __count); \
@@ -120,7 +120,7 @@ extern const bbU8 bbgUTF8_CountTrailBytes[32];
 
 /** Same as #bbUTF8_CP_NEXT but uses incrementing pointer */
 #define bbUTF8_CP_NEXT_PTR(pStr, cp) { \
-    (cp)=*((pStr)++); \
+    (cp)=(bbU8)*((pStr)++); \
     if(((bbUINT)(cp)-0xC0U) < 0x35U) { \
         bbUINT const __count = (bbUINT) bbgUTF8_CountTrailBytes[(bbUINT)cp >> 3]; \
         (cp) = bbUTF8_CU_MASK_LEAD(cp, __count); \
