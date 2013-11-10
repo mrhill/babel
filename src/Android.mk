@@ -45,7 +45,6 @@ LOCAL_SRC_FILES := \
 					str.c	\
 					StrBuf.cpp	\
 					timedate.c	\
-					Tree.cpp	\
 					dir.c	\
 
 

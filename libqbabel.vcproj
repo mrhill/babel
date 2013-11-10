@@ -268,10 +268,6 @@
 				RelativePath="src\timedate.c"
 				>
 			</File>
-			<File
-				RelativePath="src\Tree.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -364,10 +360,6 @@
 			</File>
 			<File
 				RelativePath="include\babel\timedate.h"
-				>
-			</File>
-			<File
-				RelativePath="include\babel\Tree.h"
 				>
 			</File>
 		</Filter>

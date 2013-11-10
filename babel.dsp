@@ -165,10 +165,6 @@ SOURCE=.\src\StrBuf.cpp
 
 SOURCE=.\src\timedate.c
 # End Source File
-# Begin Source File
-
-SOURCE=.\src\Tree.cpp
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -260,10 +256,6 @@ SOURCE=.\include\babel\StrBuf.h
 # Begin Source File
 
 SOURCE=.\include\babel\timedate.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\babel\Tree.h
 # End Source File
 # End Group
 # Begin Source File

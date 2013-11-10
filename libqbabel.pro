@@ -19,7 +19,6 @@ HEADERS += \
     include/babel/Arr.h \
     include/babel/Registry.h \
     include/babel/strbuf.h \
-    include/babel/Tree.h \
     include/babel/algo.h \
     include/babel/babel.h \
     include/babel/bit.h \
@@ -46,7 +45,6 @@ SOURCES += \
     src/Registry.cpp \
     src/bbStrBuf.cpp \
     src/strbuf.c \
-    src/Tree.cpp \
     src/algo.c \
     src/bit.c \
     src/cpg_unicode.c \
