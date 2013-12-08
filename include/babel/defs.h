@@ -698,10 +698,12 @@ extern bbERR bbgErr;
 */
 #define bbErrGet() bbgErr
 
-/** Set string for error code bbESTR.
-    @param 0-terminated string
+/** Set last error code and user-defined error string.
+    @param err Error code
+    @param str bbCHAR*) 0-terminated string
+    @return Value of \a err
 */
-#define bbErrSetStr(str) bbStrCpy(bbgErrStr, (str))
+bbERR bbErrSetStr(bbERR err, const bbCHAR* str);
 
 /** Get string for error code.
     @return Pointer to string. This pointer will point to an inernal buffer
@@ -823,7 +825,6 @@ enum
 {
     bbEOK = 0,      /**< Error code, indicates success of operation. */
     bbESYS = 1,     /**< Error code, indicates system error, for Windows call GetLastError(). */
-    bbESTR,         /**< Error code, check bbGetErrStr() for user readable detail. */
     bbEEND,         /**< Error code, indicates end of operation. */
     bbEBUSY,        /**< Error code, indicates operation is busy. */
     bbEUK,          /**< Error code, indicates unknown error. */
@@ -847,6 +848,9 @@ enum
     bbEFILEFORMAT,  /**< Error code, indicates file format error. */
     bbENOTAFILE,    /**< Error code, indicates not a file. */
     bbEJSONSYNTAX,  /**< Error code, indicates JSON syntax error, check bbGetErrStr() for details. */
+
+    bbEMASK = 0x7F, /**< Mask to separate error code from flags. */
+    bbESTR = 0x80,  /**< Bit to indicate user defined error string was set, check bbGetErrStr(). */
 
     bbELAST = ~0    /**< Error code, indicates error, error number can be found in #bbgErr. */
 };

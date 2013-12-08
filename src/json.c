@@ -1231,6 +1231,6 @@ e_failed:
 
     bbJsonValDestroy(pRoot);
     bbStrBufDestroy(&str);
-    return bbErrSet(bbEJSONSYNTAX);
+    return bbErrSet(bbEJSONSYNTAX|bbESTR);
 }
 

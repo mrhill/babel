@@ -2,25 +2,33 @@
 #include "str.h"
 
 bbERR  bbgErr;
-
 bbCHAR bbgErrStr[bbERRSTRMAXLEN];
+
+bbERR bbErrSetStr(bbERR err, const bbCHAR* str)
+{
+    bbStrNCpy(bbgErrStr, str, bbERRSTRMAXLEN);
+    bbgErr = err | bbESTR;
+    return err;
+}
 
 const bbCHAR* bbGetErrStr(const bbERR err)
 {
-    switch(err)
+    if (!(err & bbESTR))
     {
-    case bbEUK       : bbStrCpy(bbgErrStr, bbT("Unknown")); break;
-    case bbENOMEM    : bbStrCpy(bbgErrStr, bbT("Out of memory")); break;
-    case bbENOTFOUND : bbStrCpy(bbgErrStr, bbT("Not found")); break;
-    case bbENOTSUP   : bbStrCpy(bbgErrStr, bbT("Operation not supported")); break;
-    case bbEBADPARAM : bbStrCpy(bbgErrStr, bbT("Bad parameter")); break;
-    case bbEBADSTATE : bbStrCpy(bbgErrStr, bbT("Bad state")); break;
-    case bbESYNTAX   : bbStrCpy(bbgErrStr, bbT("Syntax error")); break;
-    case bbEOVERFLOW : bbStrCpy(bbgErrStr, bbT("Overflow")); break;
-    case bbESTR:
-    case bbEJSONSYNTAX : break;
-    default: bbSprintf(bbgErrStr, "Error %d", err); break;
+        switch (err & bbEMASK)
+        {
+        case bbEUK       : bbStrCpy(bbgErrStr, bbT("Unknown")); break;
+        case bbENOMEM    : bbStrCpy(bbgErrStr, bbT("Out of memory")); break;
+        case bbENOTFOUND : bbStrCpy(bbgErrStr, bbT("Not found")); break;
+        case bbENOTSUP   : bbStrCpy(bbgErrStr, bbT("Operation not supported")); break;
+        case bbEBADPARAM : bbStrCpy(bbgErrStr, bbT("Bad parameter")); break;
+        case bbEBADSTATE : bbStrCpy(bbgErrStr, bbT("Bad state")); break;
+        case bbESYNTAX   : bbStrCpy(bbgErrStr, bbT("Syntax error")); break;
+        case bbEOVERFLOW : bbStrCpy(bbgErrStr, bbT("Overflow")); break;
+        default: bbSprintf(bbgErrStr, "Error %d", err); break;
+        }
     }
+
     return bbgErrStr;
 }
 
