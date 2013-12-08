@@ -698,6 +698,11 @@ extern bbERR bbgErr;
 */
 #define bbErrGet() bbgErr
 
+/** Set string for error code bbESTR.
+    @param 0-terminated string
+*/
+#define bbErrSetStr(str) bbStrCpy(bbgErrStr, (str))
+
 /** Get string for error code.
     @return Pointer to string. This pointer will point to an inernal buffer
             managed by babellib and is valid only as long as no other babellib
@@ -818,6 +823,7 @@ enum
 {
     bbEOK = 0,      /**< Error code, indicates success of operation. */
     bbESYS = 1,     /**< Error code, indicates system error, for Windows call GetLastError(). */
+    bbESTR,         /**< Error code, check bbGetErrStr() for user readable detail. */
     bbEEND,         /**< Error code, indicates end of operation. */
     bbEBUSY,        /**< Error code, indicates operation is busy. */
     bbEUK,          /**< Error code, indicates unknown error. */

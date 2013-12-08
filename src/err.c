@@ -17,6 +17,7 @@ const bbCHAR* bbGetErrStr(const bbERR err)
     case bbEBADSTATE : bbStrCpy(bbgErrStr, bbT("Bad state")); break;
     case bbESYNTAX   : bbStrCpy(bbgErrStr, bbT("Syntax error")); break;
     case bbEOVERFLOW : bbStrCpy(bbgErrStr, bbT("Overflow")); break;
+    case bbESTR:
     case bbEJSONSYNTAX : break;
     default: bbSprintf(bbgErrStr, "Error %d", err); break;
     }
