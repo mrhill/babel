@@ -367,8 +367,7 @@ bbJsonVal* bbJsonObjAddStr(bbJsonVal* pVal, const bbCHAR* key, const bbCHAR* str
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_STRING);
     v.u.string.ptr = (bbCHAR*)str;
-    if (str)
-        v.u.string.length = bbStrLen(str);
+    v.u.string.length = str ? bbStrLen(str) : 0;
     return bbJsonObjAdd(pVal, key, &v);
 }
 
@@ -609,8 +608,8 @@ bbJsonVal* bbJsonArrInsStr(bbJsonVal* pVal, int pos, const bbCHAR* str)
     bbJsonVal v;
     bbJsonValInitType(&v, bbJSONTYPE_STRING);
     v.u.string.ptr = (bbCHAR*)str;
-    if (str)
-        v.u.string.length = bbStrLen(str);
+    v.u.string.length = str ? bbStrLen(str) : 0;
+    
     return bbJsonArrIns(pVal, pos, &v, 1);
 }
 
@@ -851,6 +850,7 @@ bbERR bbJsonValInitParse(bbJsonVal* pRoot, const bbCHAR* json, bbUINT length)
                 {
                 case bbJSONTYPE_STRING:
                     pVal->u.string.length = bbStrBufGetLen(&str);
+                    bbASSERT(pVal->u.string.length<0x10000);
                     pVal->u.string.ptr = bbStrBufDetach(&str);
                     flags |= flag_next;
                     break;
