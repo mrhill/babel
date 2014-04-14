@@ -441,6 +441,17 @@ bbS64 bbJsonValAsInt(const bbJsonVal* pVal, bbS64 dflt)
     }
 }
 
+double bbJsonValAsDbl(const bbJsonVal* pVal, double dflt)
+{
+    if (!pVal)
+        return dflt;
+
+    if (pVal->mType == bbJSONTYPE_DOUBLE)
+        return pVal->u.dbl;
+
+    return (double)bbJsonValAsInt(pVal, (bbS64)dflt);
+}
+
 bbS64 bbJsonObjGetInt(const bbJsonVal* pVal, const bbCHAR* key, bbS64 dflt)
 {
     return bbJsonValAsInt(bbJsonObjGet(pVal, key), dflt);
@@ -599,6 +610,30 @@ bbJsonVal* bbJsonArrInsArrU64(bbJsonVal* pVal, int pos, const bbU64* pArr, bbUIN
         {
             pInsert[count].u.integer = pArr[count];
             pInsert[count].mType = bbJSONTYPE_INTEGER;
+        }
+    return pInsert;
+}
+
+bbJsonVal* bbJsonArrInsArrF32(bbJsonVal* pVal, int pos, const float* pArr, bbUINT count)
+{
+    bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
+    if (pInsert)
+        while(count--)
+        {
+            pInsert[count].u.dbl = pArr[count];
+            pInsert[count].mType = bbJSONTYPE_DOUBLE;
+        }
+    return pInsert;
+}
+
+bbJsonVal* bbJsonArrInsArrF64(bbJsonVal* pVal, int pos, const double* pArr, bbUINT count)
+{
+    bbJsonVal* pInsert = bbJsonArrIns(pVal, pos, NULL, count);
+    if (pInsert)
+        while(count--)
+        {
+            pInsert[count].u.dbl = pArr[count];
+            pInsert[count].mType = bbJSONTYPE_DOUBLE;
         }
     return pInsert;
 }

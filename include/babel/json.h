@@ -105,6 +105,13 @@ bbJsonVal* bbJsonStrAssign(bbJsonVal* pVal, const bbCHAR* str);
 */
 bbS64 bbJsonValAsInt(const bbJsonVal* pVal, bbS64 dflt);
 
+/** Interprete Json node as double.
+    @param pVal Json node, can be NULL
+    @param dflt Default value to return for invalid Json nodes
+    @return Json value casted to integer in the most meaningful way
+*/
+double bbJsonValAsDbl(const bbJsonVal* pVal, double dflt);
+
 /** Interprete Json node as bool.
     @param pVal Json node, can be NULL
     @param dflt Default value to return for invalid Json nodes
@@ -213,7 +220,8 @@ bbJsonVal* bbJsonArrInsArrU8(bbJsonVal* pVal, int pos, const bbU8* pArr, bbUINT 
 bbJsonVal* bbJsonArrInsArrU16(bbJsonVal* pVal, int pos, const bbU16* pArr, bbUINT count);
 bbJsonVal* bbJsonArrInsArrU32(bbJsonVal* pVal, int pos, const bbU32* pArr, bbUINT count);
 bbJsonVal* bbJsonArrInsArrU64(bbJsonVal* pVal, int pos, const bbU64* pArr, bbUINT count);
-
+bbJsonVal* bbJsonArrInsArrF32(bbJsonVal* pVal, int pos, const float* pArr, bbUINT count);
+bbJsonVal* bbJsonArrInsArrF64(bbJsonVal* pVal, int pos, const double* pArr, bbUINT count);
 
 struct bbJsonVal
 {
@@ -303,6 +311,8 @@ struct bbJsonVal
     inline bbU16 u16() const { return (bbU16)bbJsonValAsInt(this, 0); } /**< Access JSON integer node as bbU16. */
     inline bbU32 u32() const { return (bbU32)bbJsonValAsInt(this, 0); } /**< Access JSON integer node as bbU32. */
     inline bbU64 u64() const { return bbJsonValAsInt(this, 0); }        /**< Access JSON integer node as bbU64. */
+    inline float f32() const { return bbJsonValAsDbl(this, 0); }        /**< Access JSON integer node as float. */
+    inline double f64() const { return bbJsonValAsDbl(this, 0); }       /**< Access JSON integer node as double. */
     inline const bbCHAR* str() const { return bbJsonValAsStr(this, bbT("")); }
 
     inline bbERR Dump(bbStrBuf& str, bbUINT indent) const { return bbJsonValDump(this, &str, indent); }
@@ -349,11 +359,14 @@ struct bbJsonVal
     inline void ArrDel(int pos, bbUINT count = 1) { bbJsonArrDel(this, pos, count); }
     inline void ArrClear() { bbJsonArrDel(this, 0, -1); }
     inline bbJsonVal* ArrIns(int pos, const bbJsonVal* pObj, bbUINT count=1) { return bbJsonArrIns(this, pos, pObj, count); }
+    inline bbJsonVal* ArrInsInt(int pos, bbS64 val) { return bbJsonArrInsInt(this, pos, val); }
     inline bbJsonVal* ArrInsStr(int pos, const bbCHAR* pStr) { return bbJsonArrInsStr(this, pos, pStr); }
     inline bbJsonVal* ArrInsArrU8(int pos, const bbU8* pArr, bbUINT count) { return bbJsonArrInsArrU8(this, pos, pArr, count); }
     inline bbJsonVal* ArrInsArrU16(int pos, const bbU16* pArr, bbUINT count) { return bbJsonArrInsArrU16(this, pos, pArr, count); }
     inline bbJsonVal* ArrInsArrU32(int pos, const bbU32* pArr, bbUINT count) { return bbJsonArrInsArrU32(this, pos, pArr, count); }
     inline bbJsonVal* ArrInsArrU64(int pos, const bbU64* pArr, bbUINT count) { return bbJsonArrInsArrU64(this, pos, pArr, count); }
+    inline bbJsonVal* ArrInsArrF32(int pos, const float* pArr, bbUINT count) { return bbJsonArrInsArrF32(this, pos, pArr, count); }
+    inline bbJsonVal* ArrInsArrF64(int pos, const double* pArr, bbUINT count) { return bbJsonArrInsArrF64(this, pos, pArr, count); }
 
     inline bbJsonVal& operator[](const bbCHAR* key) { return *bbJsonObjEnsure(this, key); }
     inline const bbJsonVal& operator[](const bbCHAR* key) const { return *bbJsonObjGet(this, key); }
