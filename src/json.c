@@ -3,6 +3,8 @@
 #include "file.h"
 #include <math.h>
 
+#define bbJsonArrGetCapacity(size) ((size) ? 2 << bbGetTopBit((size)-1) : 0)
+
 void bbJsonValInit(bbJsonVal* pVal)
 {
     bbMemClear(pVal, sizeof(bbJsonVal));
@@ -112,6 +114,7 @@ static bbERR bbJsonValDumpEscStr(bbStrBuf* s, const bbCHAR* pStr, bbUINT len)
     if (pStr) for(i=0; i<len;)
     {
         bbCP_NEXT(pStr, i, cp);
+        bbASSERT(i <= len);
         if (cp == '"' || cp == '\\')
             bbStrBufCatf(s, bbT("\\%c"), cp);
         else if (cp >= ' ')
@@ -295,7 +298,7 @@ bbERR bbJsonValInitCopy(bbJsonVal* pNew, const bbJsonVal* pVal)
         break;
 
     case bbJSONTYPE_ARRAY:
-        pNew->u.array.values = bbMemAlloc(pVal->u.array.length * sizeof(struct bbJsonVal));
+        pNew->u.array.values = bbMemAlloc(bbJsonArrGetCapacity(pVal->u.array.length) * sizeof(struct bbJsonVal));
         if (!pNew->u.array.values)
             return bbELAST;
         pNew->u.array.length = pVal->u.array.length;
@@ -524,8 +527,6 @@ bbERR bbJsonObjMerge(bbJsonVal* pVal, const bbJsonVal* pOther)
 
     return bbEOK;
 }
-
-#define bbJsonArrGetCapacity(size) ((size) ? 2 << bbGetTopBit((size)-1) : 0)
 
 bbUINT bbJsonArrGetSize(const bbJsonVal* pVal)
 {
