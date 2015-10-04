@@ -311,7 +311,7 @@ struct bbJsonVal
     inline bbU16 u16() const { return (bbU16)bbJsonValAsInt(this, 0); } /**< Access JSON integer node as bbU16. */
     inline bbU32 u32() const { return (bbU32)bbJsonValAsInt(this, 0); } /**< Access JSON integer node as bbU32. */
     inline bbU64 u64() const { return bbJsonValAsInt(this, 0); }        /**< Access JSON integer node as bbU64. */
-    inline float f32() const { return bbJsonValAsDbl(this, 0); }        /**< Access JSON integer node as float. */
+    inline float f32() const { return (float)bbJsonValAsDbl(this, 0); }        /**< Access JSON integer node as float. */
     inline double f64() const { return bbJsonValAsDbl(this, 0); }       /**< Access JSON integer node as double. */
     inline const bbCHAR* str() const { return bbJsonValAsStr(this, bbT("")); }
 
@@ -339,7 +339,7 @@ struct bbJsonVal
     inline bbS64 ObjGetS64(const bbCHAR* key, bbU64 dflt=0) const { return (bbS64)bbJsonObjGetInt(this, key, dflt); }
     inline int ObjGetInt(const bbCHAR* key, int dflt=0) const { return (int)bbJsonObjGetInt(this, key, dflt); }
     inline bbUINT ObjGetUINT(const bbCHAR* key, bbUINT dflt=0) const { return (bbUINT)bbJsonObjGetInt(this, key, dflt); }
-    inline bool ObjGetBool(const bbCHAR* key, bool dflt=false) const { return bbJsonObjGetBool(this, key, dflt); }
+    inline bool ObjGetBool(const bbCHAR* key, bool dflt = false) const { return 0!=bbJsonObjGetBool(this, key, dflt); }
     inline const bbCHAR* ObjGetStr(const bbCHAR* key, const bbCHAR* dflt = NULL) const { return bbJsonObjGetStr(this, key, dflt); }
 
     inline const bbJsonVal* ObjSetU8(const bbCHAR* key, bbU8 val) { return bbJsonObjAddInt(this, key, val); }

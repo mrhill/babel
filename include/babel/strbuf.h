@@ -185,7 +185,7 @@ struct bbStrBuf : bbStrBufRec
     #if bbSIZEOF_CHAR != 1
     bbStrBuf(const char* pStr) { bbStrBufInitCStr(this, pStr); }
     #endif
-    ~bbStrBuf() { bbStrBufClear(this); }
+    inline ~bbStrBuf() { bbStrBufClear(this); }
     inline void Clear() { bbStrBufClear(this); }
     inline void Attach(bbCHAR* const pStr, bbUINT capacity, int len) { bbStrBufAttach(this, pStr, capacity, len); }
     inline bbCHAR* Detach() { return bbStrBufDetach(this); }
