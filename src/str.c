@@ -641,6 +641,16 @@ static bbERR bbStrConvEncodeCP_DBCBE( bbU32 cp, bbU8** const ppOut, bbUINT* cons
     return bbEOK;
 }
 
+static bbERR bbStrConvEncodeCP_UTF8( bbU32 cp, bbU8** const ppOut, bbUINT* const pOutLeft)
+{
+    unsigned len = bbUTF8_CP_LENGTH(cp);
+    if (*pOutLeft < len) return bbEFULL;
+
+    bbUTF8_CP_APPEND_PTR(*ppOut, cp);
+    *pOutLeft-=len;
+    return bbEOK;
+}
+
 static bbERR bbStrConvEncodeCP_UTF16LE( bbU32 cp, bbU8** const ppOut, bbUINT* const pOutLeft)
 {
     register bbU8* pOut = *ppOut;
@@ -725,6 +735,7 @@ bbERR bbStrConvDo( bbSTRCONVH const handle, const bbU8** const ppIn, bbUINT* con
         else
             encode = bbStrConvEncodeCP_DBCLE;
         break;
+    case bbENC_UTF8: encode = bbStrConvEncodeCP_UTF8; break;
     case bbENC_UTF16:
         if (handle->encto & (bbENCMOD_BE<<bbCEMODPOS))
         {
