@@ -19,13 +19,8 @@ bbU32 bbGetTime(void)
     return TimGetSeconds() - 2082715200UL;
 }
 
-#else
+#endif
 
-#if CLOCKS_PER_SEC != 1000
-bbU32 bbGetTickCount(void)
-{
-    return clock() / (CLOCKS_PER_SEC>>10);
-}
 /*
 #include <sys/time.h>
 bbU32 bbGetTickCount(void) {
@@ -34,7 +29,4 @@ bbU32 bbGetTickCount(void) {
   return now.tv_sec * 1000 + now.tv_usec / 1000; // in ms
 }   
 */
-#endif
-
-#endif
 

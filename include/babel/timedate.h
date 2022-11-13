@@ -17,10 +17,10 @@ extern "C" {
 /** Get current tickcount in miliseconds. 
     @return Tickcount in miliseconds
 */
-#if (bbOS == bbOS_PALMOS) || (CLOCKS_PER_SEC != 1000)
+#if (bbOS == bbOS_PALMOS)
 bbU32 bbGetTickCount(void);
 #else
-#define bbGetTickCount() (bbU32)(clock())
+#define bbGetTickCount() (bbU32)(clock()/(CLOCKS_PER_SEC/1000U))
 #endif
 
 /** Get current time in seconds since midnight (00:00:00), January 1, 1970.
