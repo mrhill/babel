@@ -35,10 +35,13 @@ extern "C" bbERR bbFileStat(const bbCHAR* const pPath, bbFILESTAT* const pStat)
     pStat->uid = i.ownerId();
     pStat->gid = i.groupId();
 
-    pStat->atime = i.lastRead().toTime_t();
-    pStat->mtime = i.lastModified().toTime_t();
-    pStat->ctime = i.created().toTime_t();
-
+    pStat->atime = i.lastRead().toSecsSinceEpoch();
+    pStat->mtime = i.lastModified().toSecsSinceEpoch();
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    pStat->ctime = i.created().toSecsSinceEpoch();
+#else
+    pStat->ctime = i.birthTime().toSecsSinceEpoch();
+#endif
     return bbEOK;
 }
 
@@ -170,7 +173,7 @@ extern "C" bbCHAR* bbPathTemp(const bbCHAR* pDir)
     QString name;
     for(;;)
     {
-        name.sprintf("%06X", r&0xFFFFFF);
+        name.asprintf("%06X", r&0xFFFFFF);
         QFileInfo info(dir, name);
         if (!info.exists())
             return bbStrFromQt(info.absoluteFilePath());
