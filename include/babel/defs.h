@@ -100,7 +100,7 @@ extern "C" {
 #define bbOS_QT      9
 
 #ifndef bbOS
-#if defined(bbQT)
+#if defined(bbQT) || defined(QT_VERSION)
 #define bbOS bbOS_QT
 #elif defined(UNDER_CE)
 #define bbOS bbOS_WINCE
