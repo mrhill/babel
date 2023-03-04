@@ -318,7 +318,7 @@ struct bbJsonVal
     inline bbERR Dump(bbStrBuf& str, bbUINT indent) const { return bbJsonValDump(this, &str, indent); }
     inline bbERR Save(const bbCHAR* pFile, bbUINT indent) const { return bbJsonValSave(this, pFile, indent); }
     inline bbERR Load(const bbCHAR* pFile) { return bbJsonValLoad(this, pFile); }
-    inline void Print() const { bbStrBuf s; if (bbEOK == Dump(s, 1)) bbPrintf("%s\n", s.GetPtr()); }
+    inline void Print() const { bbStrBuf s; if (bbEOK == Dump(s, 1)) bbPrintf(bbT("%s\n"), s.GetPtr()); }
 
     inline bbJsonVal* ObjAdd(const bbCHAR* key, const bbJsonVal* pObj) { return bbJsonObjAdd(this, key, pObj); }
     inline bbJsonVal* ObjEnsure(const bbCHAR* key) { return bbJsonObjEnsure(this, key); }

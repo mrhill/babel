@@ -14,8 +14,6 @@ file(GLOB HEADERS "include/babel/*.h")
 file(GLOB CPP_SOURCES "src/*.cpp")
 file(GLOB C_SOURCES "src/*.c")
 
-add_compile_definitions(bbQT)
-
 add_library (babel STATIC ${C_SOURCES} ${CPP_SOURCES} ${HEADERS})
 target_link_libraries(babel PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 

@@ -100,7 +100,7 @@ extern "C" {
 #define bbOS_QT      9
 
 #ifndef bbOS
-#if defined(bbQT) || defined(QT_VERSION)
+#if defined(bbQT) || defined(QT_CORE_LIB)
 #define bbOS bbOS_QT
 #elif defined(UNDER_CE)
 #define bbOS bbOS_WINCE
@@ -129,6 +129,7 @@ extern "C" {
 #include <stdarg.h> /* for va_list */
 #include <string.h> /* for memset etc. */
 #include <time.h>
+#include <stdint.h>
 #if defined(UNDER_CE) || defined(WIN32) || defined(WIN64)
 #include <CRTDBG.H>
 #endif
@@ -493,7 +494,7 @@ typedef bbU32 bbCHAR32;
 
 #define bbARRSIZE(arr) (sizeof(arr)/sizeof(arr[0]))
 
-typedef unsigned long bbUPTR; /**< Unsigned integer with the size of a pointer. */
+typedef uintptr_t bbUPTR;     /**< Unsigned integer with the size of a pointer. */
 typedef bbU64 bbU64PTR;       /**< Unsigned integer large enough to hold a pointer or a bbU64. */
 typedef unsigned int bbERR;   /**< Error code or function return code. */
 
