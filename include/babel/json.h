@@ -369,7 +369,7 @@ struct bbJsonVal
     inline bbJsonVal* ArrInsArrF64(int pos, const double* pArr, bbUINT count) { return bbJsonArrInsArrF64(this, pos, pArr, count); }
 
     inline bbJsonVal& operator[](const bbCHAR* key) { return *bbJsonObjEnsure(this, key); }
-    inline const bbJsonVal& operator[](const bbCHAR* key) const { return *bbJsonObjGet(this, key); }
+    inline const bbJsonVal& operator[](const bbCHAR* key) const;
     inline const bbJsonVal& operator[](bbUINT idx) const { return u.array.values[idx]; }
     inline bbJsonVal& operator[](bbUINT idx) { return u.array.values[idx]; }
 
@@ -377,6 +377,12 @@ struct bbJsonVal
 };
 
 #ifdef  __cplusplus
+extern const bbJsonVal g_JsonNoneVal;
+
+inline const bbJsonVal& bbJsonVal::operator[](const bbCHAR* key) const {
+    auto* v = bbJsonObjGet(this, key);
+    return v ? *v : g_JsonNoneVal;
+}
 }
 #endif
 
